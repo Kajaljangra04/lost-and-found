@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// RTK Query endpoint definitions. Request/response payloads travel to and from
+// an external REST API whose shapes are validated server-side, so `any` is used
+// deliberately at this service boundary.
 import { baseApi } from "./baseApi";
 
 const api = baseApi.injectEndpoints({

@@ -9,6 +9,9 @@ export default {
  ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['"Plus Jakarta Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+      },
       colors: {
         // Custom brand colors for consistency
         brand: {

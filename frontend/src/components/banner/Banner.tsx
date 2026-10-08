@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 const Banner = () => {
   const [bgImg] = useState("/bgimg.png");
@@ -80,7 +81,7 @@ const Banner = () => {
           zIndex: 0,
         }}
       ></div>
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40 z-5"></div>
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40 z-10"></div>
 
       <div className="relative z-10 px-4 sm:px-6 lg:px-8 py-8 mx-auto max-w-7xl text-center">
         <div className="animate-fade-in" key={currentSlide}>
@@ -114,24 +115,24 @@ const Banner = () => {
           </p>
 
           <div className="flex flex-col gap-4 sm:flex-row sm:justify-center sm:gap-6 mb-8">
-            <a
-              href={currentSlideData.primaryButton.href}
+            <Link
+              to={currentSlideData.primaryButton.href}
               className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 group"
             >
               <span>{currentSlideData.primaryButton.text}</span>
               <span className="ml-2 group-hover:translate-x-1 transition-transform duration-200">
                 {currentSlideData.primaryButton.icon}
               </span>
-            </a>
-            <a
-              href={currentSlideData.secondaryButton.href}
+            </Link>
+            <Link
+              to={currentSlideData.secondaryButton.href}
               className="bg-gradient-to-r from-cyan-600 to-cyan-700 hover:from-cyan-700 hover:to-cyan-800 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-gray-900 group"
             >
               <span>{currentSlideData.secondaryButton.text}</span>
               <span className="ml-2 group-hover:translate-x-1 transition-transform duration-200">
                 {currentSlideData.secondaryButton.icon}
               </span>
-            </a>
+            </Link>
           </div>
 
           {/* Carousel Dots */}

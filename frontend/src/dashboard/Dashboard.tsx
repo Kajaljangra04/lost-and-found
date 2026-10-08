@@ -5,11 +5,39 @@ import {
   FaExclamationTriangle,
   FaChartLine,
 } from "react-icons/fa";
-import { useAdminStatsQuery } from "../redux/api/api";
+import { useAdminStatsQuery, useGetRecentActivityQuery } from "../redux/api/api";
+import type { RecentActivity } from "../types/types";
 import { Link } from "react-router-dom";
+
+const timeAgo = (date?: string | Date) => {
+  if (!date) return "just now";
+  const seconds = Math.floor(
+    (Date.now() - new Date(date).getTime()) / 1000
+  );
+  if (seconds < 60) return "just now";
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+  const days = Math.floor(hours / 24);
+  return `${days} day${days > 1 ? "s" : ""} ago`;
+};
+
+const activityStyles: Record<
+  string,
+  { dot: string; badge: string }
+> = {
+  found: { dot: "bg-blue-500", badge: "bg-blue-900 text-blue-300" },
+  lost: { dot: "bg-red-500", badge: "bg-red-900 text-red-300" },
+  claim: { dot: "bg-yellow-500", badge: "bg-yellow-900 text-yellow-300" },
+  approved: { dot: "bg-green-500", badge: "bg-green-900 text-green-300" },
+  rejected: { dot: "bg-red-500", badge: "bg-red-900 text-red-300" },
+  default: { dot: "bg-gray-500", badge: "bg-gray-700 text-gray-300" },
+};
 
 const Dashboard = () => {
   const { data: adminStats, isLoading } = useAdminStatsQuery({});
+  const { data: recentActivityData } = useGetRecentActivityQuery({});
   if (isLoading) {
     return (
       <div className="space-y-6 p-6">
@@ -57,36 +85,7 @@ const Dashboard = () => {
       </div>
     );
   }
-  const recentActivity = [
-    {
-      id: 1,
-      type: "found",
-      title: "iPhone 13 Pro found in Library",
-      time: "2 hours ago",
-      status: "new",
-    },
-    {
-      id: 2,
-      type: "claim",
-      title: "Claim submitted for Wallet",
-      time: "4 hours ago",
-      status: "pending",
-    },
-    {
-      id: "3",
-      type: "lost",
-      title: "MacBook reported lost in Cafeteria",
-      time: "6 hours ago",
-      status: "active",
-    },
-    {
-      id: 4,
-      type: "resolved",
-      title: "Keys successfully returned to owner",
-      time: "8 hours ago",
-      status: "resolved",
-    },
-  ];
+  const recentActivity = recentActivityData?.data || [];
 
   return (
     <div className="space-y-6">
@@ -167,45 +166,41 @@ const Dashboard = () => {
             <h2 className="text-xl font-bold text-white">Recent Activity</h2>
           </div>
           <div className="space-y-4">
-            {recentActivity.map((activity) => (
-              <div
-                key={activity.id}
-                className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-700/50 transition-colors"
-              >
+            {recentActivity.length === 0 && (
+              <p className="text-gray-400 text-sm py-4">
+                No recent activity yet — new items and claims will show up
+                here.
+              </p>
+            )}
+            {recentActivity.map((activity: RecentActivity) => {
+              const style =
+                activityStyles[activity.type] || activityStyles.default;
+              return (
                 <div
-                  className={`w-2 h-2 rounded-full mt-2 ${
-                    activity.type === "found"
-                      ? "bg-blue-500"
-                      : activity.type === "claim"
-                      ? "bg-yellow-500"
-                      : activity.type === "lost"
-                      ? "bg-red-500"
-                      : "bg-green-500"
-                  }`}
-                />
-
-                <div className="flex-1 min-w-0">
-                  <p className="text-white text-sm font-medium">
-                    {activity.title}
-                  </p>
-                  <p className="text-gray-400 text-xs">{activity.time}</p>
-                </div>
-
-                <span
-                  className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    activity.status === "new"
-                      ? "bg-blue-900 text-blue-300"
-                      : activity.status === "pending"
-                      ? "bg-yellow-900 text-yellow-300"
-                      : activity.status === "active"
-                      ? "bg-red-900 text-red-300"
-                      : "bg-green-900 text-green-300"
-                  }`}
+                  key={activity.id}
+                  className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-700/50 transition-colors"
                 >
-                  {activity.status}
-                </span>
-              </div>
-            ))}
+                  <div
+                    className={`w-2 h-2 rounded-full mt-2 ${style.dot}`}
+                  />
+
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white text-sm font-medium">
+                      {activity.title}
+                    </p>
+                    <p className="text-gray-400 text-xs">
+                      {timeAgo(activity.time)}
+                    </p>
+                  </div>
+
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${style.badge}`}
+                  >
+                    {activity.type}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </div>
 

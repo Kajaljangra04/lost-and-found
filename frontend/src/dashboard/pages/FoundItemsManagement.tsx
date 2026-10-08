@@ -81,7 +81,7 @@ const FoundItemsManagement = () => {
       toast.success("Item updated successfully");
       setIsEditModalOpen(false);
       setEditingItem(null);
-    } catch (error) {
+    } catch {
       toast.error("Failed to update item");
     } finally {
       setIsEditLoading(false);
@@ -114,7 +114,7 @@ const FoundItemsManagement = () => {
       toast.success("Item deleted successfully");
       setIsDeleteModalOpen(false);
       setDeletingItem(null);
-    } catch (error) {
+    } catch {
       toast.error("Failed to delete item");
     } finally {
       setIsDeleteLoading(false);

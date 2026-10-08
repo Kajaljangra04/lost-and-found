@@ -41,6 +41,7 @@ const getFoundItem = async (data: TFilter) => {
 
   const whereConditions: Prisma.FoundItemWhereInput = {
     isDeleted: false,
+    isClaimed: false, 
   };
 
   if (foundItemName) {

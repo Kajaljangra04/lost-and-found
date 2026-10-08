@@ -77,7 +77,7 @@ const UsersManagement = () => {
     try {
       await changeUserRole({ id, role: newRole }).unwrap();
       toast.success("User role changed successfully");
-    } catch (error) {
+    } catch {
       toast.error("Failed to change user role");
     }
   };
@@ -95,7 +95,7 @@ const UsersManagement = () => {
           "Status change functionality needs to be implemented on the backend"
         );
       }
-    } catch (error) {
+    } catch {
       toast.error("Failed to update user status");
     }
   };
@@ -114,7 +114,7 @@ const UsersManagement = () => {
       toast.success("User deleted successfully");
       setIsDeleteModalOpen(false);
       setDeletingUser(null);
-    } catch (error) {
+    } catch {
       toast.error("Failed to delete user");
     } finally {
       setIsDeleteLoading(false);

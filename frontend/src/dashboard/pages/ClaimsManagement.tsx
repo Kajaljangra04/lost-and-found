@@ -6,20 +6,35 @@ import {
   useUpdateClaimStatusMutation,
 } from "../../redux/api/api";
 
+type ClaimItem = {
+  id: string;
+  status: string;
+  distinguishingFeatures?: string;
+  lostDate?: string;
+  createdAt?: string;
+  foundItem?: {
+    foundItemName: string;
+    description?: string;
+    img?: string;
+    category?: { name?: string };
+    user?: { username?: string; email?: string };
+  };
+};
+
 const ClaimsManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
-  const [selectedClaim, setSelectedClaim] = useState<any>(null);
+  const [selectedClaim, setSelectedClaim] = useState<ClaimItem | null>(null);
   const [newStatus, setNewStatus] = useState("");
   const [isStatusLoading, setIsStatusLoading] = useState(false);
 
   const { data: allClaims, isLoading } = useGetAllClaimsQuery(undefined);
   const [updateClaimStatus] = useUpdateClaimStatusMutation();
 
-  const claims = allClaims?.data || [];
+  const claims: ClaimItem[] = allClaims?.data || [];
 
-  const filteredClaims = claims.filter((claim: any) => {
+  const filteredClaims = claims.filter((claim) => {
     const matchesSearch =
       claim.foundItem?.foundItemName
         ?.toLowerCase()
@@ -37,8 +52,8 @@ const ClaimsManagement = () => {
   });
 
   const handleStatusChange = (claimId: string, status: string) => {
-    const claim = claims.find((claim: any) => claim.id === claimId);
-    setSelectedClaim(claim);
+    const claim = claims.find((claim) => claim.id === claimId);
+    setSelectedClaim(claim ?? null);
     setNewStatus(status);
     setIsStatusModalOpen(true);
   };
@@ -61,9 +76,8 @@ const ClaimsManagement = () => {
       setIsStatusModalOpen(false);
       setSelectedClaim(null);
       setNewStatus("");
-    } catch (error) {
+    } catch {
       toast.error("Failed to update claim status");
-      console.error("Error updating claim status:", error);
     } finally {
       setIsStatusLoading(false);
     }
@@ -78,7 +92,7 @@ const ClaimsManagement = () => {
 
   const handleBulkApprove = async () => {
     const pendingClaims = filteredClaims.filter(
-      (claim: any) => claim.status === "PENDING"
+      (claim) => claim.status === "PENDING"
     );
     if (pendingClaims.length === 0) {
       toast.warning("No pending claims to approve");
@@ -92,7 +106,7 @@ const ClaimsManagement = () => {
     ) {
       try {
         // Approve all pending claims
-        const promises = pendingClaims.map((claim: any) =>
+        const promises = pendingClaims.map((claim) =>
           updateClaimStatus({
             claimId: claim.id,
             status: "APPROVED",
@@ -101,9 +115,8 @@ const ClaimsManagement = () => {
 
         await Promise.all(promises);
         toast.success(`Successfully approved ${pendingClaims.length} claims`);
-      } catch (error) {
+      } catch {
         toast.error("Failed to approve some claims");
-        console.error("Error in bulk approve:", error);
       }
     }
   };
@@ -121,7 +134,8 @@ const ClaimsManagement = () => {
     }
   };
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return "—";
     return new Date(dateString).toLocaleDateString();
   };
 
@@ -179,7 +193,7 @@ const ClaimsManagement = () => {
               <p className="text-gray-400 text-sm">Pending</p>
               <p className="text-2xl font-bold text-yellow-500">
                 {
-                  claims.filter((claim: any) => claim.status === "PENDING")
+                  claims.filter((claim) => claim.status === "PENDING")
                     .length
                 }
               </p>
@@ -196,7 +210,7 @@ const ClaimsManagement = () => {
               <p className="text-gray-400 text-sm">Approved</p>
               <p className="text-2xl font-bold text-green-500">
                 {
-                  claims.filter((claim: any) => claim.status === "APPROVED")
+                  claims.filter((claim) => claim.status === "APPROVED")
                     .length
                 }
               </p>
@@ -213,7 +227,7 @@ const ClaimsManagement = () => {
               <p className="text-gray-400 text-sm">Rejected</p>
               <p className="text-2xl font-bold text-red-500">
                 {
-                  claims.filter((claim: any) => claim.status === "REJECTED")
+                  claims.filter((claim) => claim.status === "REJECTED")
                     .length
                 }
               </p>
@@ -283,7 +297,7 @@ const ClaimsManagement = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-700">
-              {filteredClaims.map((claim: any) => (
+              {filteredClaims.map((claim) => (
                 <tr
                   key={claim.id}
                   className="hover:bg-gray-700 transition-colors"
@@ -291,7 +305,7 @@ const ClaimsManagement = () => {
                   <td className="px-6 py-4">
                     <div className="flex items-center space-x-3">
                       <img
-                        src={claim.foundItem?.img || "/default-item.png"}
+                        src={claim.foundItem?.img || "/bgimg.png"}
                         alt={claim.foundItem?.foundItemName}
                         className="w-12 h-12 rounded-lg object-cover"
                       />
@@ -400,7 +414,7 @@ const ClaimsManagement = () => {
                 <div className="bg-gray-700 rounded-lg p-4 mb-6 text-left">
                   <div className="flex items-center space-x-3 mb-3">
                     <img
-                      src={selectedClaim.foundItem?.img || "/default-item.png"}
+                      src={selectedClaim.foundItem?.img || "/bgimg.png"}
                       alt={selectedClaim.foundItem?.foundItemName}
                       className="w-12 h-12 rounded-lg object-cover"
                     />

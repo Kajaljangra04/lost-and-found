@@ -1,4 +1,4 @@
-import jwt, { JwtPayload, Secret } from "jsonwebtoken";
+import jwt, { JwtPayload, Secret, SignOptions } from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import config from "../config/config";
 import prisma from "../config/prisma";
@@ -23,7 +23,8 @@ const comparePasswords = async (
 const createToken = (data: Record<string, unknown>): string => {
   return jwt.sign(data, config.jwt_secrets as Secret, {
     algorithm: "HS256",
-    expiresIn: config.jwt_expires_in,
+    expiresIn: (config.jwt_expires_in ||
+      "10d") as SignOptions["expiresIn"],
   });
 };
 
@@ -33,7 +34,12 @@ const verifyToken = (token: string): JwtPayload => {
 
 const calculateMeta = async (data: any) => {
   const { page = 1, limit = 10 } = data;
-  const res = (await prisma.foundItem.findMany({})).length;
+  const res = (await prisma.foundItem.findMany({
+    where: {
+      isDeleted: false,
+      isClaimed: false, 
+    }
+  })).length;
 
   const meta = {
     total: res,

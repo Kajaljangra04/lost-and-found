@@ -1,60 +1,71 @@
 import { useForm } from "react-hook-form";
 import { Spinner } from "flowbite-react";
-import Modals from "../../components/modal/Modal";
-import { ToastContainer } from "react-toastify";
+import toastNotify from "../../components/modal/toastNotify";
+import { getErrorMessage } from "../../utils/getErrorMessage";
 import { useRegistersMutation } from "../../redux/api/api";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   MdEmail,
   MdPerson,
   MdImage,
-  MdLock,
-  MdCheckCircle,
+  MdVisibility,
+  MdVisibilityOff,
 } from "react-icons/md";
+import { useState } from "react";
+
+const inputClass =
+  "bg-gray-800/50 border border-gray-600 text-white placeholder-gray-400 rounded-lg px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 backdrop-blur-sm w-full";
+
+type RegisterForm = {
+  email: string;
+  username: string;
+  userImg?: string;
+  password: string;
+  conpassword: string;
+};
+
 const Register = () => {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const {
     handleSubmit,
     register,
     formState: { errors },
-  } = useForm();
+  } = useForm<RegisterForm>();
 
   const [registers, { isLoading }] = useRegistersMutation();
-  const onSubmit = async (data: any) => {
-    // console.log(data)
-    if (data.password == data.conpassword) {
-      try {
-        const res: any = await registers(data).unwrap();
-        console.log(res);
-        if (res?.success == false) {
-          Modals({
-            message: res?.message ? res?.message : "Failed to register",
-            status: false,
-          });
-          return;
-        }
-        if (res?.success == true) {
-          Modals({
-            message: "User registered successfully. Please login again!!!",
-            status: true,
-          });
-          navigate("/login");
-        }
-      } catch (err: any) {
-        console.log("errorrrrr", err.data.message);
-        Modals({
-          message: err?.data?.message
-            ? err?.data?.message
-            : "Failed to register",
-          status: false,
-        });
-      }
-    } else {
-      Modals({
+
+  const onSubmit = async (data: RegisterForm) => {
+    if (data.password !== data.conpassword) {
+      toastNotify({
         message: "Password and confirm password are not same",
         status: false,
       });
       return;
+    }
+
+    try {
+      const res = await registers(data).unwrap();
+      if (res?.success == false) {
+        toastNotify({
+          message: res?.message ? res?.message : "Failed to register",
+          status: false,
+        });
+        return;
+      }
+      if (res?.success == true) {
+        toastNotify({
+          message: "User registered successfully. Please login again!!!",
+          status: true,
+        });
+        navigate("/login");
+      }
+    } catch (err) {
+      toastNotify({
+        message: getErrorMessage(err, "Failed to register"),
+        status: false,
+      });
     }
   };
 
@@ -73,23 +84,26 @@ const Register = () => {
                 </p>
               </div>
 
-              {/* form */}
-              <form
-                onSubmit={handleSubmit(onSubmit)}
-                className="space-y-5"
-                action="#"
-              >
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                 <div className="space-y-1">
-                  <label className="block text-sm font-semibold text-gray-300">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-semibold text-gray-300"
+                  >
                     Email Address
                   </label>
                   <div className="relative">
                     <input
-                      type="text"
+                      id="email"
+                      type="email"
                       {...register("email", {
                         required: "Email is required",
+                        pattern: {
+                          value: /^\S+@\S+\.\S+$/,
+                          message: "Invalid email address",
+                        },
                       })}
-                      className="bg-gray-800/50 border border-gray-600 text-white placeholder-gray-400 rounded-lg px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 backdrop-blur-sm w-full"
+                      className={inputClass}
                       placeholder="name@company.com"
                     />
                     <div className="absolute inset-y-0 right-0 flex items-center pr-3">
@@ -104,17 +118,30 @@ const Register = () => {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="block text-sm font-semibold text-gray-300">
+                  <label
+                    htmlFor="username"
+                    className="block text-sm font-semibold text-gray-300"
+                  >
                     Username
                   </label>
                   <div className="relative">
                     <input
+                      id="username"
                       type="text"
                       {...register("username", {
                         required: "Username is required",
+                        minLength: {
+                          value: 3,
+                          message: "Username must be at least 3 characters",
+                        },
+                        pattern: {
+                          value: /^[a-zA-Z0-9_]+$/,
+                          message:
+                            "Letters, numbers, and underscores only",
+                        },
                       })}
                       placeholder="Choose a username"
-                      className="bg-gray-800/50 border border-gray-600 text-white placeholder-gray-400 rounded-lg px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 backdrop-blur-sm w-full"
+                      className={inputClass}
                     />
                     <div className="absolute inset-y-0 right-0 flex items-center pr-3">
                       <MdPerson className="w-5 h-5 text-gray-400" />
@@ -128,43 +155,61 @@ const Register = () => {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="block text-sm font-semibold text-gray-300">
+                  <label
+                    htmlFor="userImg"
+                    className="block text-sm font-semibold text-gray-300"
+                  >
                     Profile Image URL
                   </label>
                   <div className="relative">
                     <input
+                      id="userImg"
                       type="text"
                       {...register("userImg")}
-                      placeholder="https://example.com/your-image.jpg"
-                      className="bg-gray-800/50 border border-gray-600 text-white placeholder-gray-400 rounded-lg px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 backdrop-blur-sm w-full"
+                      placeholder="https://example.com/your-image.jpg (optional)"
+                      className={inputClass}
                     />
                     <div className="absolute inset-y-0 right-0 flex items-center pr-3">
                       <MdImage className="w-5 h-5 text-gray-400" />
                     </div>
                   </div>
-                  {errors.userImg && (
-                    <p className="text-red-500 text-sm mt-1 font-medium">
-                      {errors.userImg?.message as string}
-                    </p>
-                  )}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    <label
+                      htmlFor="password"
+                      className="block text-sm font-semibold text-gray-300"
+                    >
                       Password
                     </label>
                     <div className="relative">
                       <input
-                        type="password"
+                        id="password"
+                        type={showPassword ? "text" : "password"}
                         {...register("password", {
                           required: "Password is required",
+                          minLength: {
+                            value: 6,
+                            message: "Password must be at least 6 characters",
+                          },
                         })}
                         placeholder="••••••••"
-                        className="bg-gray-50/50 border-2 border-gray-200 text-gray-900 text-sm rounded-xl focus:border-blue-400 block w-full p-3.5 pr-12 dark:bg-gray-700/50 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-400 transition-all duration-200 hover:border-gray-300 outline-none"
+                        className={`${inputClass} pr-12`}
                       />
                       <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                        <MdLock className="w-5 h-5 text-gray-400" />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="text-gray-400 hover:text-gray-300 transition-colors duration-200"
+                          aria-label="Toggle password visibility"
+                        >
+                          {showPassword ? (
+                            <MdVisibilityOff className="w-5 h-5" />
+                          ) : (
+                            <MdVisibility className="w-5 h-5" />
+                          )}
+                        </button>
                       </div>
                     </div>
                     {errors.password && (
@@ -175,20 +220,35 @@ const Register = () => {
                   </div>
 
                   <div className="space-y-1">
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    <label
+                      htmlFor="conpassword"
+                      className="block text-sm font-semibold text-gray-300"
+                    >
                       Confirm Password
                     </label>
                     <div className="relative">
                       <input
-                        type="password"
+                        id="conpassword"
+                        type={showConfirm ? "text" : "password"}
                         {...register("conpassword", {
-                          required: "Confirm Password is required",
+                          required: "Confirm password is required",
                         })}
                         placeholder="••••••••"
-                        className="bg-gray-50/50 border-2 border-gray-200 text-gray-900 text-sm rounded-xl focus:border-blue-400 block w-full p-3.5 pr-12 dark:bg-gray-700/50 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-400 transition-all duration-200 hover:border-gray-300 outline-none"
+                        className={`${inputClass} pr-12`}
                       />
                       <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                        <MdCheckCircle className="w-5 h-5 text-gray-400" />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirm(!showConfirm)}
+                          className="text-gray-400 hover:text-gray-300 transition-colors duration-200"
+                          aria-label="Toggle confirm password visibility"
+                        >
+                          {showConfirm ? (
+                            <MdVisibilityOff className="w-5 h-5" />
+                          ) : (
+                            <MdVisibility className="w-5 h-5" />
+                          )}
+                        </button>
                       </div>
                     </div>
                     {errors.conpassword && (
@@ -207,7 +267,7 @@ const Register = () => {
                         size="md"
                         className="text-blue-600"
                       />
-                      <span className="text-gray-600 dark:text-gray-400">
+                      <span className="text-gray-400">
                         Creating your account...
                       </span>
                     </div>
@@ -222,23 +282,21 @@ const Register = () => {
                 )}
 
                 <div className="text-center pt-4">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-gray-400">
                     Already have an account?{" "}
-                    <a
-                      href="/login"
-                      className="font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-500 dark:hover:text-blue-400 transition-colors duration-200"
+                    <Link
+                      to="/login"
+                      className="font-semibold text-blue-400 hover:text-cyan-400 transition-colors duration-200"
                     >
                       Sign in here
-                    </a>
+                    </Link>
                   </p>
                 </div>
               </form>
-              {/* form */}
             </div>
           </div>
         </div>
       </section>
-      <ToastContainer />
     </>
   );
 };

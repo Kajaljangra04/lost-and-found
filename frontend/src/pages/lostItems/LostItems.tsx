@@ -9,6 +9,17 @@ import {
 import { useState } from "react";
 import type { lostItem } from "../../types/types";
 
+const formatDate = (date: string | Date | undefined) => {
+  if (!date) return "—";
+  const d = new Date(date);
+  if (Number.isNaN(d.getTime())) return "—";
+  return d.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+};
+
 const LostItemsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -216,8 +227,8 @@ const LostItemsPage = () => {
             {lostItems?.data?.map((lostItem: lostItem) => {
               return (
                 <div
-                  key={`${lostItem?.id}127`}
-                  className="group relative bg-gradient-to-br from-gray-800 via-gray-900 to-black rounded-xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105 border border-gray-700 hover:border-gray-600 max-w-sm"
+                  key={lostItem?.id}
+                  className="group relative bg-gradient-to-br from-gray-800 via-gray-900 to-black rounded-xl overflow-hidden shadow-2xl transition-all duration-300 transform hover:scale-105 hover:shadow-cyan-500/10 border border-gray-700 hover:border-gray-600 max-w-sm"
                 >
                   <div className="relative overflow-hidden">
                     <div className="h-56 w-full overflow-hidden">
@@ -258,7 +269,7 @@ const LostItemsPage = () => {
                       <div className="flex items-center text-sm">
                         <span className="text-gray-400 mr-2">📅</span>
                         <span className="text-gray-200">
-                          {lostItem?.date.split("T")[0]}
+                          {formatDate(lostItem?.date)}
                         </span>
                       </div>
                       <div className="flex items-center text-sm">
@@ -311,11 +322,8 @@ const LostItemsPage = () => {
               {(() => {
                 const pages = [];
                 const maxVisiblePages = 5;
-                let startPage = Math.max(
-                  1,
-                  currentPage - Math.floor(maxVisiblePages / 2)
-                );
-                let endPage = Math.min(
+                let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+                const endPage = Math.min(
                   totalPages,
                   startPage + maxVisiblePages - 1
                 );

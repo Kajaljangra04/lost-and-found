@@ -25,20 +25,39 @@ import {
 } from "../../redux/api/api";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import Modals from "../../components/modal/Modal";
-import { ToastContainer } from "react-toastify";
+import toastNotify from "../../components/modal/toastNotify";
+import QueryErrorBanner from "../../components/QueryErrorBanner";
+
+type MyLostItem = {
+  id: string;
+  img?: string;
+  lostItemName?: string;
+  description?: string;
+  location?: string;
+  date?: string;
+  categoryId?: string;
+  isFound?: boolean;
+};
+
+type EditLostItemForm = {
+  id?: string;
+  lostItemName: string;
+  description: string;
+  location: string;
+  date: string;
+};
 
 const MyLostItems = () => {
-  const { data: myLostItems, isLoading } = useGetMyLostItemQuery({});
+  const { data: myLostItems, isLoading, error } = useGetMyLostItemQuery({});
   const [deleteMyLostItem] = useDeleteMyLostItemMutation();
   const [isOpen, setIsOpen] = useState(false);
-  const [currentItem, setCurrentItem]: any = useState(null);
-  const [currId, setCurrId]: any = useState();
+  const [currentItem, setCurrentItem] = useState<MyLostItem | null>(null);
+  const [currId, setCurrId] = useState<string | undefined>(undefined);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [itemToDelete, setItemToDelete]: any = useState(null);
+  const [itemToDelete, setItemToDelete] = useState<MyLostItem | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const handleDeleteClick = (item: any) => {
+  const handleDeleteClick = (item: MyLostItem) => {
     setItemToDelete(item);
     setIsDeleteModalOpen(true);
   };
@@ -50,12 +69,12 @@ const MyLostItems = () => {
     try {
       const res = await deleteMyLostItem(itemToDelete.id);
       if (res?.data?.statusCode == 200) {
-        Modals({ message: res?.data?.message, status: true });
+        toastNotify({ message: res?.data?.message, status: true });
       } else {
-        Modals({ message: "Failed to delete", status: false });
+        toastNotify({ message: "Failed to delete", status: false });
       }
-    } catch (error) {
-      Modals({ message: "Failed to delete", status: false });
+    } catch {
+      toastNotify({ message: "Failed to delete", status: false });
     } finally {
       setIsDeleting(false);
       setIsDeleteModalOpen(false);
@@ -71,7 +90,7 @@ const MyLostItems = () => {
 
   const [editMyLostItem] = useEditMyLostItemMutation();
 
-  const openModal = (item: any) => {
+  const openModal = (item: MyLostItem) => {
     setCurrentItem(item);
     setIsOpen(true);
     setCurrId(item?.id);
@@ -88,20 +107,19 @@ const MyLostItems = () => {
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm();
+  } = useForm<EditLostItemForm>();
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: EditLostItemForm) => {
     data.id = currId;
     data.date = new Date(data?.date).toISOString();
 
     const res = await editMyLostItem(data);
     if (res?.data?.statusCode == 200) {
-      Modals({ message: res?.data?.message, status: true });
+      toastNotify({ message: res?.data?.message, status: true });
     } else {
-      Modals({ message: "Failed to update", status: false });
+      toastNotify({ message: "Failed to update", status: false });
     }
 
-    // console.log( res);
     closeModal();
   };
 
@@ -154,7 +172,7 @@ const MyLostItems = () => {
               <div>
                 <p className="text-gray-400 text-sm">Not Found</p>
                 <p className="text-2xl font-bold text-red-400">
-                  {myLostItems?.data?.filter((item: any) => !item.isFound)
+                  {myLostItems?.data?.filter((item: MyLostItem) => !item.isFound)
                     .length || 0}
                 </p>
               </div>
@@ -169,7 +187,7 @@ const MyLostItems = () => {
               <div>
                 <p className="text-gray-400 text-sm">Found</p>
                 <p className="text-2xl font-bold text-green-400">
-                  {myLostItems?.data?.filter((item: any) => item.isFound)
+                  {myLostItems?.data?.filter((item: MyLostItem) => item.isFound)
                     .length || 0}
                 </p>
               </div>
@@ -179,6 +197,8 @@ const MyLostItems = () => {
             </div>
           </div>
         </div>
+
+        {error && <QueryErrorBanner />}
 
         {/* Table */}
         {myLostItems?.data?.length === 0 ? (
@@ -218,7 +238,7 @@ const MyLostItems = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-700">
-                  {myLostItems?.data?.map((myLostItem: any) => (
+                  {myLostItems?.data?.map((myLostItem: MyLostItem) => (
                     <tr
                       key={myLostItem.id}
                       className="hover:bg-gray-700/50 transition-colors duration-200"
@@ -500,19 +520,6 @@ const MyLostItems = () => {
           </ModalBody>
         </div>
       </Modal>
-
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="dark"
-      />
     </div>
   );
 };

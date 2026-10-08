@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   FaTachometerAlt,
   FaSearch,
@@ -18,7 +18,6 @@ import {
   FaList,
 } from "react-icons/fa";
 import { useUserVerification, signOut } from "../auth/auth";
-import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {
   Dropdown,
@@ -26,7 +25,7 @@ import {
   DropdownItem,
   DropdownDivider,
 } from "flowbite-react";
-import Modals from "../components/modal/Modal";
+import toastNotify from "../components/modal/toastNotify";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -36,9 +35,8 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const location = useLocation();
-  const user = useUserVerification() as any;
-
-  // console.log({user})
+  const navigate = useNavigate();
+  const user = useUserVerification();
   const menuItems = [
     {
       title: "Dashboard",
@@ -122,9 +120,8 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   };
 
   const handleSignOut = () => {
-    signOut();
-    Modals({ message: "Log out successfully", status: true });
-    window.location.href = "/";
+    signOut(navigate);
+    toastNotify({ message: "Log out successfully", status: true });
   };
 
   return (
@@ -152,7 +149,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
               </div>
               <div>
                 <h1 className="text-white font-bold text-lg">Lost & Found</h1>
-                <p className="text-gray-400 text-xs">Admin Dashboard</p>
+                <p className="text-gray-400 text-xs">Dashboard</p>
               </div>
             </div>
           )}
@@ -449,20 +446,6 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         {/* Page Content */}
         <main className="p-4 lg:p-6">{children}</main>
       </div>
-
-      {/* Toast Container */}
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="dark"
-      />
     </div>
   );
 };

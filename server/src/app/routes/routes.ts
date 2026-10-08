@@ -15,6 +15,7 @@ import { utils } from "../utils/utils";
 import { adminStats } from "../utils/adminStats";
 import { aiSearchController } from "../modules/aiSearch/aiSearch.controller";
 import { aiSearchValidation } from "../modules/aiSearch/aiSearch.validate";
+import { recentActivity } from "../utils/recentActivity";
 
 const router = express.Router();
 ////////////////////////////////////////////////// user //////////////////////////////////////////////
@@ -164,5 +165,8 @@ router.post(
   validateRequest(aiSearchValidation.aiSearchSchema),
   aiSearchController.aiSearch
 );
+
+// recent activity (admin dashboard feed)
+router.get("/recent-activity", auth(), recentActivity);
 
 export default router;

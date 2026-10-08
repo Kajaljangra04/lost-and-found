@@ -7,7 +7,7 @@ const createClaim = async (item: Claim, user: JwtPayload) => {
     data: {
       foundItemId: item.foundItemId,
       distinguishingFeatures: item.distinguishingFeatures,
-      lostDate: item.lostDate,
+      lostDate: new Date(item.lostDate),
       userId: user.id,
     },
   });
@@ -76,12 +76,71 @@ const getMyClaim = async (user: JwtPayload) => {
 };
 
 const updateClaimStatus = async (claimId: string, data: Partial<Claim>) => {
-  const result = await prisma.claim.update({
-    where: {
-      id: claimId,
-    },
-    data,
+  // Start a transaction to ensure all updates happen together
+  const result = await prisma.$transaction(async (tx) => {
+    // Update the claim status
+    const updatedClaim = await tx.claim.update({
+      where: {
+        id: claimId,
+      },
+      data,
+      include: {
+        foundItem: true,
+      },
+    });
+
+    // If the claim is being approved
+    if (data.status === "APPROVED") {
+      // Mark the found item as claimed
+      await tx.foundItem.update({
+        where: {
+          id: updatedClaim.foundItemId,
+        },
+        data: {
+          isClaimed: true,
+        },
+      });
+
+      // Reject all other pending claims for the same found item
+      await tx.claim.updateMany({
+        where: {
+          foundItemId: updatedClaim.foundItemId,
+          id: {
+            not: claimId, // Exclude the current claim
+          },
+          status: "PENDING",
+        },
+        data: {
+          status: "REJECTED",
+        },
+      });
+    }
+
+    // If the claim is being rejected, check if there are any other approved claims
+    if (data.status === "REJECTED") {
+      const approvedClaims = await tx.claim.findMany({
+        where: {
+          foundItemId: updatedClaim.foundItemId,
+          status: "APPROVED",
+        },
+      });
+
+      // If no approved claims exist, mark the item as available
+      if (approvedClaims.length === 0) {
+        await tx.foundItem.update({
+          where: {
+            id: updatedClaim.foundItemId,
+          },
+          data: {
+            isClaimed: false,
+          },
+        });
+      }
+    }
+
+    return updatedClaim;
   });
+
   return result;
 };
 

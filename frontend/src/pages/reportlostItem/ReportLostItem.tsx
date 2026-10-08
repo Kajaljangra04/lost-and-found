@@ -1,7 +1,6 @@
 import { useForm } from "react-hook-form";
 import { Spinner } from "flowbite-react";
-import Modals from "../../components/modal/Modal";
-import { ToastContainer } from "react-toastify";
+import toastNotify from "../../components/modal/toastNotify";
 import { useState } from "react";
 import {
   useCategoryQuery,
@@ -10,27 +9,38 @@ import {
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { IoIosArrowDown } from "react-icons/io";
+import type { ItemCategory } from "../../types/types";
 
 // Custom styles for DatePicker to match form styling
 const datePickerStyles = `
   .react-datepicker__input-container input {
-    background-color: rgb(55 65 81) !important;
+    background-color: rgb(55 65 81 / 0.7) !important;
     border: 1px solid rgb(75 85 99) !important;
     color: white !important;
-    border-radius: 0.5rem !important;
-    padding: 0.625rem !important;
+    border-radius: 0.75rem !important;
+    padding: 0.75rem 1rem !important;
     font-size: 0.875rem !important;
     width: 100% !important;
     outline: none !important;
   }
   .react-datepicker__input-container input:focus {
-    border-color: rgb(59 130 246) !important;
-    box-shadow: 0 0 0 1px rgb(59 130 246) !important;
+    border-color: rgb(6 182 212) !important;
+    box-shadow: 0 0 0 1px rgb(6 182 212) !important;
   }
   .react-datepicker__input-container input::placeholder {
     color: rgb(156 163 175) !important;
   }
 `;
+
+const inputClass =
+  "w-full px-4 py-3 bg-gray-700/70 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all duration-200 backdrop-blur-sm";
+
+type ReportLostForm = {
+  lostItemName: string;
+  description: string;
+  imgUrl: string;
+  location: string;
+};
 
 const ReportLostItem = () => {
   const {
@@ -38,37 +48,38 @@ const ReportLostItem = () => {
     register,
     formState: { errors },
     reset,
-  } = useForm();
+  } = useForm<ReportLostForm>();
 
-  const [selectedMenu, setselectedMenu] = useState("");
-  const [selectedMenucategoryId, setselectedMenucategoryId] = useState("");
-  const handleMenuChange = (menuName: string, categoryId: string) => {
-    setselectedMenu(menuName);
-    setselectedMenucategoryId(categoryId);
-  };
+  const [categoryId, setCategoryId] = useState("");
+  const [submitted, setSubmitted] = useState(false);
   const [createLostItem, { isLoading }] = useCreateLostItemMutation();
   const { data: Category } = useCategoryQuery("");
   const [startDate, setStartDate] = useState(new Date());
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: ReportLostForm) => {
+    setSubmitted(true);
+    if (!categoryId) return;
+
     try {
       const lostData = {
         lostItemName: data.lostItemName,
         description: data.description,
-        categoryId: selectedMenucategoryId,
+        categoryId,
         img: data.imgUrl,
         location: data.location,
         date: startDate,
       };
-      const res: any = await createLostItem(lostData);
+      const res = await createLostItem(lostData);
       if (res?.data?.success == false) {
-        Modals({ message: "Failed to create Lost item", status: false });
+        toastNotify({ message: "Failed to create Lost item", status: false });
       } else {
-        Modals({ message: "Lost item reported successfully", status: true });
+        toastNotify({ message: "Lost item reported successfully", status: true });
         reset();
+        setCategoryId("");
+        setSubmitted(false);
       }
-    } catch (err: any) {
-      Modals({ message: "Failed to create Lost item", status: false });
+    } catch {
+      toastNotify({ message: "Failed to create Lost item", status: false });
     }
   };
 
@@ -78,92 +89,117 @@ const ReportLostItem = () => {
       <section className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-black py-12">
         <div className="max-w-4xl mx-auto px-6 w-full">
           <div className="bg-gradient-to-br from-gray-800/90 via-gray-900/90 to-black/90 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-700 p-8">
-            <h1 className="text-3xl font-bold text-center mb-8 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold text-center mb-2 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
               Report Lost Item
             </h1>
+            <p className="text-center text-gray-400 mb-8">
+              Tell the community what you've lost so someone can help you find
+              it.
+            </p>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div className="grid gap-6 md:grid-cols-2">
                 <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  <label
+                    htmlFor="lostItemName"
+                    className="block mb-2 text-sm font-medium text-gray-300"
+                  >
                     Lost item name
                   </label>
                   <input
+                    id="lostItemName"
                     {...register("lostItemName", {
                       required: "Lost item name is required",
                     })}
                     type="text"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    className={inputClass}
                     placeholder="Laptop/Phone"
                   />
                   {errors.lostItemName && (
-                    <p className="text-red-600">
+                    <p className="text-red-400 text-sm mt-1">
                       {errors.lostItemName?.message as string}
                     </p>
                   )}
                 </div>
                 <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  <label
+                    htmlFor="description"
+                    className="block mb-2 text-sm font-medium text-gray-300"
+                  >
                     Description
                   </label>
                   <input
+                    id="description"
                     type="text"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder="What device look like, color"
+                    className={inputClass}
+                    placeholder="What does it look like, color, brand"
                     {...register("description", {
                       required: "Description is required",
                     })}
                   />
                   {errors.description && (
-                    <p className="text-red-600">
+                    <p className="text-red-400 text-sm mt-1">
                       {errors.description?.message as string}
                     </p>
                   )}
                 </div>
                 <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  <label
+                    htmlFor="imgUrl"
+                    className="block mb-2 text-sm font-medium text-gray-300"
+                  >
                     Image url
                   </label>
                   <input
+                    id="imgUrl"
                     type="text"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    className={inputClass}
                     placeholder="http://lost-image.com"
                     {...register("imgUrl", {
                       required: "Image url is required",
                     })}
                   />
                   {errors.imgUrl && (
-                    <p className="text-red-600">
+                    <p className="text-red-400 text-sm mt-1">
                       {errors.imgUrl?.message as string}
                     </p>
                   )}
                 </div>
                 <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  <label
+                    htmlFor="location"
+                    className="block mb-2 text-sm font-medium text-gray-300"
+                  >
                     Location
                   </label>
                   <input
+                    id="location"
                     type="text"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    className={inputClass}
                     placeholder="City, Country"
                     {...register("location", {
                       required: "Location is required",
                     })}
                   />
                   {errors.location && (
-                    <p className="text-red-600">
+                    <p className="text-red-400 text-sm mt-1">
                       {errors.location?.message as string}
                     </p>
                   )}
-                </div>{" "}
+                </div>
                 <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  <label
+                    htmlFor="lostDate"
+                    className="block mb-2 text-sm font-medium text-gray-300"
+                  >
                     Date
                   </label>
                   <DatePicker
                     wrapperClassName="w-full"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    className={inputClass}
                     selected={startDate}
-                    onChange={(date: any) => setStartDate(date)}
+                    onChange={(date) => {
+                      if (date) setStartDate(date);
+                    }}
                     dateFormat="yyyy-MM-dd"
                     placeholderText="Select date"
                     showYearDropdown
@@ -173,65 +209,68 @@ const ReportLostItem = () => {
                   />
                 </div>
                 <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  <label
+                    htmlFor="category"
+                    className="block mb-2 text-sm font-medium text-gray-300"
+                  >
                     Category
                   </label>
                   <div className="relative">
                     <select
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 appearance-none cursor-pointer"
-                      value={selectedMenucategoryId}
+                      id="category"
+                      className={`${inputClass} appearance-none cursor-pointer`}
+                      value={categoryId}
                       onChange={(e) => {
-                        const selectedCategory = Category?.data?.find(
-                          (cat: any) => cat.id === e.target.value
-                        );
-                        if (selectedCategory) {
-                          handleMenuChange(
-                            selectedCategory.name,
-                            selectedCategory.id
+                        setCategoryId(e.target.value);
+                        if (submitted)
+                          setSubmitted(
+                            !Category?.data?.find(
+                              (cat: ItemCategory) => cat.id === e.target.value
+                            )
                           );
-                        }
                       }}
                     >
                       <option value="" disabled className="text-gray-400">
                         Select a category
                       </option>
-                      {Category?.data?.map((category: any) => (
+                      {Category?.data?.map((category: ItemCategory) => (
                         <option
                           key={category?.id}
                           value={category?.id}
-                          className="text-gray-900 dark:text-white"
+                          className="text-white bg-gray-700"
                         >
                           {category?.name}
                         </option>
                       ))}
                     </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 dark:text-gray-300">
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
                       <IoIosArrowDown className="h-4 w-4" />
                     </div>
                   </div>
-                  {!selectedMenu && (
-                    <p className="text-red-600 pt-1">Category is required</p>
+                  {submitted && !categoryId && (
+                    <p className="text-red-400 text-sm mt-1">
+                      Category is required
+                    </p>
                   )}
                 </div>
               </div>
 
               {isLoading ? (
-                <Spinner />
+                <div className="flex justify-center">
+                  <Spinner size="lg" />
+                </div>
               ) : (
                 <button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-gray-900 shadow-lg hover:shadow-xl"
+                  className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-gray-900 shadow-lg hover:shadow-xl"
                 >
                   Submit Lost Item
                 </button>
               )}
             </form>
-
-            {/* form */}
           </div>
         </div>
       </section>
-      <ToastContainer />
     </>
   );
 };

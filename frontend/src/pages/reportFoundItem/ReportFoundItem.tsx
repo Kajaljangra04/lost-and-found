@@ -1,8 +1,6 @@
-"use client";
 import { useForm } from "react-hook-form";
 import { Spinner } from "flowbite-react";
-import Modals from "../../components/modal/Modal";
-import { ToastContainer } from "react-toastify";
+import toastNotify from "../../components/modal/toastNotify";
 import { useState } from "react";
 import {
   useCategoryQuery,
@@ -10,6 +8,40 @@ import {
 } from "../../redux/api/api";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { IoIosArrowDown } from "react-icons/io";
+import type { ItemCategory } from "../../types/types";
+
+// Custom styles for DatePicker to match form styling
+const datePickerStyles = `
+  .react-datepicker__input-container input {
+    background-color: rgb(55 65 81 / 0.7) !important;
+    border: 1px solid rgb(75 85 99) !important;
+    color: white !important;
+    border-radius: 0.75rem !important;
+    padding: 0.75rem 1rem !important;
+    font-size: 0.875rem !important;
+    width: 100% !important;
+    outline: none !important;
+  }
+  .react-datepicker__input-container input:focus {
+    border-color: rgb(6 182 212) !important;
+    box-shadow: 0 0 0 1px rgb(6 182 212) !important;
+  }
+  .react-datepicker__input-container input::placeholder {
+    color: rgb(156 163 175) !important;
+  }
+`;
+
+const inputClass =
+  "w-full px-4 py-3 bg-gray-700/70 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all duration-200 backdrop-blur-sm";
+
+type ReportFoundForm = {
+  imgUrl: string;
+  foundItemName: string;
+  description: string;
+  location: string;
+  claimProcess: string;
+};
 
 const ReportFoundItem = () => {
   const {
@@ -17,24 +49,22 @@ const ReportFoundItem = () => {
     register,
     formState: { errors },
     reset,
-  } = useForm();
+  } = useForm<ReportFoundForm>();
 
-  const [selectedMenu, setselectedMenu] = useState("");
-  const [selectedMenucategoryId, setselectedMenucategoryId] = useState("");
-  const handleMenuChange = (menuName: string, categoryId: string) => {
-    setselectedMenu(menuName);
-    setselectedMenucategoryId(categoryId);
-  };
+  const [categoryId, setCategoryId] = useState("");
+  const [submitted, setSubmitted] = useState(false);
   const [createFoundItem, { isLoading }] = useCreateFoundItemMutation();
   const { data: Category } = useCategoryQuery("");
-
   const [startDate, setStartDate] = useState(new Date());
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: ReportFoundForm) => {
+    setSubmitted(true);
+    if (!categoryId) return;
+
     try {
       const foundData = {
         img: data.imgUrl,
-        categoryId: selectedMenucategoryId,
+        categoryId,
         foundItemName: data.foundItemName,
         description: data.description,
         location: data.location,
@@ -42,39 +72,50 @@ const ReportFoundItem = () => {
         claimProcess: data.claimProcess,
       };
 
-      const res: any = await createFoundItem(foundData);
+      const res = await createFoundItem(foundData);
 
       if (res?.data?.success == false) {
-        Modals({ message: "Failed to create Found item", status: false });
+        toastNotify({ message: "Failed to create Found item", status: false });
       } else {
-        Modals({ message: "Found item created successfully", status: true });
+        toastNotify({ message: "Found item created successfully", status: true });
         reset();
+        setCategoryId("");
+        setSubmitted(false);
       }
-    } catch (err: any) {
-      Modals({ message: "Failed to create Found item", status: false });
+    } catch {
+      toastNotify({ message: "Failed to create Found item", status: false });
     }
   };
 
   return (
     <>
+      <style>{datePickerStyles}</style>
       <section className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-black py-12">
         <div className="max-w-4xl mx-auto px-6 w-full">
           <div className="bg-gradient-to-br from-gray-800/90 via-gray-900/90 to-black/90 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-700 p-8">
-            <h1 className="text-3xl font-bold text-center mb-8 bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold text-center mb-2 bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
               Report Found Item
             </h1>
+            <p className="text-center text-gray-400 mb-8">
+              Found something? Let the community know so it can find its way
+              home.
+            </p>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              <div className="grid gap-6 mb-6 md:grid-cols-2">
+              <div className="grid gap-6 md:grid-cols-2">
                 <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-300">
+                  <label
+                    htmlFor="foundItemName"
+                    className="block mb-2 text-sm font-medium text-gray-300"
+                  >
                     Found item name
                   </label>
                   <input
+                    id="foundItemName"
                     {...register("foundItemName", {
                       required: "Found item name is required",
                     })}
                     type="text"
-                    className="w-full px-4 py-3 bg-gray-700/70 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all duration-200 backdrop-blur-sm"
+                    className={inputClass}
                     placeholder="Laptop/Phone"
                   />
                   {errors.foundItemName && (
@@ -84,13 +125,17 @@ const ReportFoundItem = () => {
                   )}
                 </div>
                 <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-300">
+                  <label
+                    htmlFor="description"
+                    className="block mb-2 text-sm font-medium text-gray-300"
+                  >
                     Description
                   </label>
                   <input
+                    id="description"
                     type="text"
-                    className="w-full px-4 py-3 bg-gray-700/70 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all duration-200 backdrop-blur-sm"
-                    placeholder="What device look like, color"
+                    className={inputClass}
+                    placeholder="What does it look like, color, brand"
                     {...register("description", {
                       required: "Description is required",
                     })}
@@ -103,12 +148,16 @@ const ReportFoundItem = () => {
                 </div>
 
                 <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-300">
+                  <label
+                    htmlFor="imgUrl"
+                    className="block mb-2 text-sm font-medium text-gray-300"
+                  >
                     Image url
                   </label>
                   <input
+                    id="imgUrl"
                     type="text"
-                    className="w-full px-4 py-3 bg-gray-700/70 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all duration-200 backdrop-blur-sm"
+                    className={inputClass}
                     placeholder="http://found-image.com"
                     {...register("imgUrl", {
                       required: "Image url is required",
@@ -121,12 +170,16 @@ const ReportFoundItem = () => {
                   )}
                 </div>
                 <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-300">
+                  <label
+                    htmlFor="location"
+                    className="block mb-2 text-sm font-medium text-gray-300"
+                  >
                     Location
                   </label>
                   <input
+                    id="location"
                     type="text"
-                    className="w-full px-4 py-3 bg-gray-700/70 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all duration-200 backdrop-blur-sm"
+                    className={inputClass}
                     placeholder="City, Country"
                     {...register("location", {
                       required: "Location is required",
@@ -139,12 +192,16 @@ const ReportFoundItem = () => {
                   )}
                 </div>
                 <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-300">
+                  <label
+                    htmlFor="claimProcess"
+                    className="block mb-2 text-sm font-medium text-gray-300"
+                  >
                     Claim Process
                   </label>
                   <input
+                    id="claimProcess"
                     type="text"
-                    className="w-full px-4 py-3 bg-gray-700/70 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all duration-200 backdrop-blur-sm"
+                    className={inputClass}
                     placeholder="How should someone claim this item?"
                     {...register("claimProcess", {
                       required: "Claim process is required",
@@ -157,14 +214,19 @@ const ReportFoundItem = () => {
                   )}
                 </div>
                 <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-300">
+                  <label
+                    htmlFor="foundDate"
+                    className="block mb-2 text-sm font-medium text-gray-300"
+                  >
                     Date
                   </label>
                   <DatePicker
                     wrapperClassName="w-full"
-                    className="w-full px-4 py-3 bg-gray-700/70 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all duration-200 backdrop-blur-sm"
+                    className={inputClass}
                     selected={startDate}
-                    onChange={(date: any) => setStartDate(date)}
+                    onChange={(date) => {
+                      if (date) setStartDate(date);
+                    }}
                     dateFormat="yyyy-MM-dd"
                     placeholderText="Select date"
                     showYearDropdown
@@ -175,29 +237,23 @@ const ReportFoundItem = () => {
                 </div>
 
                 <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-300">
+                  <label
+                    htmlFor="category"
+                    className="block mb-2 text-sm font-medium text-gray-300"
+                  >
                     Category
                   </label>
                   <div className="relative">
                     <select
-                      className="w-full px-4 py-3 bg-gray-700/70 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all duration-200 backdrop-blur-sm appearance-none cursor-pointer"
-                      value={selectedMenucategoryId}
-                      onChange={(e) => {
-                        const selectedCategory = Category?.data?.find(
-                          (cat: any) => cat.id === e.target.value
-                        );
-                        if (selectedCategory) {
-                          handleMenuChange(
-                            selectedCategory.name,
-                            selectedCategory.id
-                          );
-                        }
-                      }}
+                      id="category"
+                      className={`${inputClass} appearance-none cursor-pointer`}
+                      value={categoryId}
+                      onChange={(e) => setCategoryId(e.target.value)}
                     >
                       <option value="" disabled className="text-gray-400">
                         Select a category
                       </option>
-                      {Category?.data?.map((category: any) => (
+                      {Category?.data?.map((category: ItemCategory) => (
                         <option
                           key={category?.id}
                           value={category?.id}
@@ -208,16 +264,10 @@ const ReportFoundItem = () => {
                       ))}
                     </select>
                     <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
-                      <svg
-                        className="fill-current h-4 w-4"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                      >
-                        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-                      </svg>
+                      <IoIosArrowDown className="h-4 w-4" />
                     </div>
                   </div>
-                  {!selectedMenu && (
+                  {submitted && !categoryId && (
                     <p className="text-red-400 text-sm mt-1">
                       Category is required
                     </p>
@@ -241,7 +291,6 @@ const ReportFoundItem = () => {
           </div>
         </div>
       </section>
-      <ToastContainer />
     </>
   );
 };

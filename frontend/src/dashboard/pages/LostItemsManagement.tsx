@@ -15,6 +15,7 @@ import {
   useEditMyLostItemMutation,
   useCategoryQuery,
 } from "../../redux/api/api";
+import type { ItemCategory } from "../../types/types";
 import { IoMdRadioButtonOn } from "react-icons/io";
 interface LostItem {
   id: string;
@@ -63,7 +64,7 @@ const LostItemsManagement = () => {
   });
 
   const { data: categoriesData } = useCategoryQuery({});
-  console.log("first", lostItemsData);
+
   const [deleteMyLostItem] = useDeleteMyLostItemMutation();
   const [markAsFound] = useMarkLostItemAsFoundMutation();
   const [editMyLostItem] = useEditMyLostItemMutation();
@@ -93,7 +94,7 @@ const LostItemsManagement = () => {
       toast.success("Item updated successfully");
       setIsEditModalOpen(false);
       setEditingItem(null);
-    } catch (error) {
+    } catch {
       toast.error("Failed to update item");
     } finally {
       setIsEditLoading(false);
@@ -119,7 +120,7 @@ const LostItemsManagement = () => {
       toast.success("Item deleted successfully");
       setIsDeleteModalOpen(false);
       setDeletingItem(null);
-    } catch (error) {
+    } catch {
       toast.error("Failed to delete item");
     } finally {
       setIsDeleteLoading(false);
@@ -140,7 +141,7 @@ const LostItemsManagement = () => {
         ? "Item marked as not found successfully"
         : "Item marked as found successfully";
       toast.success(message);
-    } catch (error) {
+    } catch {
       toast.error("Failed to update item status");
     } finally {
       setMarkingAsFoundId(null);
@@ -531,7 +532,7 @@ const LostItemsManagement = () => {
                   required
                 >
                   <option value="">Select a category</option>
-                  {categoriesData?.data?.map((category: any) => (
+                  {categoriesData?.data?.map((category: ItemCategory) => (
                     <option key={category.id} value={category.id}>
                       {category.name}
                     </option>

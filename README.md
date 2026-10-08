@@ -97,25 +97,58 @@ This project demonstrates a complete implementation of a community service platf
 
 ## 🛠️ Installation & Usage (Local)
 
-```bash
-# Clone the repository
-git clone https://github.com/alamin147/lost-and-found.git
+> 💡 The database is a **cloud PostgreSQL (Neon)** instance — no local database or Docker is required.
 
-# Navigate to the backend
+### Prerequisites
+- Node.js 18+
+
+### 1. Configure the database
+
+Copy the project's connection string from Neon (or any PostgreSQL host) into `server/.env`:
+
+```bash
+DATABASE_URL="postgresql://user:password@ep-xxx.aws.neon.tech/lost_and_found?sslmode=require"
+```
+
+Then apply migrations and seed data:
+
+```bash
+cd lost-and-found/server
+npm run migrate:deploy   # apply database migrations
+npm run seed             # seed categories, admin & demo users, sample items
+```
+
+### 2. Backend
+
+```bash
 cd lost-and-found/server
 npm install
+npm start                # starts the API on http://localhost:5000
+```
 
-# Create .env file in the server directory with required environment variables
-# Then start the server
-npm start
+### 3. Frontend
 
-# Navigate to the frontend
-cd ../frontend
+```bash
+cd lost-and-found/frontend
 npm install
+
+# .env:
+#   VITE_SERVER_URL=http://localhost:5000
+
 npm run dev
 ```
 
 Open `http://localhost:5173` in your browser.
+
+### 👤 Seeded accounts
+
+| Role  | Username | Password  |
+|-------|----------|-----------|
+| Admin | `admin`  | `admin123` |
+| User  | `demo`   | `demo1234` |
+
+> ✅ **AI search:** Powered by Google's new **Interactions API** (`POST /v1beta/interactions` — the old `generateContent` API is retired for new projects). Configured via `GEMINI_API_KEY` and `GEMINI_MODEL` (default `gemini-3.5-flash`) in `server/.env`. If the API is unreachable, rate-limited, or the key is invalid, search automatically falls back to built-in keyword search.
+
 
 ---
 
@@ -248,6 +281,7 @@ PUT /api/claims/:claimId        - Update claim status (with authentication)
 ### Dashboard & Statistics
 ```http
 GET /api/admin/stats            - Get admin dashboard statistics (admin only)
+GET /api/recent-activity        - Get recent activity feed for the dashboard (with authentication)
 ```
 
 ### AI Search
@@ -342,4 +376,11 @@ The application is fully responsive and optimized for:
 The application can be deployed on various platforms:
 - **Frontend**: Vercel hosting service
 - **Backend**: Vercel hosting service
-- **Database**: PostgreSQL on Prisma Cloud
+- **Database**: PostgreSQL on Neon
+
+> ⚠️ **Backend deploys:** `server/vercel.json` uses the legacy `builds` config, so Vercel does **not** run the build step itself — it ships your local `dist/` as-is. Always deploy with:
+> ```bash
+> cd server
+> npm run deploy    # = npm run build && vercel --prod
+> ```
+> The frontend (Vite) builds automatically on Vercel — a plain `vercel --prod` inside `frontend/` is enough.

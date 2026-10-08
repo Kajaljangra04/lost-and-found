@@ -3,10 +3,35 @@ import { FaSearch, FaRobot, FaBrain, FaSpinner, FaEye, FaMapMarkerAlt, FaCalenda
 import { useAiSearchMutation } from "../../redux/api/api";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { getErrorMessage } from "../../utils/getErrorMessage";
+
+interface AISearchFoundItem {
+  id: string;
+  img?: string;
+  foundItemName: string;
+  description?: string;
+  location?: string;
+  date?: string;
+  isClaimed?: boolean;
+  category?: { name?: string };
+  user?: { username?: string };
+}
+
+interface AISearchLostItem {
+  id: string;
+  img?: string;
+  lostItemName: string;
+  description?: string;
+  location?: string;
+  date?: string;
+  isFound?: boolean;
+  category?: { name?: string };
+  user?: { username?: string };
+}
 
 interface SearchResult {
-  foundItems: any[];
-  lostItems: any[];
+  foundItems: AISearchFoundItem[];
+  lostItems: AISearchLostItem[];
   reasoning: string;
   totalFound: number;
   totalLost: number;
@@ -28,26 +53,30 @@ const AiSearch: React.FC = () => {
 
     try {
       const response = await aiSearch({ query: searchQuery }).unwrap();
-      console.log("Full API response:", response);
 
       // The response might be wrapped in a data property
       const result = response.data || response;
-      console.log("Search results:", result);
 
       setSearchResults(result);
       toast.success("AI search completed successfully!");
-    } catch (error: any) {
-      console.error("Search error:", error);
-      toast.error(error?.data?.message || "Search failed. Please try again.");
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Search failed. Please try again."));
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString();
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return "—";
+    const date = new Date(dateString);
+    if (Number.isNaN(date.getTime())) return "—";
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-indigo-900">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-12">
@@ -147,14 +176,19 @@ const AiSearch: React.FC = () => {
                             src={item.img}
                             alt={item.foundItemName}
                             className="w-full h-40 object-cover rounded-lg"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = "/bgimg.png";
+                            }}
                           />
-                          {item.isClaimed ?<div className="absolute top-2 right-2 bg-emerald-500 text-white px-2 py-1 rounded-lg text-xs font-semibold">
-                            Found
-                          </div>:<div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-lg text-xs font-semibold">
-                            Not Claimed
-                          </div>}
-
-
+                          {item.isClaimed ? (
+                            <div className="absolute top-2 right-2 bg-emerald-500 text-white px-2 py-1 rounded-lg text-xs font-semibold">
+                              ✓ Claimed
+                            </div>
+                          ) : (
+                            <div className="absolute top-2 right-2 bg-cyan-500 text-white px-2 py-1 rounded-lg text-xs font-semibold">
+                              ✦ Available
+                            </div>
+                          )}
                         </div>
                       )}
                       <h4 className="font-bold text-white text-lg mb-3 overflow-hidden text-ellipsis whitespace-nowrap">
@@ -219,6 +253,9 @@ const AiSearch: React.FC = () => {
                             src={item.img}
                             alt={item.lostItemName}
                             className="w-full h-40 object-cover rounded-lg"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = "/bgimg.png";
+                            }}
                           />
                           <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-lg text-xs font-semibold">
                             LOST

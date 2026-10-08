@@ -15,8 +15,8 @@ import {
 } from "../../redux/api/api";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import Modals from "../../components/modal/Modal";
-import { ToastContainer } from "react-toastify";
+import toastNotify from "../../components/modal/toastNotify";
+import QueryErrorBanner from "../../components/QueryErrorBanner";
 import {
   FaSearch,
   FaCheckCircle,
@@ -27,17 +27,36 @@ import {
   FaTrash,
 } from "react-icons/fa";
 
+type MyFoundItem = {
+  id: string;
+  img?: string;
+  foundItemName?: string;
+  description?: string;
+  location?: string;
+  date?: string;
+  categoryId?: string;
+  isClaimed?: boolean;
+};
+
+type EditFoundItemForm = {
+  id?: string;
+  foundItemName: string;
+  description: string;
+  location: string;
+  date: string;
+};
+
 const MyFoundItems = () => {
-  const { data: myFoundItems, isLoading } = useGetMyFoundItemQuery({});
+  const { data: myFoundItems, isLoading, error } = useGetMyFoundItemQuery({});
   const [deleteMyFoundItem] = useDeleteMyFoundItemMutation();
   const [isOpen, setIsOpen] = useState(false);
-  const [currentItem, setCurrentItem]: any = useState(null);
-  const [currId, setCurrId]: any = useState();
+  const [currentItem, setCurrentItem] = useState<MyFoundItem | null>(null);
+  const [currId, setCurrId] = useState<string | undefined>(undefined);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [itemToDelete, setItemToDelete]: any = useState(null);
+  const [itemToDelete, setItemToDelete] = useState<MyFoundItem | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const handleDeleteClick = (item: any) => {
+  const handleDeleteClick = (item: MyFoundItem) => {
     setItemToDelete(item);
     setIsDeleteModalOpen(true);
   };
@@ -49,12 +68,12 @@ const MyFoundItems = () => {
     try {
       const res = await deleteMyFoundItem(itemToDelete.id);
       if (res?.data?.statusCode == 200) {
-        Modals({ message: res?.data?.message, status: true });
+        toastNotify({ message: res?.data?.message, status: true });
       } else {
-        Modals({ message: "Failed to delete", status: false });
+        toastNotify({ message: "Failed to delete", status: false });
       }
-    } catch (error) {
-      Modals({ message: "Failed to delete", status: false });
+    } catch {
+      toastNotify({ message: "Failed to delete", status: false });
     } finally {
       setIsDeleting(false);
       setIsDeleteModalOpen(false);
@@ -70,7 +89,7 @@ const MyFoundItems = () => {
 
   const [editMyFoundItem] = useEditMyFoundItemMutation();
 
-  const openModal = (item: any) => {
+  const openModal = (item: MyFoundItem) => {
     setCurrentItem(item);
     setIsOpen(true);
     setCurrId(item?.id);
@@ -87,20 +106,19 @@ const MyFoundItems = () => {
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm();
+  } = useForm<EditFoundItemForm>();
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: EditFoundItemForm) => {
     data.id = currId;
     data.date = new Date(data?.date).toISOString();
 
     const res = await editMyFoundItem(data);
     if (res?.data?.statusCode == 200) {
-      Modals({ message: res?.data?.message, status: true });
+      toastNotify({ message: res?.data?.message, status: true });
     } else {
-      Modals({ message: "Failed to update", status: false });
+      toastNotify({ message: "Failed to update", status: false });
     }
 
-    // console.log( res);
     closeModal();
   };
 
@@ -153,7 +171,7 @@ const MyFoundItems = () => {
               <div>
                 <p className="text-gray-400 text-sm">Not Claimed</p>
                 <p className="text-2xl font-bold text-red-400">
-                  {myFoundItems?.data?.filter((item: any) => !item.isClaimed)
+                  {myFoundItems?.data?.filter((item: MyFoundItem) => !item.isClaimed)
                     .length || 0}
                 </p>
               </div>
@@ -168,7 +186,7 @@ const MyFoundItems = () => {
               <div>
                 <p className="text-gray-400 text-sm">Claimed</p>
                 <p className="text-2xl font-bold text-green-400">
-                  {myFoundItems?.data?.filter((item: any) => item.isClaimed)
+                  {myFoundItems?.data?.filter((item: MyFoundItem) => item.isClaimed)
                     .length || 0}
                 </p>
               </div>
@@ -178,6 +196,8 @@ const MyFoundItems = () => {
             </div>
           </div>
         </div>
+
+        {error && <QueryErrorBanner />}
 
         {/* Table */}
         {myFoundItems?.data?.length === 0 ? (
@@ -217,7 +237,7 @@ const MyFoundItems = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-700">
-                  {myFoundItems?.data?.map((myFoundItem: any) => (
+                  {myFoundItems?.data?.map((myFoundItem: MyFoundItem) => (
                     <tr
                       key={myFoundItem.id}
                       className="hover:bg-gray-700/50 transition-colors duration-200"
@@ -274,7 +294,7 @@ const MyFoundItems = () => {
                       <td className="px-6 py-4 text-gray-300">
                         <div className="flex items-center">
                           <FaCalendarAlt className="mr-2 text-gray-400" />
-                          <span>{myFoundItem?.date.split("T")[0]}</span>
+                          <span>{myFoundItem?.date ? myFoundItem.date.split("T")[0] : "—"}</span>
                         </div>
                       </td>
                       <td className="px-6 py-4">
@@ -497,19 +517,6 @@ const MyFoundItems = () => {
           </ModalBody>
         </div>
       </Modal>
-
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="dark"
-      />
     </div>
   );
 };

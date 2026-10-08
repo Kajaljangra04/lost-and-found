@@ -9,6 +9,7 @@ import {
   FaBoxOpen,
 } from "react-icons/fa";
 import { toast } from "react-toastify";
+import { getErrorMessage } from "../../utils/getErrorMessage";
 import {
   useCategoryQuery,
   useCreateCategoryMutation,
@@ -68,8 +69,8 @@ const CategoriesManagement = () => {
         setEditingId(null);
         setEditForm({ name: "" });
         toast.success("Category updated successfully");
-      } catch (error: any) {
-        toast.error(error?.data?.message || "Failed to update category");
+      } catch (error) {
+        toast.error(getErrorMessage(error, "Failed to update category"));
       }
     }
   };
@@ -86,8 +87,8 @@ const CategoriesManagement = () => {
         setNewCategory({ name: "" });
         setShowAddForm(false);
         toast.success("Category added successfully");
-      } catch (error: any) {
-        toast.error(error?.data?.message || "Failed to create category");
+      } catch (error) {
+        toast.error(getErrorMessage(error, "Failed to create category"));
       }
     }
   };
@@ -104,8 +105,8 @@ const CategoriesManagement = () => {
         setShowDeleteModal(false);
         setCategoryToDelete(null);
         toast.success("Category deleted successfully");
-      } catch (error: any) {
-        toast.error(error?.data?.message || "Failed to delete category");
+      } catch (error) {
+        toast.error(getErrorMessage(error, "Failed to delete category"));
       }
     }
   };

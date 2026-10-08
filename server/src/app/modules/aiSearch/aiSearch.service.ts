@@ -1,23 +1,71 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import prisma from "../../config/prisma";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+const GEMINI_API_URL =
+  "https://generativelanguage.googleapis.com/v1beta/interactions";
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.5-flash";
 
-// Gemini API calls
-async function safeGenerate(model: any, prompt: string, retries = 3) {
-  for (let i = 0; i < retries; i++) {
-    try {
-      const result = await model.generateContent(prompt);
-      return result;
-    } catch (err: any) {
-      if (err.status === 503 && i < retries - 1) {
-        console.warn(`Gemini overloaded. Retrying... attempt ${i + 1}`);
-        await new Promise((res) => setTimeout(res, (i + 1) * 1000)); 
-      } else {
-        throw err;
-      }
-    }
+// Call the Gemini Interactions API (the old generateContent API is retired
+// for new projects, see https://ai.google.dev/gemini-api/docs/get-started)
+async function generateText(prompt: string, budgetMs = 8000): Promise<string> {
+  const apiKey = process.env.GEMINI_API_KEY || "";
+  if (!apiKey) {
+    throw new Error("GEMINI_API_KEY is not set");
   }
+
+  const deadline = Date.now() + budgetMs;
+  let lastError: Error = new Error("Gemini request failed");
+
+  // Up to 2 attempts, but never exceed the overall time budget so the
+  // request fits within the serverless function timeout.
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const remaining = deadline - Date.now();
+    if (remaining < 1500) break;
+
+    const response = await fetch(GEMINI_API_URL, {
+      method: "POST",
+      headers: {
+        "x-goog-api-key": apiKey,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ model: GEMINI_MODEL, input: prompt }),
+      signal: AbortSignal.timeout(remaining),
+    }).catch((err) => {
+      throw new Error(`Gemini request error: ${err?.message || err}`);
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      lastError = new Error(
+        `Gemini API error ${response.status}: ${errorText}`
+      );
+      const retryable = response.status === 429 || response.status >= 500;
+      if (retryable && attempt === 0) {
+        console.warn(
+          `Gemini request failed (${response.status}). Retrying once...`
+        );
+        await new Promise((res) => setTimeout(res, 400));
+        continue;
+      }
+      throw lastError;
+    }
+
+    const data = await response.json();
+    // Extract the final text from the interaction's model_output steps
+    const text = (data.steps ?? [])
+      .filter((step: any) => step.type === "model_output")
+      .flatMap((step: any) => step.content ?? [])
+      .filter((part: any) => part.type === "text")
+      .map((part: any) => part.text)
+      .join("")
+      .trim();
+
+    if (!text) {
+      throw new Error("Gemini returned an empty response");
+    }
+    return text;
+  }
+
+  throw lastError;
 }
 
 const aiSearchItems = async (searchQuery: string) => {
@@ -60,9 +108,6 @@ const aiSearchItems = async (searchQuery: string) => {
       date: item.date,
     }));
 
-    // Gemini model
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
     const prompt = `
     You are an AI assistant helping people find lost and found items.
 
@@ -89,9 +134,7 @@ const aiSearchItems = async (searchQuery: string) => {
     Only return the JSON object, no additional text.
     `;
 
-    const result = await safeGenerate(model, prompt);
-    const response = await result.response;
-    let aiResponse = response.text().trim();
+    let aiResponse = (await generateText(prompt)).trim();
 
     aiResponse = aiResponse
       .replace(/```json/g, "")
@@ -151,22 +194,48 @@ const performSimpleSearch = (
   lostItems: any[]
 ) => {
   const query = searchQuery.toLowerCase();
+  // Split into meaningful keywords so partial queries still match
+  const keywords = query
+    .split(/[^a-z0-9]+/)
+    .filter((word) => word.length > 2);
 
-  const matchedFoundItems = foundItems.filter(
-    (item) =>
-      item.foundItemName.toLowerCase().includes(query) ||
-      item.description.toLowerCase().includes(query) ||
-      item.category?.name.toLowerCase().includes(query) ||
-      item.location.toLowerCase().includes(query)
-  );
+  const scoreItem = (fields: string[]) => {
+    const text = fields.filter(Boolean).join(" ").toLowerCase();
+    // Full phrase match counts extra
+    let score = text.includes(query) ? 100 : 0;
+    for (const keyword of keywords) {
+      if (text.includes(keyword)) score += 1;
+    }
+    return score;
+  };
 
-  const matchedLostItems = lostItems.filter(
-    (item) =>
-      item.lostItemName.toLowerCase().includes(query) ||
-      item.description.toLowerCase().includes(query) ||
-      item.category?.name.toLowerCase().includes(query) ||
-      item.location.toLowerCase().includes(query)
-  );
+  const matchedFoundItems = foundItems
+    .map((item) => ({
+      item,
+      score: scoreItem([
+        item.foundItemName,
+        item.description,
+        item.category?.name,
+        item.location,
+      ]),
+    }))
+    .filter((entry) => entry.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .map((entry) => entry.item);
+
+  const matchedLostItems = lostItems
+    .map((item) => ({
+      item,
+      score: scoreItem([
+        item.lostItemName,
+        item.description,
+        item.category?.name,
+        item.location,
+      ]),
+    }))
+    .filter((entry) => entry.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .map((entry) => entry.item);
 
   return {
     foundItems: matchedFoundItems,

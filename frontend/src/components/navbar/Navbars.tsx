@@ -2,17 +2,14 @@ import { signOut, useUserVerification } from "../../auth/auth";
 import {
   Dropdown,
   Navbar,
-  NavbarBrand,
   NavbarToggle,
   NavbarCollapse,
-  NavbarLink,
   DropdownHeader,
   DropdownItem,
   DropdownDivider,
 } from "flowbite-react";
 import { Link, useNavigate } from "react-router-dom";
-import Modals from "../modal/Modal";
-import { ToastContainer } from "react-toastify";
+import toastNotify from "../modal/toastNotify";
 import {
   FaSearch,
   FaUser,
@@ -25,12 +22,11 @@ import {
 
 export function Navbars() {
   const navigate = useNavigate();
-  const users: any = useUserVerification();
-  // console.log(users);
+  const users = useUserVerification();
+
   const handleSignOut = () => {
     signOut(navigate);
-    Modals({ message: "Log out successfully", status: true });
-    window.location.reload();
+    toastNotify({ message: "Log out successfully", status: true });
   };
   return (
     <>
@@ -38,7 +34,7 @@ export function Navbars() {
         fluid
         className="sticky top-0 z-50 bg-gradient-to-r from-gray-800 to-gray-900 backdrop-blur-md border-b border-gray-700 shadow-2xl"
       >
-        <NavbarBrand href="/">
+        <Link to="/" className="flex items-center shrink-0">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg">
               <FaSearch className="text-white text-lg" />
@@ -50,7 +46,7 @@ export function Navbars() {
               <p className="text-gray-400 text-xs">Find what matters</p>
             </div>
           </div>
-        </NavbarBrand>
+        </Link>
         <div className="flex md:order-2">
           {users?.email ? (
             <div className="flex items-center space-x-3">
@@ -198,63 +194,51 @@ export function Navbars() {
           <NavbarToggle />
         </div>
         <NavbarCollapse>
-          <NavbarLink
-            href="/"
-            className="text-gray-300 hover:text-white hover:bg-gray-700/50 px-4 py-3 rounded-lg transition-all duration-200 font-medium flex items-center space-x-2"
+          <Link
+            to="/"
+            className="block text-gray-300 hover:text-white hover:bg-gray-700/50 px-4 py-3 rounded-lg transition-all duration-200 font-medium flex items-center space-x-2"
           >
             <span>Home</span>
-          </NavbarLink>
-          <NavbarLink
-            href="/reportlostItem"
-            className="text-gray-300 hover:text-white hover:bg-gray-700/50 px-4 py-3 rounded-lg transition-all duration-200 font-medium"
+          </Link>
+          <Link
+            to="/reportlostItem"
+            className="block text-gray-300 hover:text-white hover:bg-gray-700/50 px-4 py-3 rounded-lg transition-all duration-200 font-medium"
           >
             Report Lost Item
-          </NavbarLink>
-          <NavbarLink
-            href="/reportFoundItem"
-            className="text-gray-300 hover:text-white hover:bg-gray-700/50 px-4 py-3 rounded-lg transition-all duration-200 font-medium"
+          </Link>
+          <Link
+            to="/reportFoundItem"
+            className="block text-gray-300 hover:text-white hover:bg-gray-700/50 px-4 py-3 rounded-lg transition-all duration-200 font-medium"
           >
             Report Found Item
-          </NavbarLink>
-          <NavbarLink
-            href="/lostItems"
-            className="text-gray-300 hover:text-white hover:bg-gray-700/50 px-4 py-3 rounded-lg transition-all duration-200 font-medium"
+          </Link>
+          <Link
+            to="/lostItems"
+            className="block text-gray-300 hover:text-white hover:bg-gray-700/50 px-4 py-3 rounded-lg transition-all duration-200 font-medium"
           >
             Lost items
-          </NavbarLink>
-          <NavbarLink
-            href="/foundItems"
-            className="text-gray-300 hover:text-white hover:bg-gray-700/50 px-4 py-3 rounded-lg transition-all duration-200 font-medium"
+          </Link>
+          <Link
+            to="/foundItems"
+            className="block text-gray-300 hover:text-white hover:bg-gray-700/50 px-4 py-3 rounded-lg transition-all duration-200 font-medium"
           >
             Found items
-          </NavbarLink>
-          <NavbarLink
-            href="/ai-search"
-            className="text-gray-300 hover:text-white hover:bg-gray-700/50 px-4 py-3 rounded-lg transition-all duration-200 font-medium flex items-center space-x-2"
+          </Link>
+          <Link
+            to="/ai-search"
+            className="block text-gray-300 hover:text-white hover:bg-gray-700/50 px-4 py-3 rounded-lg transition-all duration-200 font-medium flex items-center space-x-2"
           >
             <FaBrain />
             <span>AI Search</span>
-          </NavbarLink>
-          <NavbarLink
-            href="#aboutUs"
-            className="text-gray-300 hover:text-white hover:bg-gray-700/50 px-4 py-3 rounded-lg transition-all duration-200 font-medium"
+          </Link>
+          <Link
+            to="/#aboutUs"
+            className="block text-gray-300 hover:text-white hover:bg-gray-700/50 px-4 py-3 rounded-lg transition-all duration-200 font-medium"
           >
             About us
-          </NavbarLink>
+          </Link>
         </NavbarCollapse>
       </Navbar>
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="dark"
-      />
     </>
   );
 }

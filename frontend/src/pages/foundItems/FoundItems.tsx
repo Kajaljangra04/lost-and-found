@@ -1,4 +1,5 @@
 import { useGetFoundItemsQuery } from "../../redux/api/api";
+import type { FoundItem } from "../../types/types";
 import { Link } from "react-router-dom";
 import {
   FaSearch,
@@ -7,6 +8,17 @@ import {
   FaChevronRight,
 } from "react-icons/fa";
 import { useState } from "react";
+
+const formatDate = (date: string | Date | undefined) => {
+  if (!date) return "—";
+  const d = new Date(date);
+  if (Number.isNaN(d.getTime())) return "—";
+  return d.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+};
 
 const FoundItemsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -22,7 +34,6 @@ const FoundItemsPage = () => {
     sortBy,
     sortOrder,
   });
-  // console.log(foundItems?.data);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -211,12 +222,11 @@ const FoundItemsPage = () => {
           </div>
         ) : (
           <div className="grid gap-6 mx-auto grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {" "}
-            {foundItems?.data?.map((foundItem: any) => {
+            {foundItems?.data?.map((foundItem: FoundItem) => {
               return (
                 <div
                   key={foundItem.id}
-                  className="group relative bg-gradient-to-br from-gray-800 via-gray-900 to-black rounded-xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105 border border-gray-700 hover:border-gray-600 max-w-sm"
+                  className="group relative bg-gradient-to-br from-gray-800 via-gray-900 to-black rounded-xl overflow-hidden shadow-2xl transition-all duration-300 transform hover:scale-105 hover:shadow-cyan-500/10 border border-gray-700 hover:border-gray-600 max-w-sm"
                 >
                   <div className="relative overflow-hidden">
                     <div className="h-56 w-full overflow-hidden">
@@ -238,9 +248,9 @@ const FoundItemsPage = () => {
                         ✓ Claimed
                       </div>
                     ) : (
-                      <div className="absolute top-3 right-3 bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg backdrop-blur-sm border border-red-400/50">
-                      ⚠ Not Found
-                    </div>
+                      <div className="absolute top-3 right-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg backdrop-blur-sm border border-cyan-400/50">
+                        ✦ Available
+                      </div>
                     )}
                   </div>
 
@@ -257,9 +267,9 @@ const FoundItemsPage = () => {
                       <div className="flex items-center text-sm">
                         <span className="text-gray-400 mr-2">📅</span>
                         <span className="text-gray-200">
-                          {foundItem?.date
-                            ? foundItem?.date?.split("T")[0]
-                            : foundItem?.createdAt?.split("T")[0]}
+                          {formatDate(
+                            foundItem?.date || foundItem?.createdAt
+                          )}
                         </span>
                       </div>
                       <div className="flex items-center text-sm">
@@ -312,11 +322,8 @@ const FoundItemsPage = () => {
               {(() => {
                 const pages = [];
                 const maxVisiblePages = 5;
-                let startPage = Math.max(
-                  1,
-                  currentPage - Math.floor(maxVisiblePages / 2)
-                );
-                let endPage = Math.min(
+                let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+                const endPage = Math.min(
                   totalPages,
                   startPage + maxVisiblePages - 1
                 );

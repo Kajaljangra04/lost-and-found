@@ -1,12 +1,16 @@
 import { useForm } from "react-hook-form";
 import { Spinner } from "flowbite-react";
-import Modals from "../../components/modal/Modal";
-import { ToastContainer } from "react-toastify";
+import toastNotify from "../../components/modal/toastNotify";
+import { getErrorMessage } from "../../utils/getErrorMessage";
 import { setUserLocalStorage } from "../../auth/auth";
 import { useLoginMutation } from "../../redux/api/api";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { MdEmail, MdVisibility, MdVisibilityOff } from "react-icons/md";
 import { useState } from "react";
+
+const inputClass =
+  "bg-gray-800/50 border border-gray-600 text-white placeholder-gray-400 rounded-lg px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 backdrop-blur-sm w-full";
+
 const Login = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -15,37 +19,36 @@ const Login = () => {
     register,
     formState: { errors },
     setValue,
-  } = useForm();
+  } = useForm<{ username: string; password: string }>();
 
   const [login, { isLoading }] = useLoginMutation();
 
-  // Auto-fill functions
+  // Auto-fill for demo accounts (matches the seeded database)
   const fillAdminCredentials = () => {
-    setValue("username", "admin@gmail.com");
-    setValue("password", "123456");
+    setValue("username", "admin");
+    setValue("password", "admin123");
   };
 
   const fillUserCredentials = () => {
-    setValue("username", "user1@gmail.com");
-    setValue("password", "123456");
+    setValue("username", "demo");
+    setValue("password", "demo1234");
   };
 
-  const onSubmit = async (data: any) => {
-    // console.log(data)
+  const onSubmit = async (data: { username: string; password: string }) => {
     try {
-      const res: any = await login(data);
-      console.log(res);
+      const res = await login(data);
       if (res?.data) {
-        Modals({ message: "User logged in successfully", status: true });
+        toastNotify({ message: "User logged in successfully", status: true });
         setUserLocalStorage(res?.data?.data?.token);
         navigate("/");
-        // Reload the page to update user state
-        window.location.reload();
       } else {
-        Modals({ message: res?.error?.data?.message, status: false });
+        toastNotify({
+          message: getErrorMessage(res?.error, "Failed to login"),
+          status: false,
+        });
       }
-    } catch (err: any) {
-      Modals({ message: "Failed to login", status: false });
+    } catch {
+      toastNotify({ message: "Failed to login", status: false });
     }
   };
 
@@ -59,28 +62,25 @@ const Login = () => {
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
                   Welcome Back
                 </h1>
-                <p className="text-gray-300">
-                  Sign in to your account
-                </p>
+                <p className="text-gray-300">Sign in to your account</p>
               </div>
 
-              {/* form */}
-              <form
-                onSubmit={handleSubmit(onSubmit)}
-                className="space-y-5"
-                action="#"
-              >
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                 <div className="space-y-1">
-                  <label className="block text-sm font-semibold text-gray-300">
+                  <label
+                    htmlFor="username"
+                    className="block text-sm font-semibold text-gray-300"
+                  >
                     Email or Username
                   </label>
                   <div className="relative">
                     <input
+                      id="username"
                       type="text"
                       {...register("username", {
                         required: "Username is required",
                       })}
-                      className="bg-gray-800/50 border border-gray-600 text-white placeholder-gray-400 rounded-lg px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 backdrop-blur-sm w-full"
+                      className={inputClass}
                       placeholder="name@company.com or username"
                     />
                     <div className="absolute inset-y-0 right-0 flex items-center pr-3">
@@ -95,23 +95,28 @@ const Login = () => {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="block text-sm font-semibold text-gray-300">
+                  <label
+                    htmlFor="password"
+                    className="block text-sm font-semibold text-gray-300"
+                  >
                     Password
                   </label>
                   <div className="relative">
                     <input
+                      id="password"
                       type={showPassword ? "text" : "password"}
                       {...register("password", {
                         required: "Password is required",
                       })}
                       placeholder="••••••••"
-                      className="bg-gray-800/50 border border-gray-600 text-white placeholder-gray-400 rounded-lg px-4 py-3 pr-20 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 backdrop-blur-sm w-full"
+                      className={`${inputClass} pr-20`}
                     />
                     <div className="absolute inset-y-0 right-0 flex items-center pr-3">
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
                         className="text-gray-400 hover:text-gray-300 transition-colors duration-200 mr-2"
+                        aria-label="Toggle password visibility"
                       >
                         {showPassword ? (
                           <MdVisibilityOff className="w-5 h-5" />
@@ -127,9 +132,6 @@ const Login = () => {
                     </p>
                   )}
                 </div>
-                <div className="flex items-center justify-between py-2">
-                  <div className="flex items-center"></div>
-                </div>
 
                 {isLoading ? (
                   <div className="flex justify-center py-4">
@@ -139,9 +141,7 @@ const Login = () => {
                         size="md"
                         className="text-blue-600"
                       />
-                      <span className="text-gray-300">
-                        Signing you in...
-                      </span>
+                      <span className="text-gray-300">Signing you in...</span>
                     </div>
                   </div>
                 ) : (
@@ -183,21 +183,19 @@ const Login = () => {
                 <div className="text-center pt-4">
                   <p className="text-sm text-gray-300">
                     Don't have an account yet?{" "}
-                    <a
-                      href="/register"
+                    <Link
+                      to="/register"
                       className="font-semibold text-blue-400 hover:text-cyan-400 transition-colors duration-200"
                     >
                       Sign up here
-                    </a>
+                    </Link>
                   </p>
                 </div>
               </form>
-              {/* form */}
             </div>
           </div>
         </div>
       </section>
-      <ToastContainer />
     </>
   );
 };

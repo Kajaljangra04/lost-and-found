@@ -7,12 +7,15 @@ import {
   FaMapMarkerAlt,
   FaUser,
   FaTag,
+  FaEnvelope,
 } from "react-icons/fa";
 
 const SingleLostItem = () => {
-  const { lostItem: lostItemId }: any = useParams();
-  const { data: singleLostItem, isLoading } =
-    useGetSingleLostItemQuery(lostItemId);
+  const { lostItem: lostItemId } = useParams<{ lostItem: string }>();
+  const { data: singleLostItem, isLoading } = useGetSingleLostItemQuery(
+    lostItemId ?? "",
+    { skip: !lostItemId }
+  );
 
   if (isLoading) {
     return (
@@ -195,9 +198,23 @@ const SingleLostItem = () => {
                   >
                     Report Found Item
                   </Link>
-                  <button className="flex-1 border-2 border-cyan-600 text-cyan-600 hover:bg-cyan-600 hover:text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-gray-900">
+                  <a
+                    href={`mailto:${
+                      user?.email || ""
+                    }?subject=${encodeURIComponent(
+                      `I found your lost item: ${lostItemName}`
+                    )}&body=${encodeURIComponent(
+                      `Hi ${
+                        user?.username || "there"
+                      },\n\nI think I found your lost item "${lostItemName}" near ${location}. Here are some details:\n\n[Describe the item you found]\n\nYou can reach me back at this email address.\n\nThanks!`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 border-2 border-cyan-600 text-cyan-600 hover:bg-cyan-600 hover:text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-gray-900 text-center inline-flex items-center justify-center gap-2"
+                  >
+                    <FaEnvelope />
                     Contact Owner
-                  </button>
+                  </a>
                 </div>
               ) : (
                 <div className="bg-green-900/30 border border-green-500/50 rounded-xl p-4 text-center">

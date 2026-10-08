@@ -6,7 +6,8 @@ import { Spinner } from "flowbite-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useParams } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
+import { getErrorMessage } from "../../utils/getErrorMessage";
 import "react-toastify/dist/ReactToastify.css";
 import {
   FaArrowLeft,
@@ -20,6 +21,22 @@ import {
 const SingleFoundItem = () => {
   const { foundItem: foundItemParam } = useParams<{ foundItem: string }>();
   const foundItemId = foundItemParam;
+
+  const { data: singleFoundItem, isLoading } = useGetSingleFoundItemQuery(
+    foundItemId ?? "",
+    { skip: !foundItemId }
+  );
+
+  const [createClaim, { isLoading: claimLoading }] = useCreateClaimMutation();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isClaimModalOpen, setIsClaimModalOpen] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<{ lostDate: string; distinguishingFeatures: string }>();
 
   if (!foundItemId) {
     return (
@@ -45,50 +62,14 @@ const SingleFoundItem = () => {
     );
   }
 
-  const { data: singleFoundItem, isLoading } =
-    useGetSingleFoundItemQuery(foundItemId);
-
-  const [createClaim, { isLoading: claimLoading }] = useCreateClaimMutation();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isClaimModalOpen, setIsClaimModalOpen] = useState(false);
-
-  if (!foundItemId) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto px-4">
-          <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 shadow-xl border border-gray-700">
-            <div className="text-red-400 text-6xl mb-4">⚠️</div>
-            <h2 className="text-2xl font-bold text-white mb-4">
-              Invalid Item ID
-            </h2>
-            <p className="text-gray-300 mb-6">
-              No valid item ID was provided. Please check the URL and try again.
-            </p>
-            <Link
-              to="/foundItems"
-              className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-semibold rounded-lg transition-all duration-200"
-            >
-              <FaArrowLeft className="mr-2" />
-              Back to Found Items
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm();
-
   const handleClaimModal = () => {
     setIsClaimModalOpen(true);
   };
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: {
+    lostDate: string;
+    distinguishingFeatures: string;
+  }) => {
     setIsSubmitting(true);
 
     try {
@@ -99,8 +80,11 @@ const SingleFoundItem = () => {
       };
 
       const res = await createClaim(claimData);
-      console.log("first", res);
-      if (res.data?.success) {
+      if (res?.error) {
+        toast.error(
+          getErrorMessage(res.error, "Failed to submit claim. Please try again.")
+        );
+      } else if (res.data?.success) {
         toast.success(
           "Claim submitted successfully! We will review your request."
         );
@@ -109,8 +93,7 @@ const SingleFoundItem = () => {
       } else {
         toast.error("Failed to submit claim. Please try again.");
       }
-    } catch (error) {
-      console.error("Error submitting claim:", error);
+    } catch {
       toast.error("An unexpected error occurred. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -332,10 +315,14 @@ const SingleFoundItem = () => {
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 <div>
-                  <label className="block mb-2 text-sm font-semibold text-white">
+                  <label
+                    htmlFor="lostDate"
+                    className="block mb-2 text-sm font-semibold text-white"
+                  >
                     When did you lose this item? *
                   </label>
                   <input
+                    id="lostDate"
                     type="date"
                     {...register("lostDate", {
                       required: "Lost date is required",
@@ -350,10 +337,14 @@ const SingleFoundItem = () => {
                 </div>
 
                 <div>
-                  <label className="block mb-2 text-sm font-semibold text-white">
+                  <label
+                    htmlFor="distinguishingFeatures"
+                    className="block mb-2 text-sm font-semibold text-white"
+                  >
                     Distinguishing Features *
                   </label>
                   <textarea
+                    id="distinguishingFeatures"
                     rows={4}
                     placeholder="Describe unique features, colors, brands, scratches, or any other identifying characteristics..."
                     {...register("distinguishingFeatures", {
@@ -401,18 +392,6 @@ const SingleFoundItem = () => {
         </div>
       )}
 
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="dark"
-      />
     </>
   );
 };

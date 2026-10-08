@@ -1,4 +1,5 @@
 import { useMyClaimsQuery } from "../../redux/api/api";
+import type { Claim } from "../../types/types";
 import { Link } from "react-router-dom";
 import { useState, useMemo } from "react";
 import {
@@ -12,7 +13,6 @@ import {
   FaTimesCircle,
   FaClock,
 } from "react-icons/fa";
-import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const MyClaimReqPage = () => {
@@ -67,7 +67,7 @@ const MyClaimReqPage = () => {
   const filteredAndSortedClaims = useMemo(() => {
     if (!myClaims?.data) return [];
 
-    let filtered = myClaims.data.filter((claim: any) => {
+    const filtered = myClaims.data.filter((claim: Claim) => {
       const matchesSearch =
         searchTerm === "" ||
         claim?.foundItem?.foundItemName
@@ -87,7 +87,7 @@ const MyClaimReqPage = () => {
     });
 
     // Sort claims
-    filtered.sort((a: any, b: any) => {
+    filtered.sort((a: Claim, b: Claim) => {
       let aValue, bValue;
 
       switch (sortBy) {
@@ -318,7 +318,7 @@ const MyClaimReqPage = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-700">
-                  {filteredAndSortedClaims.map((claim: any) => {
+                  {filteredAndSortedClaims.map((claim: Claim) => {
                     const statusConfig = getStatusConfig(claim?.status);
 
                     return (
@@ -409,19 +409,6 @@ const MyClaimReqPage = () => {
           </div>
         )}
       </div>
-
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="dark"
-      />
     </div>
   );
 };

@@ -25,6 +25,8 @@ import MyLostItems from "./dashboard/myLostItems/MyLostItems.tsx";
 import ReportLostItem from "./pages/reportlostItem/ReportLostItem.tsx";
 import ReportFoundItem from "./pages/reportFoundItem/ReportFoundItem.tsx";
 import AiSearch from "./pages/aiSearch/AiSearch.tsx";
+import NotFound from "./pages/notFound/NotFound.tsx";
+import { RequireAuth, RequireAdmin } from "./components/guards/ProtectedRoute.tsx";
 
 const router = createBrowserRouter([
   {
@@ -71,86 +73,110 @@ const router = createBrowserRouter([
         path: "/ai-search",
         element: <AiSearch />,
       },
+      {
+        path: "*",
+        element: <NotFound />,
+      },
     ],
   },
   {
     path: "/dashboard",
     element: (
-      <DashboardLayout>
-        <Dashboard />
-      </DashboardLayout>
+      <RequireAdmin>
+        <DashboardLayout>
+          <Dashboard />
+        </DashboardLayout>
+      </RequireAdmin>
     ),
   },
   {
     path: "/dashboard/found-items",
     element: (
-      <DashboardLayout>
-        <FoundItemsManagement />
-      </DashboardLayout>
+      <RequireAdmin>
+        <DashboardLayout>
+          <FoundItemsManagement />
+        </DashboardLayout>
+      </RequireAdmin>
     ),
   },
   {
     path: "/dashboard/lost-items",
     element: (
-      <DashboardLayout>
-        <LostItemsManagement />
-      </DashboardLayout>
+      <RequireAdmin>
+        <DashboardLayout>
+          <LostItemsManagement />
+        </DashboardLayout>
+      </RequireAdmin>
     ),
   },
   {
     path: "/dashboard/claims",
     element: (
-      <DashboardLayout>
-        <ClaimsManagement />
-      </DashboardLayout>
+      <RequireAdmin>
+        <DashboardLayout>
+          <ClaimsManagement />
+        </DashboardLayout>
+      </RequireAdmin>
     ),
   },
   {
     path: "/dashboard/users",
     element: (
-      <DashboardLayout>
-        <UsersManagement />
-      </DashboardLayout>
+      <RequireAdmin>
+        <DashboardLayout>
+          <UsersManagement />
+        </DashboardLayout>
+      </RequireAdmin>
     ),
   },
   {
     path: "/dashboard/categories",
     element: (
-      <DashboardLayout>
-        <CategoriesManagement />
-      </DashboardLayout>
+      <RequireAdmin>
+        <DashboardLayout>
+          <CategoriesManagement />
+        </DashboardLayout>
+      </RequireAdmin>
     ),
   },
   {
     path: "/dashboard/settings",
     element: (
-      <DashboardLayout>
-        <Settings />
-      </DashboardLayout>
+      <RequireAuth>
+        <DashboardLayout>
+          <Settings />
+        </DashboardLayout>
+      </RequireAuth>
     ),
   },
   {
     path: "/dashboard/myFoundItems",
     element: (
-      <DashboardLayout>
-        <MyFoundItems />
-      </DashboardLayout>
+      <RequireAuth>
+        <DashboardLayout>
+          <MyFoundItems />
+        </DashboardLayout>
+      </RequireAuth>
     ),
   },
   {
     path: "/dashboard/myLostItems",
     element: (
-      <DashboardLayout>
-        <MyLostItems />
-      </DashboardLayout>
+      <RequireAuth>
+        <DashboardLayout>
+          <MyLostItems />
+        </DashboardLayout>
+      </RequireAuth>
     ),
   },
   {
     path: "/dashboard/myClaimRequest",
     element: (
-      <DashboardLayout>
-        <MyClaimReqPage />
-      </DashboardLayout>
+      <RequireAuth>
+        <DashboardLayout>
+          <MyClaimReqPage />
+        </DashboardLayout>
+      </RequireAuth>
     ),
   },
 ]);

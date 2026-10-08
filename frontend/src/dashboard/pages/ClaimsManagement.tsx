@@ -124,13 +124,13 @@ const ClaimsManagement = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "PENDING":
-        return "bg-yellow-500";
+        return "border-warn/30 bg-warn/10 text-amber-300";
       case "APPROVED":
-        return "bg-green-500";
+        return "border-ok/30 bg-ok/10 text-emerald-300";
       case "REJECTED":
-        return "bg-red-500";
+        return "border-bad/30 bg-bad/10 text-rose-300";
       default:
-        return "bg-gray-500";
+        return "border-line-strong bg-white/5 text-ink-dim";
     }
   };
 
@@ -142,11 +142,11 @@ const ClaimsManagement = () => {
   if (isLoading) {
     return (
       <div className="p-6">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-700 rounded w-1/4 mb-6"></div>
+        <div>
+          <div className="skeleton mb-6 h-8 w-1/4"></div>
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-20 bg-gray-700 rounded"></div>
+              <div key={i} className="skeleton h-20"></div>
             ))}
           </div>
         </div>
@@ -159,192 +159,200 @@ const ClaimsManagement = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">Claims Management</h1>
-          <p className="text-gray-400 mt-1">Review and manage item claims</p>
+          <h1 className="text-2xl font-bold tracking-tight text-ink">
+            Claims Management
+          </h1>
+          <p className="mt-1 text-sm text-ink-mute">
+            Review and manage item claims
+          </p>
         </div>
         <div className="flex gap-2">
           <button
             onClick={handleBulkApprove}
-            className="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+            className="btn btn-primary"
           >
-            <FaCheck className="mr-2" />
+            <FaCheck />
             Bulk/All Approve Pending
           </button>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
+        <div className="card card-hover p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">Total Claims</p>
-              <p className="text-2xl font-bold text-white">{claims.length}</p>
+              <p className="text-sm text-ink-mute">Total Claims</p>
+              <p className="text-2xl font-bold tabular-nums text-ink">
+                {claims.length}
+              </p>
             </div>
-            <div className="bg-gray-500 p-3 rounded-lg">
-              <FaEye className="text-white" />
+            <div className="grid h-10 w-10 place-items-center rounded-xl bg-accent/10 text-accent">
+              <FaEye />
             </div>
           </div>
         </div>
 
-        <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+        <div className="card card-hover p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">Pending</p>
-              <p className="text-2xl font-bold text-yellow-500">
+              <p className="text-sm text-ink-mute">Pending</p>
+              <p className="text-2xl font-bold tabular-nums text-ink">
                 {
                   claims.filter((claim) => claim.status === "PENDING")
                     .length
                 }
               </p>
             </div>
-            <div className="bg-gray-500 p-3 rounded-lg">
-              <FaSearch className="text-white" />
+            <div className="grid h-10 w-10 place-items-center rounded-xl bg-warn/10 text-warn">
+              <FaSearch />
             </div>
           </div>
         </div>
 
-        <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+        <div className="card card-hover p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">Approved</p>
-              <p className="text-2xl font-bold text-green-500">
+              <p className="text-sm text-ink-mute">Approved</p>
+              <p className="text-2xl font-bold tabular-nums text-ink">
                 {
                   claims.filter((claim) => claim.status === "APPROVED")
                     .length
                 }
               </p>
             </div>
-            <div className="bg-gray-500 p-3 rounded-lg">
-              <FaCheck className="text-white" />
+            <div className="grid h-10 w-10 place-items-center rounded-xl bg-ok/10 text-ok">
+              <FaCheck />
             </div>
           </div>
         </div>
 
-        <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+        <div className="card card-hover p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">Rejected</p>
-              <p className="text-2xl font-bold text-red-500">
+              <p className="text-sm text-ink-mute">Rejected</p>
+              <p className="text-2xl font-bold tabular-nums text-ink">
                 {
                   claims.filter((claim) => claim.status === "REJECTED")
                     .length
                 }
               </p>
             </div>
-            <div className="bg-gray-500 p-3 rounded-lg">
-              <FaTimes className="text-white" />
+            <div className="grid h-10 w-10 place-items-center rounded-xl bg-bad/10 text-bad">
+              <FaTimes />
             </div>
           </div>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+      <div className="card p-5">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1">
             <div className="relative">
-              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <FaSearch className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-mute" />
               <input
                 type="text"
                 placeholder="Search claims..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="field pl-10"
               />
             </div>
           </div>
 
           <div className="flex gap-4">
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-            >
-              <option value="ALL">All Status</option>
-              <option value="PENDING">Pending</option>
-              <option value="APPROVED">Approved</option>
-              <option value="REJECTED">Rejected</option>
-            </select>
+            <div className="w-44">
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="field"
+              >
+                <option value="ALL">All Status</option>
+                <option value="PENDING">Pending</option>
+                <option value="APPROVED">Approved</option>
+                <option value="REJECTED">Rejected</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Claims Table */}
-      <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
+      <div className="card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-900">
-              <tr>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-300">
+            <thead>
+              <tr className="border-b border-line">
+                <th className="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-ink-mute">
                   Found Item
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-300">
+                <th className="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-ink-mute">
                   Category
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-300">
+                <th className="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-ink-mute">
                   Claim Details
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-300">
+                <th className="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-ink-mute">
                   Found By
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-300">
+                <th className="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-ink-mute">
                   Lost Date
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-300">
+                <th className="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-ink-mute">
                   Status
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-700">
+            <tbody className="divide-y divide-line">
               {filteredClaims.map((claim) => (
                 <tr
                   key={claim.id}
-                  className="hover:bg-gray-700 transition-colors"
+                  className="transition-colors hover:bg-white/[0.03]"
                 >
                   <td className="px-6 py-4">
                     <div className="flex items-center space-x-3">
                       <img
                         src={claim.foundItem?.img || "/bgimg.png"}
                         alt={claim.foundItem?.foundItemName}
-                        className="w-12 h-12 rounded-lg object-cover"
+                        className="h-12 w-12 rounded-lg border border-line object-cover"
                       />
                       <div>
-                        <div className="font-medium text-white">
+                        <div className="font-medium text-ink">
                           {claim.foundItem?.foundItemName}
                         </div>
-                        <div className="text-sm text-gray-400 truncate max-w-xs">
+                        <div className="max-w-xs truncate text-sm text-ink-mute">
                           {claim.foundItem?.description}
                         </div>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    <span className="badge badge-neutral">
                       {claim.foundItem?.category?.name}
                     </span>
                   </td>
                   <td className="px-6 py-4">
                     <div className="max-w-xs">
-                      <div className="text-white text-sm font-medium mb-1">
+                      <div className="mb-1 text-sm font-medium text-ink">
                         Distinguishing Features:
                       </div>
-                      <div className="text-gray-400 text-sm truncate">
+                      <div className="truncate text-sm text-ink-mute">
                         {claim.distinguishingFeatures || "No details provided"}
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4">
                     <div>
-                      <div className="text-white">
+                      <div className="text-ink">
                         {claim.foundItem?.user?.username}
                       </div>
-                      <div className="text-sm text-gray-400">
+                      <div className="text-sm text-ink-mute">
                         {claim.foundItem?.user?.email}
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-gray-300">
+                  <td className="px-6 py-4 text-sm text-ink-dim">
                     {formatDate(claim.lostDate)}
                   </td>
                   <td className="px-6 py-4">
@@ -353,26 +361,17 @@ const ClaimsManagement = () => {
                       onChange={(e) =>
                         handleStatusChange(claim.id, e.target.value)
                       }
-                      className={`px-3 py-1 rounded-lg text-xs font-medium text-white border-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500 ${getStatusColor(
+                      className={`cursor-pointer rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-wide focus:outline-none ${getStatusColor(
                         claim.status
                       )}`}
                     >
-                      <option
-                        value="PENDING"
-                        className="bg-gray-800 text-yellow-400"
-                      >
+                      <option value="PENDING" className="bg-surface-3 text-ink">
                         PENDING
                       </option>
-                      <option
-                        value="APPROVED"
-                        className="bg-gray-800 text-green-400"
-                      >
+                      <option value="APPROVED" className="bg-surface-3 text-ink">
                         APPROVED
                       </option>
-                      <option
-                        value="REJECTED"
-                        className="bg-gray-800 text-red-400"
-                      >
+                      <option value="REJECTED" className="bg-surface-3 text-ink">
                         REJECTED
                       </option>
                     </select>
@@ -384,9 +383,9 @@ const ClaimsManagement = () => {
         </div>
 
         {filteredClaims.length === 0 && (
-          <div className="text-center py-12">
-            <FaSearch className="mx-auto text-4xl text-gray-500 mb-4" />
-            <p className="text-gray-400">
+          <div className="py-12 text-center">
+            <FaSearch className="mx-auto mb-4 text-4xl text-ink-mute" />
+            <p className="text-sm text-ink-mute">
               No claims found matching your criteria
             </p>
           </div>
@@ -395,53 +394,53 @@ const ClaimsManagement = () => {
 
       {/* Status Change Confirmation Modal */}
       {isStatusModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4 border border-gray-700">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="mx-4 w-full max-w-md rounded-2xl border border-line bg-surface p-6 shadow-pop">
             <div className="text-center">
               <div className="mb-4">
-                <div className="bg-gray-100 rounded-full p-3 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                  <FaCheck className="text-blue-600 text-xl" />
+                <div className="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-full bg-accent/10">
+                  <FaCheck className="text-xl text-accent" />
                 </div>
-                <h2 className="text-xl font-bold text-white mb-2">
+                <h2 className="mb-2 text-xl font-bold text-ink">
                   Change Claim Status
                 </h2>
-                <p className="text-gray-400 mb-4">
+                <p className="mb-4 text-sm text-ink-dim">
                   Are you sure you want to change the status of this claim?
                 </p>
               </div>
 
               {selectedClaim && (
-                <div className="bg-gray-700 rounded-lg p-4 mb-6 text-left">
-                  <div className="flex items-center space-x-3 mb-3">
+                <div className="mb-6 rounded-xl border border-line bg-surface-2 p-4 text-left">
+                  <div className="mb-3 flex items-center space-x-3">
                     <img
                       src={selectedClaim.foundItem?.img || "/bgimg.png"}
                       alt={selectedClaim.foundItem?.foundItemName}
-                      className="w-12 h-12 rounded-lg object-cover"
+                      className="h-12 w-12 rounded-lg border border-line object-cover"
                     />
                     <div>
-                      <h3 className="font-medium text-white">
+                      <h3 className="font-medium text-ink">
                         {selectedClaim.foundItem?.foundItemName}
                       </h3>
-                      <p className="text-sm text-gray-400">
+                      <p className="text-sm text-ink-mute">
                         {selectedClaim.foundItem?.category?.name}
                       </p>
                     </div>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-400">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-ink-mute">
                       Current Status:
                       <span
-                        className={`ml-2 px-2 py-1 rounded-full text-xs font-medium text-white ${getStatusColor(
+                        className={`badge ml-2 align-middle ${getStatusColor(
                           selectedClaim.status
                         )}`}
                       >
                         {selectedClaim.status}
                       </span>
                     </span>
-                    <span className="text-sm text-gray-400">
+                    <span className="text-sm text-ink-mute">
                       New Status:
                       <span
-                        className={`ml-2 px-2 py-1 rounded-full text-xs font-medium text-white ${getStatusColor(
+                        className={`badge ml-2 align-middle ${getStatusColor(
                           newStatus
                         )}`}
                       >
@@ -457,7 +456,7 @@ const ClaimsManagement = () => {
                   type="button"
                   onClick={handleStatusCancel}
                   disabled={isStatusLoading}
-                  className="flex-1 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-500 disabled:cursor-not-allowed text-white py-2 px-4 rounded-lg transition-colors"
+                  className="btn btn-outline flex-1"
                 >
                   Cancel
                 </button>
@@ -465,12 +464,12 @@ const ClaimsManagement = () => {
                   type="button"
                   onClick={handleStatusConfirm}
                   disabled={isStatusLoading}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center"
+                  className="btn btn-primary flex-1"
                 >
                   {isStatusLoading ? (
                     <>
                       <svg
-                        className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                        className="animate-spin -ml-1 mr-2 h-4 w-4"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"

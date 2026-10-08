@@ -129,11 +129,11 @@ const CategoriesManagement = () => {
   if (isLoading) {
     return (
       <div className="p-6">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-700 rounded w-1/4 mb-6"></div>
+        <div>
+          <div className="skeleton mb-6 h-8 w-1/4"></div>
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-20 bg-gray-700 rounded"></div>
+              <div key={i} className="skeleton h-20"></div>
             ))}
           </div>
         </div>
@@ -146,41 +146,40 @@ const CategoriesManagement = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">Category Management</h1>
-          <p className="text-gray-400 mt-1">
+          <h1 className="text-2xl font-bold tracking-tight text-ink">
+            Category Management
+          </h1>
+          <p className="mt-1 text-sm text-ink-mute">
             Manage item categories and classifications
           </p>
         </div>
-        <button
-          onClick={() => setShowAddForm(true)}
-          className="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
-        >
-          <FaPlus className="mr-2" />
+        <button onClick={() => setShowAddForm(true)} className="btn btn-primary">
+          <FaPlus />
           Add Category
         </button>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div className="card card-hover p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">Total Categories</p>
-              <p className="text-2xl font-bold text-white">
+              <p className="text-sm text-ink-mute">Total Categories</p>
+              <p className="text-2xl font-bold tabular-nums text-ink">
                 {categories.length}
               </p>
             </div>
-            <div className="bg-gray-500 p-3 rounded-lg">
-              <FaBoxOpen className="text-white" />
+            <div className="grid h-10 w-10 place-items-center rounded-xl bg-accent/10 text-accent">
+              <FaBoxOpen />
             </div>
           </div>
         </div>
 
-        <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+        <div className="card card-hover p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">Recently Added</p>
-              <p className="text-2xl font-bold text-green-500">
+              <p className="text-sm text-ink-mute">Recently Added</p>
+              <p className="text-2xl font-bold tabular-nums text-ink">
                 {
                   categories.filter((cat) => {
                     const createdDate = new Date(cat.createdAt);
@@ -191,8 +190,8 @@ const CategoriesManagement = () => {
                 }
               </p>
             </div>
-            <div className="bg-gray-500 p-3 rounded-lg">
-              <FaBoxOpen className="text-white" />
+            <div className="grid h-10 w-10 place-items-center rounded-xl bg-ok/10 text-ok">
+              <FaBoxOpen />
             </div>
           </div>
         </div>
@@ -200,8 +199,8 @@ const CategoriesManagement = () => {
 
       {/* Add Category Form */}
       {showAddForm && (
-        <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-          <h3 className="text-lg font-semibold text-white mb-4">
+        <div className="card p-5">
+          <h3 className="mb-4 text-lg font-semibold text-ink">
             Add New Category
           </h3>
           <div className="flex flex-col md:flex-row gap-4">
@@ -212,13 +211,13 @@ const CategoriesManagement = () => {
               onChange={(e) =>
                 setNewCategory({ ...newCategory, name: e.target.value })
               }
-              className="flex-1 px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="field flex-1"
             />
             <div className="flex gap-2">
               <button
                 onClick={handleAdd}
                 disabled={!newCategory.name.trim() || isCreating}
-                className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-500 text-white rounded-lg transition-colors flex items-center gap-2"
+                className="btn btn-primary"
               >
                 <FaSave />
                 {isCreating ? "Adding..." : "Add"}
@@ -228,7 +227,7 @@ const CategoriesManagement = () => {
                   setShowAddForm(false);
                   setNewCategory({ name: "" });
                 }}
-                className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors flex items-center gap-2"
+                className="btn btn-outline"
               >
                 <FaTimes />
                 Cancel
@@ -239,44 +238,44 @@ const CategoriesManagement = () => {
       )}
 
       {/* Search */}
-      <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+      <div className="card p-5">
         <div className="relative">
-          <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <FaSearch className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-mute" />
           <input
             type="text"
             placeholder="Search categories..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="field pl-10"
           />
         </div>
       </div>
 
       {/* Categories Table */}
-      <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
+      <div className="card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-900">
-              <tr>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-300">
+            <thead>
+              <tr className="border-b border-line">
+                <th className="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-ink-mute">
                   Category Name
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-300">
+                <th className="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-ink-mute">
                   Created At
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-300">
+                <th className="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-ink-mute">
                   Updated At
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-300">
+                <th className="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-ink-mute">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-700">
+            <tbody className="divide-y divide-line">
               {filteredCategories.map((category) => (
                 <tr
                   key={category.id}
-                  className="hover:bg-gray-700 transition-colors"
+                  className="transition-colors hover:bg-white/[0.03]"
                 >
                   <td className="px-6 py-4">
                     {editingId === category.id ? (
@@ -286,18 +285,18 @@ const CategoriesManagement = () => {
                         onChange={(e) =>
                           setEditForm({ ...editForm, name: e.target.value })
                         }
-                        className="px-3 py-1 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+                        className="field"
                       />
                     ) : (
-                      <div className="font-medium text-white">
+                      <div className="font-medium text-ink">
                         {category.name}
                       </div>
                     )}
                   </td>
-                  <td className="px-6 py-4 text-gray-300">
+                  <td className="px-6 py-4 text-sm text-ink-dim">
                     {formatDate(category.createdAt)}
                   </td>
-                  <td className="px-6 py-4 text-gray-300">
+                  <td className="px-6 py-4 text-sm text-ink-dim">
                     {formatDate(category.updatedAt)}
                   </td>
                   <td className="px-6 py-4">
@@ -307,13 +306,15 @@ const CategoriesManagement = () => {
                           <button
                             onClick={handleSave}
                             disabled={!editForm.name.trim() || isUpdating}
-                            className="p-2 text-green-500 hover:bg-green-500 hover:text-white rounded-lg transition-colors disabled:text-gray-500"
+                            className="rounded-lg p-2 text-emerald-400 transition-colors hover:bg-emerald-500/15 hover:text-emerald-300 disabled:cursor-not-allowed disabled:opacity-50"
+                            title="Save category"
                           >
                             <FaSave />
                           </button>
                           <button
                             onClick={handleCancel}
-                            className="p-2 text-gray-500 hover:bg-gray-500 hover:text-white rounded-lg transition-colors"
+                            className="rounded-lg p-2 text-ink-mute transition-colors hover:bg-white/5 hover:text-ink"
+                            title="Cancel edit"
                           >
                             <FaTimes />
                           </button>
@@ -322,13 +323,15 @@ const CategoriesManagement = () => {
                         <>
                           <button
                             onClick={() => handleEdit(category)}
-                            className="p-2 text-yellow-500 hover:bg-yellow-500 hover:text-white rounded-lg transition-colors"
+                            className="rounded-lg p-2 text-ink-mute transition-colors hover:bg-white/5 hover:text-ink"
+                            title="Edit category"
                           >
                             <FaEdit />
                           </button>
                           <button
                             onClick={() => handleDeleteClick(category)}
-                            className="p-2 text-red-500 hover:bg-red-500 hover:text-white rounded-lg transition-colors"
+                            className="rounded-lg p-2 text-rose-400 transition-colors hover:bg-rose-500/15 hover:text-rose-300"
+                            title="Delete category"
                           >
                             <FaTrash />
                           </button>
@@ -343,9 +346,9 @@ const CategoriesManagement = () => {
         </div>
 
         {filteredCategories.length === 0 && (
-          <div className="text-center py-12">
-            <FaBoxOpen className="mx-auto text-4xl text-gray-500 mb-4" />
-            <p className="text-gray-400">
+          <div className="py-12 text-center">
+            <FaBoxOpen className="mx-auto mb-4 text-4xl text-ink-mute" />
+            <p className="text-sm text-ink-mute">
               {searchTerm
                 ? "No categories found matching your search criteria."
                 : "No categories found. Add one to get started."}
@@ -356,19 +359,19 @@ const CategoriesManagement = () => {
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-gray-800 border-gray-700">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm">
+          <div className="relative top-20 mx-auto w-96 rounded-2xl border border-line bg-surface p-5 shadow-pop">
             <div className="mt-3 text-center">
-              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
-                <FaTrash className="h-6 w-6 text-red-600" />
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-rose-500/10">
+                <FaTrash className="h-6 w-6 text-rose-400" />
               </div>
-              <h3 className="text-lg font-medium text-white mt-4">
+              <h3 className="mt-4 text-lg font-semibold text-ink">
                 Delete Category
               </h3>
               <div className="mt-2 px-7 py-3">
-                <p className="text-sm text-gray-300">
+                <p className="text-sm text-ink-dim">
                   Are you sure you want to delete the category "
-                  <span className="font-medium text-white">
+                  <span className="font-medium text-ink">
                     {categoryToDelete?.name}
                   </span>
                   "? This action cannot be undone.
@@ -379,14 +382,14 @@ const CategoriesManagement = () => {
                   <button
                     onClick={handleConfirmDelete}
                     disabled={isDeleting}
-                    className="px-4 py-2 bg-red-500 text-white text-base font-medium rounded-md w-24 shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300 disabled:bg-gray-400"
+                    className="btn btn-danger w-24"
                   >
                     {isDeleting ? "..." : "Delete"}
                   </button>
                   <button
                     onClick={handleCancelDelete}
                     disabled={isDeleting}
-                    className="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-24 shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:bg-gray-400"
+                    className="btn btn-outline w-24"
                   >
                     Cancel
                   </button>

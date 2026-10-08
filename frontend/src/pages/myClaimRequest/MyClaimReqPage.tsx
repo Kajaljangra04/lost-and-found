@@ -12,6 +12,7 @@ import {
   FaCheckCircle,
   FaTimesCircle,
   FaClock,
+  FaInbox,
 } from "react-icons/fa";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -24,40 +25,32 @@ const MyClaimReqPage = () => {
   const [sortBy, setSortBy] = useState("createdAt");
   const [sortOrder, setSortOrder] = useState("desc");
 
-  // Get status icon and color
+  // Get status icon and badge classes
   const getStatusConfig = (status: string) => {
     switch (status) {
       case "PENDING":
         return {
-          icon: <FaClock className="w-4 h-4" />,
-          color: "from-yellow-500 to-yellow-600",
-          bgColor: "bg-yellow-900/30 border-yellow-500/50",
-          textColor: "text-yellow-300",
+          icon: <FaClock className="h-3.5 w-3.5" />,
+          badge: "badge badge-warn",
           label: "Pending",
         };
       case "APPROVED":
       case "ACCEPTED":
         return {
-          icon: <FaCheckCircle className="w-4 h-4" />,
-          color: "from-green-500 to-green-600",
-          bgColor: "bg-green-900/30 border-green-500/50",
-          textColor: "text-green-300",
+          icon: <FaCheckCircle className="h-3.5 w-3.5" />,
+          badge: "badge badge-ok",
           label: "Approved",
         };
       case "REJECTED":
         return {
-          icon: <FaTimesCircle className="w-4 h-4" />,
-          color: "from-red-500 to-red-600",
-          bgColor: "bg-red-900/30 border-red-500/50",
-          textColor: "text-red-300",
+          icon: <FaTimesCircle className="h-3.5 w-3.5" />,
+          badge: "badge badge-danger",
           label: "Rejected",
         };
       default:
         return {
-          icon: <FaClock className="w-4 h-4" />,
-          color: "from-gray-500 to-gray-600",
-          bgColor: "bg-gray-900/30 border-gray-500/50",
-          textColor: "text-gray-300",
+          icon: <FaClock className="h-3.5 w-3.5" />,
+          badge: "badge badge-neutral",
           label: "Unknown",
         };
     }
@@ -124,35 +117,30 @@ const MyClaimReqPage = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+      <div className="page">
         {/* Loading skeletons */}
-        <div className="bg-gradient-to-r from-gray-800 to-gray-900 shadow-2xl">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div className="text-center">
-              <div className="h-12 bg-gradient-to-r from-gray-700 to-gray-600 rounded-lg mb-6 animate-pulse"></div>
-              <div className="h-6 bg-gradient-to-r from-gray-700 to-gray-600 rounded mb-8 max-w-md mx-auto animate-pulse"></div>
-            </div>
+        <div className="mx-auto max-w-7xl px-4 pt-12 sm:px-6 lg:px-8">
+          <div className="section-head">
+            <div className="skeleton mx-auto h-10 w-64" />
+            <div className="skeleton mx-auto h-5 w-3/4 max-w-md" />
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">
           {/* Filter skeleton */}
-          <div className="flex flex-col md:flex-row gap-4 mb-8">
-            <div className="flex-1 h-12 bg-gradient-to-r from-gray-800 to-gray-700 rounded-lg animate-pulse"></div>
-            <div className="w-48 h-12 bg-gradient-to-r from-gray-800 to-gray-700 rounded-lg animate-pulse"></div>
+          <div className="mb-8 flex flex-col gap-4 md:flex-row">
+            <div className="skeleton h-12 flex-1" />
+            <div className="skeleton h-12 w-48" />
           </div>
 
           {/* Cards skeleton */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {[...Array(8)].map((_, i) => (
-              <div
-                key={i}
-                className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 animate-pulse shadow-xl border border-gray-700"
-              >
-                <div className="h-48 bg-gradient-to-r from-gray-700 to-gray-600 rounded-xl mb-4"></div>
-                <div className="h-6 bg-gradient-to-r from-gray-700 to-gray-600 rounded mb-3"></div>
-                <div className="h-4 bg-gradient-to-r from-gray-700 to-gray-600 rounded mb-2"></div>
-                <div className="h-4 bg-gradient-to-r from-gray-700 to-gray-600 rounded w-3/4"></div>
+              <div key={i} className="card p-6">
+                <div className="skeleton mb-4 h-48" />
+                <div className="skeleton mb-3 h-6" />
+                <div className="skeleton mb-2 h-4" />
+                <div className="skeleton h-4 w-3/4" />
               </div>
             ))}
           </div>
@@ -161,41 +149,37 @@ const MyClaimReqPage = () => {
     );
   }
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+    <div className="page pb-12">
       {/* Header Section */}
-      <div className="bg-gradient-to-r from-gray-800 to-gray-900 shadow-2xl">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent mb-6">
-              My Claims
-            </h1>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              Track the status of your item claims and view detailed information
-              about each request.
-            </p>
-          </div>
+      <div className="mx-auto max-w-7xl px-4 pt-12 sm:px-6 lg:px-8">
+        <div className="section-head">
+          <h1 className="section-title">My Claims</h1>
+          <p className="section-sub">
+            Track the status of your item claims and view detailed information
+            about each request.
+          </p>
         </div>
       </div>
 
       {/* Search and Filter Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 shadow-xl border border-gray-700 mb-8">
-          <div className="flex flex-col lg:flex-row gap-4">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="card mb-8 p-6">
+          <div className="flex flex-col gap-4 lg:flex-row">
             {/* Search Input */}
-            <div className="flex-1 relative">
-              <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <div className="relative flex-1">
+              <FaSearch className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink-mute" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search by item name, description, or location..."
-                className="w-full pl-12 pr-12 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all duration-200"
+                className="field pl-12 pr-12"
               />
               {searchTerm && (
                 <button
                   type="button"
                   onClick={clearSearch}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-ink-mute transition-colors hover:text-ink"
                 >
                   <FaTimes />
                 </button>
@@ -207,7 +191,7 @@ const MyClaimReqPage = () => {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all duration-200"
+                className="field"
               >
                 <option value="ALL">All Status</option>
                 <option value="PENDING">Pending</option>
@@ -223,7 +207,7 @@ const MyClaimReqPage = () => {
                   setSortBy(newSortBy);
                   setSortOrder(newSortOrder);
                 }}
-                className="px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all duration-200"
+                className="field"
               >
                 <option value="createdAt-desc">Latest First</option>
                 <option value="createdAt-asc">Oldest First</option>
@@ -237,17 +221,19 @@ const MyClaimReqPage = () => {
         </div>
 
         {/* Results Info */}
-        <div className="flex justify-between items-center mb-6">
-          <div className="text-gray-300">
+        <div className="mb-6 flex items-center justify-between">
+          <div className="text-sm text-ink-dim">
             {filteredAndSortedClaims.length > 0 ? (
               <span>
                 Showing {filteredAndSortedClaims.length} claim
                 {filteredAndSortedClaims.length !== 1 ? "s" : ""}
                 {searchTerm && (
-                  <span className="ml-2 text-cyan-400">for "{searchTerm}"</span>
+                  <span className="ml-2 text-accent">
+                    for "{searchTerm}"
+                  </span>
                 )}
                 {statusFilter !== "ALL" && (
-                  <span className="ml-2 text-cyan-400">
+                  <span className="ml-2 text-accent">
                     with status "{statusFilter}"
                   </span>
                 )}
@@ -260,13 +246,15 @@ const MyClaimReqPage = () => {
 
         {/* Claims Table */}
         {filteredAndSortedClaims.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-12 shadow-xl border border-gray-700 max-w-md mx-auto">
-              <div className="text-6xl mb-6">📋</div>
-              <h3 className="text-2xl font-bold text-white mb-4">
+          <div className="py-16 text-center">
+            <div className="card mx-auto max-w-md p-12">
+              <div className="mx-auto mb-6 grid h-16 w-16 place-items-center rounded-2xl border border-line bg-surface-2">
+                <FaInbox className="text-2xl text-ink-mute" />
+              </div>
+              <h3 className="mb-4 text-2xl font-bold text-ink">
                 No Claims Found
               </h3>
-              <p className="text-gray-300 mb-6">
+              <p className="mb-6 text-ink-dim">
                 {searchTerm || statusFilter !== "ALL"
                   ? "No claims match your current filters. Try adjusting your search or filter criteria."
                   : "You haven't submitted any claims yet. Browse found items and claim your lost belongings!"}
@@ -277,60 +265,57 @@ const MyClaimReqPage = () => {
                     setSearchTerm("");
                     setStatusFilter("ALL");
                   }}
-                  className="px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-semibold rounded-lg transition-all duration-200 mr-4"
+                  className="btn btn-outline mr-4"
                 >
                   Clear Filters
                 </button>
               )}
-              <Link
-                to="/foundItems"
-                className="inline-block px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-lg transition-all duration-200"
-              >
+              <Link to="/foundItems" className="btn btn-brand">
                 Browse Found Items
               </Link>
             </div>
           </div>
         ) : (
           /* Table View */
-          <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl overflow-hidden shadow-xl border border-gray-700">
+          <div className="card overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gradient-to-r from-gray-900 to-gray-800">
+                <thead className="border-b border-line bg-white/[0.02]">
                   <tr>
-                    <th className="px-6 py-4 text-left text-sm font-medium text-gray-300">
+                    <th className="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-ink-mute">
                       Item
                     </th>
-                    <th className="px-6 py-4 text-left text-sm font-medium text-gray-300">
+                    <th className="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-ink-mute">
                       Status
                     </th>
-                    <th className="px-6 py-4 text-left text-sm font-medium text-gray-300">
+                    <th className="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-ink-mute">
                       Location
                     </th>
-                    <th className="px-6 py-4 text-left text-sm font-medium text-gray-300">
+                    <th className="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-ink-mute">
                       Found By
                     </th>
-                    <th className="px-6 py-4 text-left text-sm font-medium text-gray-300">
+                    <th className="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-ink-mute">
                       Claim Date
                     </th>
-                    <th className="px-6 py-4 text-left text-sm font-medium text-gray-300">
+                    <th className="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-ink-mute">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-700">
+                <tbody className="divide-y divide-line">
                   {filteredAndSortedClaims.map((claim: Claim) => {
                     const statusConfig = getStatusConfig(claim?.status);
 
                     return (
                       <tr
                         key={claim.id}
-                        className="hover:bg-gray-700/50 transition-colors duration-200"
+                        className="transition-colors hover:bg-white/[0.03]"
                       >
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4 text-sm text-ink-dim">
                           <div className="flex items-center">
-                            <div className="flex-shrink-0 w-12 h-12 mr-4">
+                            <div className="mr-4 w-12 flex-shrink-0">
                               <img
-                                className="w-12 h-12 rounded-lg object-cover"
+                                className="h-12 w-12 rounded-lg border border-line object-cover"
                                 src={claim?.foundItem?.img}
                                 alt={claim?.foundItem?.foundItemName}
                                 onError={(e) => {
@@ -340,10 +325,10 @@ const MyClaimReqPage = () => {
                               />
                             </div>
                             <div>
-                              <div className="font-medium text-white">
+                              <div className="font-semibold text-ink">
                                 {claim?.foundItem?.foundItemName}
                               </div>
-                              <div className="text-sm text-gray-400 truncate max-w-xs">
+                              <div className="max-w-xs truncate text-sm text-ink-mute">
                                 {claim?.foundItem?.description ||
                                   "No description provided."}
                               </div>
@@ -351,33 +336,31 @@ const MyClaimReqPage = () => {
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          <div
-                            className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${statusConfig.color} text-white shadow-lg`}
-                          >
+                          <span className={statusConfig.badge}>
                             {statusConfig.icon}
-                            <span className="ml-1">{statusConfig.label}</span>
-                          </div>
+                            <span>{statusConfig.label}</span>
+                          </span>
                         </td>
-                        <td className="px-6 py-4 text-gray-300">
+                        <td className="px-6 py-4 text-sm text-ink-dim">
                           <div className="flex items-center">
-                            <FaMapMarkerAlt className="mr-2 text-gray-400" />
-                            <span className="truncate max-w-xs">
+                            <FaMapMarkerAlt className="mr-2 text-ink-mute" />
+                            <span className="max-w-xs truncate">
                               {claim?.foundItem?.location ||
                                 "Location not specified"}
                             </span>
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-gray-300">
+                        <td className="px-6 py-4 text-sm text-ink-dim">
                           <div className="flex items-center">
-                            <FaUser className="mr-2 text-gray-400" />
+                            <FaUser className="mr-2 text-ink-mute" />
                             <span>
                               {claim?.foundItem?.user?.username || "Unknown"}
                             </span>
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-gray-300">
+                        <td className="px-6 py-4 text-sm text-ink-dim">
                           <div className="flex items-center">
-                            <FaCalendarAlt className="mr-2 text-gray-400" />
+                            <FaCalendarAlt className="mr-2 text-ink-mute" />
                             <span>
                               {claim?.createdAt
                                 ? new Date(claim.createdAt).toLocaleDateString(
@@ -393,11 +376,12 @@ const MyClaimReqPage = () => {
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          <Link to={`/foundItems/${claim?.foundItem?.id}`}>
-                            <button className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-gray-900 shadow-lg hover:shadow-xl">
-                              <FaEye className="mr-2" />
-                              View Details
-                            </button>
+                          <Link
+                            to={`/foundItems/${claim?.foundItem?.id}`}
+                            className="btn btn-outline btn-sm"
+                          >
+                            <FaEye />
+                            View Details
                           </Link>
                         </td>
                       </tr>

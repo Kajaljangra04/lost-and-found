@@ -1,4 +1,4 @@
-import { FaPlus, FaMinus } from "react-icons/fa";
+import { FaChevronDown } from "react-icons/fa";
 import { useState } from "react";
 
 interface FaqItem {
@@ -41,40 +41,39 @@ const Faq = () => {
   const faqs: FaqItem[] = defaultFaqs;
 
   return (
-    <div className="py-16 lg:py-20 bg-gradient-to-br from-gray-900 via-gray-800 to-black">
-      <div className="px-4 sm:px-6 lg:px-8 mx-auto max-w-7xl">
-        <div className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-12">
+    <div className="py-16 lg:py-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-6xl flex-col gap-12 lg:flex-row">
           <div className="flex flex-col text-left lg:basis-1/2">
-            <p className="inline-block font-semibold text-blue-400 mb-4">FAQ</p>
-            <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-4">
-              Frequently Asked{" "}
-              <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-                Questions
-              </span>
-            </h2>
-            <p className="text-gray-300 text-lg">
+            <span className="eyebrow mb-4">FAQ</span>
+            <h2 className="section-title mb-4">Frequently Asked Questions</h2>
+            <p className="text-ink-dim">
               Find answers to common questions about our lost and found
               management system.
             </p>
           </div>
 
-          <ul className="lg:basis-1/2 space-y-2">
+          <ul className="space-y-3 lg:basis-1/2">
             {faqs.map((faq, index) => (
-              <li
-                key={index}
-                className="bg-gradient-to-br from-gray-800/50 via-gray-900/50 to-black/50 rounded-lg border border-gray-700 overflow-hidden"
-              >
+              <li key={index} className="card overflow-hidden">
                 <button
-                  className="relative flex gap-4 items-center w-full p-6 text-base font-semibold text-left hover:bg-gray-700/30 transition-all duration-200"
+                  type="button"
+                  className={`flex w-full items-center justify-between gap-4 p-5 text-left text-sm font-semibold transition-colors duration-200 ${
+                    expandedIndex === index
+                      ? "text-accent"
+                      : "text-ink hover:bg-white/[0.03]"
+                  }`}
                   onClick={() => toggleFaq(index)}
                   aria-expanded={expandedIndex === index}
                 >
-                  <span className="flex-1 text-white text-left">
-                    {faq.question}
-                  </span>
-                  <div className="text-blue-400">
-                    {expandedIndex === index ? <FaMinus /> : <FaPlus />}
-                  </div>
+                  <span className="flex-1">{faq.question}</span>
+                  <FaChevronDown
+                    className={`shrink-0 transition-transform duration-300 ${
+                      expandedIndex === index
+                        ? "rotate-180 text-accent"
+                        : "text-ink-mute"
+                    }`}
+                  />
                 </button>
                 <div
                   className={`transition-[max-height] duration-500 ease-in-out overflow-hidden ${
@@ -82,13 +81,13 @@ const Faq = () => {
                   }`}
                 >
                   <div
-                    className={`px-6 pb-6 leading-relaxed transform transition-transform duration-500 ${
+                    className={`px-5 pb-5 transition-transform duration-500 ${
                       expandedIndex === index
                         ? "translate-y-0"
                         : "-translate-y-4"
                     }`}
                   >
-                    <div className="text-gray-300 leading-relaxed">
+                    <div className="text-sm leading-relaxed text-ink-dim">
                       {faq.answer}
                     </div>
                   </div>

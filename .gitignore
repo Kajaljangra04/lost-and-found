@@ -35,3 +35,4 @@ frontend/.vscode
 frontend/dist
 frontend/.env
 frontend/.vercel
+server/.env.bak*

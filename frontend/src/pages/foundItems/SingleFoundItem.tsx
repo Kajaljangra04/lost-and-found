@@ -16,6 +16,9 @@ import {
   FaUser,
   FaTag,
   FaTimes,
+  FaCheckCircle,
+  FaBoxOpen,
+  FaExclamationTriangle,
 } from "react-icons/fa";
 
 const SingleFoundItem = () => {
@@ -40,23 +43,19 @@ const SingleFoundItem = () => {
 
   if (!foundItemId) {
     return (
-      <div className="min-h-screen bg-gray-900 py-8">
-        <div className="container mx-auto px-4">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-white mb-4">
-              Item Not Found
-            </h1>
-            <p className="text-gray-300 mb-6">
-              The requested item could not be found.
-            </p>
-            <Link
-              to="/foundItems"
-              className="inline-flex items-center text-blue-400 hover:text-blue-300"
-            >
-              <FaArrowLeft className="mr-2" />
-              Back to Found Items
-            </Link>
-          </div>
+      <div className="page flex items-center justify-center px-4 py-12">
+        <div className="text-center">
+          <h1 className="mb-4 text-3xl font-bold text-ink">Item Not Found</h1>
+          <p className="mb-6 text-ink-dim">
+            The requested item could not be found.
+          </p>
+          <Link
+            to="/foundItems"
+            className="link-accent inline-flex items-center gap-2"
+          >
+            <FaArrowLeft />
+            Back to Found Items
+          </Link>
         </div>
       </div>
     );
@@ -102,10 +101,10 @@ const SingleFoundItem = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div className="page flex items-center justify-center">
         <div className="text-center">
-          <Spinner size="xl" className="mb-4" />
-          <p className="text-gray-400">Loading found item details...</p>
+          <Spinner size="xl" className="mb-4 text-accent" />
+          <p className="text-ink-dim">Loading found item details...</p>
         </div>
       </div>
     );
@@ -117,25 +116,20 @@ const SingleFoundItem = () => {
   // Handle case where item is not found
   if (!foundItemData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto px-4">
-          <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 shadow-xl border border-gray-700">
-            <div className="text-red-400 text-6xl mb-4">😞</div>
-            <h2 className="text-2xl font-bold text-white mb-4">
-              Item Not Found
-            </h2>
-            <p className="text-gray-300 mb-6">
-              The found item you're looking for doesn't exist or may have been
-              removed.
-            </p>
-            <Link
-              to="/foundItems"
-              className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-semibold rounded-lg transition-all duration-200"
-            >
-              <FaArrowLeft className="mr-2" />
-              Back to Found Items
-            </Link>
+      <div className="page flex items-center justify-center px-4 py-12">
+        <div className="card w-full max-w-md p-8 text-center">
+          <div className="mx-auto mb-5 grid h-14 w-14 place-items-center rounded-2xl border border-bad/30 bg-bad/10">
+            <FaExclamationTriangle className="text-xl text-rose-300" />
           </div>
+          <h2 className="mb-4 text-2xl font-bold text-ink">Item Not Found</h2>
+          <p className="mb-6 text-ink-dim">
+            The found item you're looking for doesn't exist or may have been
+            removed.
+          </p>
+          <Link to="/foundItems" className="btn btn-outline w-full">
+            <FaArrowLeft />
+            Back to Found Items
+          </Link>
         </div>
       </div>
     );
@@ -143,53 +137,55 @@ const SingleFoundItem = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+      <div className="page">
         {/* Header with Back Button */}
-        <div className="bg-gradient-to-r from-gray-800 to-gray-900 shadow-2xl">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="border-b border-line">
+          <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
             <Link
               to="/foundItems"
-              className="inline-flex items-center text-cyan-400 hover:text-cyan-300 transition-colors duration-200 mb-4"
+              className="link-accent mb-4 inline-flex items-center gap-2 text-sm"
             >
-              <FaArrowLeft className="mr-2" />
+              <FaArrowLeft />
               Back to Found Items
             </Link>
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
+            <h1 className="mb-2 text-3xl font-bold text-ink md:text-4xl">
               {foundItemData?.foundItemName || "Found Item"}
             </h1>
-            <p className="text-gray-300">
+            <p className="text-ink-dim">
               Found item details and claim information
             </p>
           </div>
         </div>
 
         {/* Main Content */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
             {/* Image Section */}
             <div className="space-y-6">
-              <div className="relative group">
-                <div className="aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900 shadow-2xl">
+              <div className="group relative">
+                <div className="aspect-square overflow-hidden rounded-2xl border border-line bg-surface-2 shadow-card">
                   <img
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                     src={foundItemData?.img}
                     alt={foundItemData?.foundItemName}
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = "/bgimg.png";
                     }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
                 </div>
 
                 {/* Status Badge */}
-                <div className="absolute top-4 right-4">
+                <div className="absolute right-4 top-4">
                   {foundItemData?.isClaimed ? (
-                    <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg backdrop-blur-sm border border-green-400/50">
-                      ✓ Claimed
+                    <span className="badge badge-ok bg-surface/90 backdrop-blur-md">
+                      <FaCheckCircle />
+                      Claimed
                     </span>
                   ) : (
-                    <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg backdrop-blur-sm border border-blue-400/50">
-                      🔍 Available
+                    <span className="badge badge-accent bg-surface/90 backdrop-blur-md">
+                      <FaBoxOpen />
+                      Available
                     </span>
                   )}
                 </div>
@@ -199,74 +195,74 @@ const SingleFoundItem = () => {
             {/* Details Section */}
             <div className="space-y-8">
               {/* Description */}
-              <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 shadow-xl border border-gray-700">
-                <h2 className="text-xl font-bold text-white mb-4">
-                  Description
-                </h2>
-                <p className="text-gray-300 leading-relaxed">
+              <div className="card p-6">
+                <h2 className="mb-4 text-xl font-bold text-ink">Description</h2>
+                <p className="leading-relaxed text-ink-dim">
                   {foundItemData?.description ||
                     "No description available for this item."}
                 </p>
               </div>
 
-              {/* Details Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 shadow-xl border border-gray-700">
-                  <div className="flex items-center text-cyan-400 mb-2">
-                    <FaCalendarAlt className="mr-3" />
-                    <span className="font-semibold">Date Found</span>
+              {/* Details */}
+              <div className="card p-6">
+                <dl className="divide-y divide-line">
+                  <div className="flex items-center justify-between gap-4 py-3 first:pt-0">
+                    <dt className="flex items-center gap-2.5 text-sm text-ink-mute">
+                      <FaCalendarAlt className="text-accent" />
+                      Date Found
+                    </dt>
+                    <dd className="text-right text-sm font-semibold text-ink">
+                      {foundItemData?.date
+                        ? new Date(foundItemData.date).toLocaleDateString(
+                            "en-US",
+                            {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            }
+                          )
+                        : "Date not specified"}
+                    </dd>
                   </div>
-                  <p className="text-gray-300">
-                    {foundItemData?.date
-                      ? new Date(foundItemData.date).toLocaleDateString(
-                          "en-US",
-                          {
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                          }
-                        )
-                      : "Date not specified"}
-                  </p>
-                </div>
 
-                <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 shadow-xl border border-gray-700">
-                  <div className="flex items-center text-cyan-400 mb-2">
-                    <FaMapMarkerAlt className="mr-3" />
-                    <span className="font-semibold">Location</span>
+                  <div className="flex items-center justify-between gap-4 py-3">
+                    <dt className="flex items-center gap-2.5 text-sm text-ink-mute">
+                      <FaMapMarkerAlt className="text-accent" />
+                      Location
+                    </dt>
+                    <dd className="text-right text-sm font-semibold text-ink">
+                      {foundItemData?.location || "Location not specified"}
+                    </dd>
                   </div>
-                  <p className="text-gray-300">
-                    {foundItemData?.location || "Location not specified"}
-                  </p>
-                </div>
 
-                <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 shadow-xl border border-gray-700">
-                  <div className="flex items-center text-cyan-400 mb-2">
-                    <FaTag className="mr-3" />
-                    <span className="font-semibold">Category</span>
+                  <div className="flex items-center justify-between gap-4 py-3">
+                    <dt className="flex items-center gap-2.5 text-sm text-ink-mute">
+                      <FaTag className="text-accent" />
+                      Category
+                    </dt>
+                    <dd className="text-right text-sm font-semibold text-ink">
+                      {foundItemData?.category?.name || "Uncategorized"}
+                    </dd>
                   </div>
-                  <p className="text-gray-300">
-                    {foundItemData?.category?.name || "Uncategorized"}
-                  </p>
-                </div>
 
-                <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 shadow-xl border border-gray-700">
-                  <div className="flex items-center text-cyan-400 mb-2">
-                    <FaUser className="mr-3" />
-                    <span className="font-semibold">Found By</span>
+                  <div className="flex items-center justify-between gap-4 py-3 last:pb-0">
+                    <dt className="flex items-center gap-2.5 text-sm text-ink-mute">
+                      <FaUser className="text-accent" />
+                      Found By
+                    </dt>
+                    <dd className="text-right text-sm font-semibold text-ink">
+                      {foundItemData?.user?.username || "Anonymous"}
+                    </dd>
                   </div>
-                  <p className="text-gray-300">
-                    {foundItemData?.user?.username || "Anonymous"}
-                  </p>
-                </div>
+                </dl>
               </div>
 
               {/* Claim Process Information */}
-              <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 shadow-xl border border-gray-700">
-                <h3 className="text-lg font-bold text-white mb-4">
+              <div className="card p-6">
+                <h3 className="mb-4 text-lg font-bold text-ink">
                   Claim Process
                 </h3>
-                <p className="text-gray-300 mb-6 leading-relaxed">
+                <p className="mb-6 leading-relaxed text-ink-dim">
                   {foundItemData?.claimProcess ||
                     "To claim this item, please provide the date you lost it and any distinguishing features that can help verify ownership."}
                 </p>
@@ -274,13 +270,13 @@ const SingleFoundItem = () => {
                 {!foundItemData?.isClaimed ? (
                   <button
                     onClick={handleClaimModal}
-                    className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-gray-900 shadow-lg hover:shadow-xl"
+                    className="btn btn-brand btn-lg w-full"
                   >
                     Start Claim Process
                   </button>
                 ) : (
-                  <div className="bg-green-900/30 border border-green-500/50 rounded-xl p-4 text-center">
-                    <p className="text-green-300 font-medium">
+                  <div className="rounded-xl border border-ok/30 bg-ok/10 p-4 text-center">
+                    <p className="font-medium text-emerald-300">
                       This item has already been claimed
                     </p>
                   </div>
@@ -293,32 +289,29 @@ const SingleFoundItem = () => {
 
       {/* Custom Claim Modal */}
       {isClaimModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-75 backdrop-blur-sm">
-          <div className="relative w-full max-w-md bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-2xl border border-gray-700">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm">
+          <div className="card relative w-full max-w-md">
             {/* Modal Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-700">
-              <h3 className="text-xl font-bold text-white">Claim Process</h3>
+            <div className="flex items-center justify-between border-b border-line p-6">
+              <h3 className="text-xl font-bold text-ink">Claim Process</h3>
               <button
                 onClick={() => setIsClaimModalOpen(false)}
-                className="text-gray-400 hover:text-white transition-colors duration-200 p-1"
+                className="rounded-lg p-1.5 text-ink-mute transition-colors hover:text-ink"
               >
-                <FaTimes className="w-5 h-5" />
+                <FaTimes className="h-5 w-5" />
               </button>
             </div>
 
             {/* Modal Body */}
             <div className="p-6">
-              <p className="text-gray-300 mb-6 text-sm">
+              <p className="mb-6 text-sm text-ink-dim">
                 Please provide the following information to verify your
                 ownership of this item.
               </p>
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 <div>
-                  <label
-                    htmlFor="lostDate"
-                    className="block mb-2 text-sm font-semibold text-white"
-                  >
+                  <label htmlFor="lostDate" className="field-label">
                     When did you lose this item? *
                   </label>
                   <input
@@ -327,20 +320,17 @@ const SingleFoundItem = () => {
                     {...register("lostDate", {
                       required: "Lost date is required",
                     })}
-                    className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all duration-200"
+                    className="field"
                   />
                   {errors.lostDate && (
-                    <p className="text-red-400 text-sm mt-1">
+                    <p className="field-error">
                       {errors.lostDate.message as string}
                     </p>
                   )}
                 </div>
 
                 <div>
-                  <label
-                    htmlFor="distinguishingFeatures"
-                    className="block mb-2 text-sm font-semibold text-white"
-                  >
+                  <label htmlFor="distinguishingFeatures" className="field-label">
                     Distinguishing Features *
                   </label>
                   <textarea
@@ -354,33 +344,36 @@ const SingleFoundItem = () => {
                         message: "Please provide at least 10 characters",
                       },
                     })}
-                    className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all duration-200 resize-none"
+                    className="field resize-none"
                   />
                   {errors.distinguishingFeatures && (
-                    <p className="text-red-400 text-sm mt-1">
+                    <p className="field-error">
                       {errors.distinguishingFeatures.message as string}
                     </p>
                   )}
                 </div>
 
-                <div className="flex space-x-4 pt-4">
+                <div className="flex gap-4 pt-4">
                   <button
                     type="button"
                     onClick={() => setIsClaimModalOpen(false)}
-                    className="flex-1 px-4 py-3 text-gray-300 bg-gray-700 hover:bg-gray-600 rounded-lg transition-all duration-200 font-medium"
+                    className="btn btn-outline flex-1"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={isSubmitting || claimLoading}
-                    className="flex-1 px-4 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white rounded-lg transition-all duration-200 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="btn btn-brand flex-1"
                   >
                     {isSubmitting || claimLoading ? (
-                      <div className="flex items-center justify-center">
-                        <Spinner size="sm" className="mr-2" />
+                      <>
+                        <Spinner
+                          size="sm"
+                          className="fill-accent-ink text-accent-ink"
+                        />
                         Submitting...
-                      </div>
+                      </>
                     ) : (
                       "Submit Claim"
                     )}
@@ -391,7 +384,6 @@ const SingleFoundItem = () => {
           </div>
         </div>
       )}
-
     </>
   );
 };

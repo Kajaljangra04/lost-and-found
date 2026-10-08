@@ -125,31 +125,35 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+    <div className="min-h-screen">
       {/* Mobile Overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <div
-        className={`fixed top-0 left-0 h-full bg-gradient-to-b from-gray-800 to-gray-900 border-r border-gray-700 z-50 transition-all duration-300 shadow-2xl ${
+        className={`fixed top-0 left-0 z-50 h-full w-64 border-r border-line bg-surface transition-all duration-300 shadow-pop ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } lg:translate-x-0 ${sidebarCollapsed ? "lg:w-20" : "lg:w-64"} w-64`}
+        } lg:translate-x-0 ${sidebarCollapsed ? "lg:w-20" : "lg:w-64"}`}
       >
         {/* Sidebar Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-700">
+        <div className="flex items-center justify-between border-b border-line p-4">
           {!sidebarCollapsed && (
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center">
-                <FaSearch className="text-white text-lg" />
-              </div>
-              <div>
-                <h1 className="text-white font-bold text-lg">Lost & Found</h1>
-                <p className="text-gray-400 text-xs">Dashboard</p>
+            <div className="flex items-center gap-3">
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-accent to-indigo-500 shadow-glow">
+                <FaSearch className="text-sm text-white" />
+              </span>
+              <div className="leading-tight">
+                <h1 className="text-[15px] font-extrabold tracking-tight text-ink">
+                  Lost &amp; Found
+                </h1>
+                <p className="text-[11px] font-medium text-ink-mute">
+                  Dashboard
+                </p>
               </div>
             </div>
           )}
@@ -157,7 +161,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           {/* Mobile Close Button */}
           <button
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden text-gray-400 hover:text-white p-2"
+            className="rounded-lg p-2 text-ink-mute transition-colors hover:bg-white/5 hover:text-ink lg:hidden"
           >
             <FaTimes />
           </button>
@@ -165,7 +169,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           {/* Desktop Collapse Button */}
           <button
             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-            className="hidden lg:block text-gray-400 hover:text-white p-2 rounded-lg hover:bg-gray-700 transition-colors"
+            className="hidden rounded-lg p-2 text-ink-mute transition-colors hover:bg-white/5 hover:text-ink lg:block"
           >
             {sidebarCollapsed ? <FaChevronRight /> : <FaChevronLeft />}
           </button>
@@ -179,10 +183,10 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                 key={index}
                 to={item.path}
                 onClick={() => setSidebarOpen(false)}
-                className={`flex items-center px-3 py-3 rounded-lg transition-all duration-200 group relative ${
+                className={`group relative flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-150 ${
                   isActive(item.path)
-                    ? "bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-lg"
-                    : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                    ? "bg-white/[0.07] text-ink"
+                    : "text-ink-dim hover:bg-white/5 hover:text-ink"
                 }`}
               >
                 <div
@@ -195,9 +199,9 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
                 {!sidebarCollapsed && (
                   <>
-                    <span className="font-medium truncate">{item.title}</span>
+                    <span className="truncate">{item.title}</span>
                     {item.badge && (
-                      <span className="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                      <span className="badge badge-danger ml-auto">
                         {item.badge}
                       </span>
                     )}
@@ -206,10 +210,10 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
                 {/* Tooltip for collapsed sidebar */}
                 {sidebarCollapsed && (
-                  <div className="absolute left-full ml-2 px-3 py-2 bg-gray-800 text-white text-sm rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
+                  <div className="absolute left-full z-50 ml-2 invisible whitespace-nowrap rounded-lg border border-line bg-surface-3 px-3 py-2 text-xs font-medium text-ink opacity-0 shadow-pop transition-all duration-200 group-hover:visible group-hover:opacity-100">
                     {item.title}
                     {item.badge && (
-                      <span className="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                      <span className="badge badge-danger ml-2">
                         {item.badge}
                       </span>
                     )}
@@ -220,13 +224,13 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           </div>
 
           {/* Divider */}
-          <div className="my-4 mx-3 border-t border-gray-700"></div>
+          <div className="my-4 mx-3 border-t border-line"></div>
 
           {/* Quick Actions */}
           <div className="px-3 space-y-1">
             <Link
               to="/"
-              className="flex items-center px-3 py-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200 group relative"
+              className="group relative flex items-center rounded-lg px-3 py-2.5 text-sm font-medium text-ink-dim transition-colors duration-150 hover:bg-white/5 hover:text-ink"
             >
               <div
                 className={`flex-shrink-0 ${
@@ -235,12 +239,10 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
               >
                 <FaHome />
               </div>
-              {!sidebarCollapsed && (
-                <span className="font-medium">Back to Site</span>
-              )}
+              {!sidebarCollapsed && <span>Back to Site</span>}
 
               {sidebarCollapsed && (
-                <div className="absolute left-full ml-2 px-3 py-2 bg-gray-800 text-white text-sm rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
+                <div className="absolute left-full z-50 ml-2 invisible whitespace-nowrap rounded-lg border border-line bg-surface-3 px-3 py-2 text-xs font-medium text-ink opacity-0 shadow-pop transition-all duration-200 group-hover:visible group-hover:opacity-100">
                   Back to Site
                 </div>
               )}
@@ -248,7 +250,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
             <button
               onClick={handleSignOut}
-              className="w-full flex items-center px-3 py-3 rounded-lg text-gray-300 hover:bg-red-600 hover:text-white transition-all duration-200 group relative"
+              className="group relative flex w-full items-center rounded-lg px-3 py-2.5 text-sm font-medium text-rose-300 transition-colors duration-150 hover:bg-rose-500/10 hover:text-rose-200"
             >
               <div
                 className={`flex-shrink-0 ${
@@ -257,12 +259,10 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
               >
                 <FaSignOutAlt />
               </div>
-              {!sidebarCollapsed && (
-                <span className="font-medium">Sign Out</span>
-              )}
+              {!sidebarCollapsed && <span>Sign Out</span>}
 
               {sidebarCollapsed && (
-                <div className="absolute left-full ml-2 px-3 py-2 bg-gray-800 text-white text-sm rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
+                <div className="absolute left-full z-50 ml-2 invisible whitespace-nowrap rounded-lg border border-line bg-surface-3 px-3 py-2 text-xs font-medium text-rose-300 opacity-0 shadow-pop transition-all duration-200 group-hover:visible group-hover:opacity-100">
                   Sign Out
                 </div>
               )}
@@ -278,19 +278,19 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         }`}
       >
         {/* Top Navbar */}
-        <header className="bg-gradient-to-r from-gray-800 to-gray-900 border-b border-gray-700 shadow-lg">
+        <header className="sticky top-0 z-30 border-b border-line bg-canvas/75 backdrop-blur-xl">
           <div className="flex items-center justify-between px-4 py-3">
             {/* Mobile Menu Button */}
             <button
               onClick={() => setSidebarOpen(true)}
-              className="lg:hidden text-gray-300 hover:text-white p-2 rounded-lg hover:bg-gray-700 transition-colors"
+              className="rounded-lg p-2 text-ink-dim transition-colors hover:bg-white/5 hover:text-ink lg:hidden"
             >
               <FaBars />
             </button>
 
             {/* Page Title */}
             <div className="flex-1 lg:ml-0 ml-4">
-              <h1 className="text-white text-xl font-semibold">
+              <h1 className="text-lg font-semibold tracking-tight text-ink">
                 {location.pathname === "/dashboard" && "Dashboard Overview"}
                 {location.pathname.includes("/found-items") &&
                   "Found Items Management"}
@@ -305,63 +305,61 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             </div>
 
             {/* User Actions */}
-            <div className="flex items-center space-x-3">
-              <div className="hidden sm:block text-right">
-                <p className="text-white text-sm font-medium">
+            <div className="flex items-center gap-3">
+              <div className="hidden text-right sm:block">
+                <p className="text-sm font-semibold text-ink">
                   {user?.name || "User"}
                 </p>
-                <p className="text-gray-400 text-xs">{user?.role || "USER"}</p>
+                <p className="text-[11px] font-medium uppercase tracking-wide text-ink-mute">
+                  {user?.role || "USER"}
+                </p>
               </div>
 
               <Dropdown
                 arrowIcon={false}
                 inline
                 label={
-                  <div className="relative group cursor-pointer">
+                  <div className="group relative cursor-pointer">
                     {user?.userImg ? (
                       <img
                         src={user?.userImg}
                         alt="User"
-                        className="w-10 h-10 rounded-full border-2 border-gray-600 group-hover:border-cyan-400 transition-all duration-200 shadow-lg"
+                        className="h-10 w-10 rounded-full border border-line-strong object-cover transition group-hover:border-accent/60"
                       />
                     ) : (
-                      <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center border-2 border-gray-600 group-hover:border-cyan-400 transition-all duration-200 shadow-lg">
-                        <span className="text-white font-semibold text-sm">
-                          {user?.name?.charAt(0)?.toUpperCase() ||
-                            user?.username?.charAt(0)?.toUpperCase() ||
-                            user?.email?.charAt(0)?.toUpperCase() ||
-                            "U"}
-                        </span>
+                      <div className="grid h-10 w-10 place-items-center rounded-full border border-line-strong bg-surface-3 text-sm font-semibold text-ink transition group-hover:border-accent/60">
+                        {user?.name?.charAt(0)?.toUpperCase() ||
+                          user?.username?.charAt(0)?.toUpperCase() ||
+                          user?.email?.charAt(0)?.toUpperCase() ||
+                          "U"}
                       </div>
                     )}
-                    <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 border-2 border-gray-800 rounded-full"></div>
+                    <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-canvas bg-ok" />
                   </div>
                 }
-                className="bg-gray-800 border border-gray-700 shadow-2xl"
+                className="border border-line bg-surface shadow-pop"
               >
-                <DropdownHeader className="bg-gray-700/50">
-                  <div className="flex items-center space-x-3 py-2">
+                <DropdownHeader className="bg-surface-2/60">
+                  <div className="flex items-center gap-3 py-2">
                     {user?.userImg ? (
                       <img
                         src={user?.userImg}
                         alt="User"
-                        className="w-8 h-8 rounded-full"
+                        className="h-9 w-9 rounded-full border border-line object-cover"
                       />
                     ) : (
-                      <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-                        <span className="text-white font-semibold text-xs">
-                          {user?.name?.charAt(0)?.toUpperCase() ||
-                            user?.username?.charAt(0)?.toUpperCase() ||
-                            user?.email?.charAt(0)?.toUpperCase() ||
-                            "U"}
-                        </span>
+                      <div className="grid h-9 w-9 place-items-center rounded-full bg-surface-4 text-xs font-bold text-ink">
+                        {user?.name?.charAt(0)?.toUpperCase() ||
+                          user?.username?.charAt(0)?.toUpperCase() ||
+                          user?.email?.charAt(0)?.toUpperCase() ||
+                          "U"}
                       </div>
                     )}
-                    <div>
-                      <span className="block text-white font-medium text-sm">
+                    <div className="min-w-0">
+                      <span className="block truncate text-sm font-semibold text-ink">
                         {user?.email ? user?.email : "User"}
                       </span>
-                      <span className="block text-gray-400 text-xs">
+                      <span className="block text-xs text-ink-mute">
                         {user?.role}
                       </span>
                     </div>
@@ -369,72 +367,72 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                 </DropdownHeader>
 
                 {user?.role === "ADMIN" && (
-                  <DropdownItem className="hover:bg-gray-700 text-gray-300 hover:text-white">
+                  <DropdownItem className="rounded-lg text-ink-dim hover:bg-white/5 hover:text-ink">
                     <Link
                       to="/dashboard"
-                      className="flex items-center space-x-2 w-full"
+                      className="flex w-full items-center gap-2.5"
                     >
-                      <FaTachometerAlt className="text-cyan-400" />
+                      <FaTachometerAlt className="text-accent" />
                       <span>Dashboard</span>
                     </Link>
                   </DropdownItem>
                 )}
 
-                <DropdownItem className="hover:bg-gray-700 text-gray-300 hover:text-white">
+                <DropdownItem className="rounded-lg text-ink-dim hover:bg-white/5 hover:text-ink">
                   <Link
                     to="/dashboard/settings"
-                    className="flex items-center space-x-2 w-full"
+                    className="flex w-full items-center gap-2.5"
                   >
-                    <FaCog className="text-blue-400" />
+                    <FaCog className="text-accent" />
                     <span>Settings</span>
                   </Link>
                 </DropdownItem>
 
-                <DropdownItem className="hover:bg-gray-700 text-gray-300 hover:text-white">
+                <DropdownItem className="rounded-lg text-ink-dim hover:bg-white/5 hover:text-ink">
                   <Link
                     to="/dashboard/myLostItems"
-                    className="flex items-center space-x-2 w-full"
+                    className="flex w-full items-center gap-2.5"
                   >
-                    <FaList className="text-yellow-400" />
+                    <FaList className="text-warn" />
                     <span>My lost items</span>
                   </Link>
                 </DropdownItem>
 
-                <DropdownItem className="hover:bg-gray-700 text-gray-300 hover:text-white">
+                <DropdownItem className="rounded-lg text-ink-dim hover:bg-white/5 hover:text-ink">
                   <Link
                     to="/dashboard/myFoundItems"
-                    className="flex items-center space-x-2 w-full"
+                    className="flex w-full items-center gap-2.5"
                   >
-                    <FaSearch className="text-green-400" />
+                    <FaSearch className="text-ok" />
                     <span>My found items</span>
                   </Link>
                 </DropdownItem>
 
-                <DropdownItem className="hover:bg-gray-700 text-gray-300 hover:text-white">
+                <DropdownItem className="rounded-lg text-ink-dim hover:bg-white/5 hover:text-ink">
                   <Link
                     to="/dashboard/myClaimRequest"
-                    className="flex items-center space-x-2 w-full"
+                    className="flex w-full items-center gap-2.5"
                   >
-                    <FaUser className="text-purple-400" />
+                    <FaUser className="text-indigo-300" />
                     <span>My claims</span>
                   </Link>
                 </DropdownItem>
 
-                <DropdownItem className="hover:bg-gray-700 text-gray-300 hover:text-white">
-                  <Link to="/" className="flex items-center space-x-2 w-full">
-                    <FaHome className="text-blue-400" />
+                <DropdownItem className="rounded-lg text-ink-dim hover:bg-white/5 hover:text-ink">
+                  <Link to="/" className="flex w-full items-center gap-2.5">
+                    <FaHome className="text-accent" />
                     <span>Back to Site</span>
                   </Link>
                 </DropdownItem>
 
-                <DropdownDivider className="border-gray-600" />
+                <DropdownDivider className="bg-line" />
 
                 <DropdownItem
                   onClick={handleSignOut}
-                  className="hover:bg-red-600 text-gray-300 hover:text-white"
+                  className="rounded-lg text-rose-300 hover:bg-rose-500/15 hover:text-rose-200"
                 >
-                  <div className="flex items-center space-x-2 w-full">
-                    <FaSignOutAlt className="text-red-400" />
+                  <div className="flex w-full items-center gap-2.5">
+                    <FaSignOutAlt />
                     <span>Sign out</span>
                   </div>
                 </DropdownItem>

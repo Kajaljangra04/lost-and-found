@@ -151,11 +151,11 @@ const LostItemsManagement = () => {
   if (isLoading) {
     return (
       <div className="p-6">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-700 rounded w-1/4 mb-6"></div>
+        <div>
+          <div className="skeleton mb-6 h-8 w-1/4"></div>
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-20 bg-gray-700 rounded"></div>
+              <div key={i} className="skeleton h-20"></div>
             ))}
           </div>
         </div>
@@ -166,8 +166,8 @@ const LostItemsManagement = () => {
   if (error) {
     return (
       <div className="p-6">
-        <div className="bg-red-900/20 border border-red-500 rounded-lg p-4">
-          <p className="text-red-400">
+        <div className="rounded-2xl border border-bad/30 bg-bad/10 p-4">
+          <p className="text-sm font-medium text-rose-300">
             Error loading lost items. Please try again.
           </p>
         </div>
@@ -192,7 +192,7 @@ const LostItemsManagement = () => {
   });
 
   const getStatusColor = (isFound: boolean) => {
-    return isFound ? "bg-green-500" : "bg-red-500";
+    return isFound ? "badge-ok" : "badge-danger";
   };
 
   return (
@@ -200,179 +200,184 @@ const LostItemsManagement = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">
+          <h1 className="text-2xl font-bold tracking-tight text-ink">
             Lost Items Management
           </h1>
-          <p className="text-gray-400 mt-1">
+          <p className="mt-1 text-sm text-ink-mute">
             Manage all lost item reports in the system
           </p>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <div className="card card-hover p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">Total Reports</p>
-              <p className="text-2xl font-bold text-white">{items.length}</p>
+              <p className="text-sm text-ink-mute">Total Reports</p>
+              <p className="text-2xl font-bold tabular-nums text-ink">
+                {items.length}
+              </p>
             </div>
-            <div className="bg-gray-500 p-3 rounded-lg">
-              <FaEye className="text-white" />
+            <div className="grid h-10 w-10 place-items-center rounded-xl bg-accent/10 text-accent">
+              <FaEye />
             </div>
           </div>
         </div>
 
-        <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+        <div className="card card-hover p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">Active</p>
-              <p className="text-2xl font-bold text-red-500">
+              <p className="text-sm text-ink-mute">Active</p>
+              <p className="text-2xl font-bold tabular-nums text-ink">
                 {items.filter((item: LostItem) => !item.isFound).length}
               </p>
             </div>
-            <div className="bg-gray-500 p-3 rounded-lg">
-              <IoMdRadioButtonOn className="text-white" />
+            <div className="grid h-10 w-10 place-items-center rounded-xl bg-bad/10 text-bad">
+              <IoMdRadioButtonOn />
             </div>
           </div>
         </div>
 
-        <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+        <div className="card card-hover p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">Found</p>
-              <p className="text-2xl font-bold text-green-500">
+              <p className="text-sm text-ink-mute">Found</p>
+              <p className="text-2xl font-bold tabular-nums text-ink">
                 {items.filter((item: LostItem) => item.isFound).length}
               </p>
             </div>
-            <div className="bg-gray-500 p-3 rounded-lg">
-              <FaSearch className="text-white" />
+            <div className="grid h-10 w-10 place-items-center rounded-xl bg-ok/10 text-ok">
+              <FaSearch />
             </div>
           </div>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+      <div className="card p-5">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1">
             <div className="relative">
-              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <FaSearch className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-mute" />
               <input
                 type="text"
                 placeholder="Search lost items..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500"
+                className="field pl-10"
               />
             </div>
           </div>
 
           <div className="flex gap-4">
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500"
-            >
-              <option value="ALL">All Status</option>
-              <option value="ACTIVE">Active</option>
-              <option value="FOUND">Found</option>
-            </select>
+            <div className="w-44">
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="field"
+              >
+                <option value="ALL">All Status</option>
+                <option value="ACTIVE">Active</option>
+                <option value="FOUND">Found</option>
+              </select>
+            </div>
 
-            <select
-              value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
-              className="px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500"
-            >
-              <option value="ALL">All Categories</option>
-              <option value="Electronics">Electronics</option>
-              <option value="Personal Items">Personal Items</option>
-              <option value="Jewelry">Jewelry</option>
-              <option value="Documents">Documents</option>
-            </select>
+            <div className="w-48">
+              <select
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value)}
+                className="field"
+              >
+                <option value="ALL">All Categories</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Personal Items">Personal Items</option>
+                <option value="Jewelry">Jewelry</option>
+                <option value="Documents">Documents</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Items Table */}
-      <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
+      <div className="card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-900">
-              <tr>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-300">
+            <thead>
+              <tr className="border-b border-line">
+                <th className="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-ink-mute">
                   Item
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-300">
+                <th className="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-ink-mute">
                   Category
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-300">
+                <th className="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-ink-mute">
                   Location
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-300">
+                <th className="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-ink-mute">
                   Date Lost
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-300">
+                <th className="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-ink-mute">
                   Status
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-300">
+                <th className="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-ink-mute">
                   Reported By
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-300">
+                <th className="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-ink-mute">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-700">
+            <tbody className="divide-y divide-line">
               {filteredItems.map((item: LostItem) => (
                 <tr
                   key={item.id}
-                  className="hover:bg-gray-700 transition-colors"
+                  className="transition-colors hover:bg-white/[0.03]"
                 >
                   <td className="px-6 py-4">
                     <div>
-                      <div className="font-medium text-white">
+                      <div className="font-medium text-ink">
                         {item.lostItemName}
                       </div>
-                      <div className="text-sm text-gray-400 truncate max-w-xs">
+                      <div className="max-w-xs truncate text-sm text-ink-mute">
                         {item.description}
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-gray-300">
+                  <td className="px-6 py-4 text-sm text-ink-dim">
                     {item.category?.name || "N/A"}
                   </td>
-                  <td className="px-6 py-4 text-gray-300">{item.location}</td>
-                  <td className="px-6 py-4 text-gray-300">
+                  <td className="px-6 py-4 text-sm text-ink-dim">
+                    {item.location}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-ink-dim">
                     {new Date(item.date).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4">
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium text-white ${getStatusColor(
-                        item.isFound
-                      )}`}
-                    >
+                    <span className={`badge ${getStatusColor(item.isFound)}`}>
                       {item.isFound ? "Found" : "Active"}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-gray-300">
+                  <td className="px-6 py-4 text-sm text-ink-dim">
                     {item.user?.username || "N/A"}
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center space-x-2">
                       <button
                         onClick={() => handleEdit(item)}
-                        className="p-2 text-yellow-500 hover:bg-yellow-500 hover:text-white rounded-lg transition-colors"
+                        className="rounded-lg p-2 text-ink-mute transition-colors hover:bg-white/5 hover:text-ink"
+                        title="Edit item"
                       >
                         <FaEdit />
                       </button>
                       <button
                         onClick={() => handleMarkAsFound(item.id, item.isFound)}
                         disabled={markingAsFoundId === item.id}
-                        className={`p-2 rounded-lg transition-colors disabled:cursor-not-allowed flex items-center justify-center ${
+                        className={`flex items-center justify-center rounded-lg p-2 transition-colors disabled:cursor-not-allowed ${
                           item.isFound
-                            ? "text-red-500 hover:bg-red-500 hover:text-white disabled:bg-red-400"
-                            : "text-green-500 hover:bg-green-500 hover:text-white disabled:bg-green-400"
+                            ? "text-rose-400 hover:bg-rose-500/15 hover:text-rose-300 disabled:opacity-50"
+                            : "text-emerald-400 hover:bg-emerald-500/15 hover:text-emerald-300 disabled:opacity-50"
                         }`}
                         title={
                           item.isFound ? "Mark as Not Found" : "Mark as Found"
@@ -381,7 +386,7 @@ const LostItemsManagement = () => {
                         {markingAsFoundId === item.id ? (
                           <svg
                             className={`animate-spin h-4 w-4 ${
-                              item.isFound ? "text-red-500" : "text-green-500"
+                              item.isFound ? "text-rose-400" : "text-emerald-400"
                             }`}
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
@@ -409,7 +414,8 @@ const LostItemsManagement = () => {
                       </button>
                       <button
                         onClick={() => handleDelete(item)}
-                        className="p-2 text-red-500 hover:bg-red-500 hover:text-white rounded-lg transition-colors flex items-center justify-center"
+                        className="flex items-center justify-center rounded-lg p-2 text-rose-400 transition-colors hover:bg-rose-500/15 hover:text-rose-300"
+                        title="Delete item"
                       >
                         <FaTrash />
                       </button>
@@ -422,9 +428,9 @@ const LostItemsManagement = () => {
         </div>
 
         {filteredItems.length === 0 && (
-          <div className="text-center py-12">
-            <FaSearch className="mx-auto text-4xl text-gray-500 mb-4" />
-            <p className="text-gray-400">
+          <div className="py-12 text-center">
+            <FaSearch className="mx-auto mb-4 text-4xl text-ink-mute" />
+            <p className="text-sm text-ink-mute">
               No lost items found matching your criteria
             </p>
           </div>
@@ -433,16 +439,14 @@ const LostItemsManagement = () => {
 
       {/* Edit Modal */}
       {isEditModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
-            <h2 className="text-xl font-bold text-white mb-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="mx-4 w-full max-w-md rounded-2xl border border-line bg-surface p-6 shadow-pop">
+            <h2 className="mb-4 text-xl font-bold text-ink">
               Edit Lost Item
             </h2>
             <form onSubmit={handleEditSubmit} className="space-y-4">
               <div>
-                <label className="block text-gray-300 text-sm font-medium mb-1">
-                  Item Name
-                </label>
+                <label className="field-label">Item Name</label>
                 <input
                   type="text"
                   value={editFormData.lostItemName}
@@ -453,15 +457,13 @@ const LostItemsManagement = () => {
                     })
                   }
                   disabled={isEditLoading}
-                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:bg-gray-600 disabled:cursor-not-allowed"
+                  className="field disabled:cursor-not-allowed disabled:opacity-50"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-gray-300 text-sm font-medium mb-1">
-                  Description
-                </label>
+                <label className="field-label">Description</label>
                 <textarea
                   value={editFormData.description}
                   onChange={(e) =>
@@ -471,16 +473,14 @@ const LostItemsManagement = () => {
                     })
                   }
                   disabled={isEditLoading}
-                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:bg-gray-600 disabled:cursor-not-allowed"
+                  className="field disabled:cursor-not-allowed disabled:opacity-50"
                   rows={3}
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-gray-300 text-sm font-medium mb-1">
-                  Location
-                </label>
+                <label className="field-label">Location</label>
                 <input
                   type="text"
                   value={editFormData.location}
@@ -491,15 +491,13 @@ const LostItemsManagement = () => {
                     })
                   }
                   disabled={isEditLoading}
-                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:bg-gray-600 disabled:cursor-not-allowed"
+                  className="field disabled:cursor-not-allowed disabled:opacity-50"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-gray-300 text-sm font-medium mb-1">
-                  Date Lost
-                </label>
+                <label className="field-label">Date Lost</label>
                 <input
                   type="date"
                   value={editFormData.date}
@@ -510,15 +508,13 @@ const LostItemsManagement = () => {
                     })
                   }
                   disabled={isEditLoading}
-                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:bg-gray-600 disabled:cursor-not-allowed"
+                  className="field disabled:cursor-not-allowed disabled:opacity-50"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-gray-300 text-sm font-medium mb-1">
-                  Category
-                </label>
+                <label className="field-label">Category</label>
                 <select
                   value={editFormData.categoryId}
                   onChange={(e) =>
@@ -528,7 +524,7 @@ const LostItemsManagement = () => {
                     })
                   }
                   disabled={isEditLoading}
-                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500 disabled:bg-gray-600 disabled:cursor-not-allowed"
+                  className="field disabled:cursor-not-allowed disabled:opacity-50"
                   required
                 >
                   <option value="">Select a category</option>
@@ -544,12 +540,12 @@ const LostItemsManagement = () => {
                 <button
                   type="submit"
                   disabled={isEditLoading}
-                  className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center justify-center"
+                  className="btn btn-primary flex-1"
                 >
                   {isEditLoading ? (
                     <>
                       <svg
-                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                        className="animate-spin -ml-1 mr-3 h-5 w-5"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
@@ -578,7 +574,7 @@ const LostItemsManagement = () => {
                   type="button"
                   onClick={handleEditCancel}
                   disabled={isEditLoading}
-                  className="flex-1 bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  className="btn btn-outline flex-1"
                 >
                   Cancel
                 </button>
@@ -590,31 +586,31 @@ const LostItemsManagement = () => {
 
       {/* Delete Confirmation Modal */}
       {isDeleteModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4 border border-gray-700">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="mx-4 w-full max-w-md rounded-2xl border border-line bg-surface p-6 shadow-pop">
             <div className="text-center">
               <div className="mb-4">
-                <div className="bg-gray-100 rounded-full p-3 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                  <FaTrash className="text-red-600 text-xl" />
+                <div className="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-full bg-rose-500/10">
+                  <FaTrash className="text-xl text-rose-400" />
                 </div>
-                <h2 className="text-xl font-bold text-white mb-2">
+                <h2 className="mb-2 text-xl font-bold text-ink">
                   Delete Lost Item
                 </h2>
-                <p className="text-gray-400 mb-4">
+                <p className="mb-4 text-sm text-ink-dim">
                   Are you sure you want to delete this item? This action cannot
                   be undone.
                 </p>
               </div>
 
               {deletingItem && (
-                <div className="bg-gray-700 rounded-lg p-4 mb-6 text-left">
-                  <h3 className="font-medium text-white mb-2">
+                <div className="mb-6 rounded-xl border border-line bg-surface-2 p-4 text-left">
+                  <h3 className="mb-2 font-medium text-ink">
                     {deletingItem.lostItemName}
                   </h3>
-                  <p className="text-sm text-gray-400 mb-2">
+                  <p className="mb-2 text-sm text-ink-mute">
                     {deletingItem.description}
                   </p>
-                  <div className="flex justify-between text-sm text-gray-500">
+                  <div className="flex justify-between text-sm text-ink-mute">
                     <span>Location: {deletingItem.location}</span>
                     <span>
                       Date: {new Date(deletingItem.date).toLocaleDateString()}
@@ -628,7 +624,7 @@ const LostItemsManagement = () => {
                   type="button"
                   onClick={handleDeleteCancel}
                   disabled={isDeleteLoading}
-                  className="flex-1 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-500 disabled:cursor-not-allowed text-white py-2 px-4 rounded-lg transition-colors"
+                  className="btn btn-outline flex-1"
                 >
                   Cancel
                 </button>
@@ -636,12 +632,12 @@ const LostItemsManagement = () => {
                   type="button"
                   onClick={handleDeleteConfirm}
                   disabled={isDeleteLoading}
-                  className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-red-400 disabled:cursor-not-allowed text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center"
+                  className="btn btn-danger flex-1"
                 >
                   {isDeleteLoading ? (
                     <>
                       <svg
-                        className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                        className="animate-spin -ml-1 mr-2 h-4 w-4"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"

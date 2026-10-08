@@ -6,6 +6,11 @@ import {
   FaFilter,
   FaChevronLeft,
   FaChevronRight,
+  FaTimes,
+  FaCheckCircle,
+  FaBoxOpen,
+  FaCalendarAlt,
+  FaMapMarkerAlt,
 } from "react-icons/fa";
 import { useState } from "react";
 
@@ -64,45 +69,42 @@ const FoundItemsPage = () => {
 
   if (isLoading)
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
-        <div className="py-8 px-4 mx-auto max-w-screen-2xl sm:py-6 lg:px-6">
+      <div className="page">
+        <div className="mx-auto max-w-screen-2xl px-4 py-8 sm:py-6 lg:px-6">
           {/* Header Skeleton */}
-          <div className="mx-auto text-center lg:mb-8 mb-6">
-            <div className="h-8 bg-gray-700 rounded-lg w-64 mx-auto mb-4 animate-pulse"></div>
-            <div className="h-4 bg-gray-700 rounded w-96 mx-auto animate-pulse"></div>
+          <div className="mx-auto mb-12 max-w-2xl space-y-4 text-center">
+            <div className="skeleton mx-auto h-9 w-64" />
+            <div className="skeleton mx-auto h-5 w-3/4 max-w-md" />
           </div>
 
           {/* Search Skeleton */}
-          <div className="bg-gray-800/50 rounded-2xl p-6 mb-8 shadow-xl backdrop-blur-sm border border-gray-700">
-            <div className="max-w-4xl mx-auto">
-              <div className="h-12 bg-gray-700 rounded-xl mb-6 animate-pulse"></div>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <div className="h-10 bg-gray-700 rounded-lg flex-1 animate-pulse"></div>
-                <div className="h-10 bg-gray-700 rounded-lg w-32 animate-pulse"></div>
+          <div className="card mb-8 p-6">
+            <div className="mx-auto max-w-4xl">
+              <div className="skeleton mb-6 h-12" />
+              <div className="flex flex-col gap-4 sm:flex-row">
+                <div className="skeleton h-10 flex-1" />
+                <div className="skeleton h-10 w-32" />
               </div>
             </div>
           </div>
 
           {/* Cards Skeleton */}
           <div className="container mx-auto px-4">
-            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="mx-auto grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {Array.from({ length: 8 }).map((_, index) => (
-                <div
-                  key={index}
-                  className="bg-gray-800/50 rounded-2xl overflow-hidden shadow-lg animate-pulse backdrop-blur-sm border border-gray-700"
-                >
-                  <div className="h-56 bg-gray-700"></div>
+                <div key={index} className="card overflow-hidden">
+                  <div className="skeleton h-56 rounded-none" />
                   <div className="p-6">
-                    <div className="h-6 bg-gray-700 rounded mb-3"></div>
-                    <div className="space-y-2 mb-4">
-                      <div className="h-4 bg-gray-700 rounded"></div>
-                      <div className="h-4 bg-gray-700 rounded w-3/4"></div>
+                    <div className="skeleton mb-3 h-6 w-2/3" />
+                    <div className="mb-4 space-y-2">
+                      <div className="skeleton h-4" />
+                      <div className="skeleton h-4 w-3/4" />
                     </div>
-                    <div className="space-y-2 mb-4">
-                      <div className="h-4 bg-gray-700 rounded w-1/2"></div>
-                      <div className="h-4 bg-gray-700 rounded w-2/3"></div>
+                    <div className="mb-4 space-y-2">
+                      <div className="skeleton h-4 w-1/2" />
+                      <div className="skeleton h-4 w-2/3" />
                     </div>
-                    <div className="h-10 bg-gray-700 rounded-xl"></div>
+                    <div className="skeleton h-10" />
                   </div>
                 </div>
               ))}
@@ -112,41 +114,37 @@ const FoundItemsPage = () => {
       </div>
     );
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black pb-16">
-      <div className="py-8 px-4 mx-auto max-w-screen-2xl sm:py-6 lg:px-6">
+    <div className="page pb-16">
+      <div className="mx-auto max-w-screen-2xl px-4 py-8 sm:py-6 lg:px-6">
         {/* Header Section */}
-        <div className="mx-auto text-center lg:mb-8 mb-6">
-          <h2 className="mb-4 text-3xl lg:text-4xl tracking-tight font-extrabold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
-            All Found Items
-          </h2>
-          <p className="font-light text-gray-400 sm:text-xl">
+        <div className="section-head">
+          <h2 className="section-title">All Found Items</h2>
+          <p className="section-sub">
             Discover items that have been found and reported by our community
           </p>
         </div>
 
         {/* Search and Filter Section */}
-        <div className="bg-gray-800/50 rounded-2xl p-6 mb-8 shadow-xl backdrop-blur-sm border border-gray-700">
-          <div className="max-w-4xl mx-auto">
+        <div className="card mb-8 p-6">
+          <div className="mx-auto max-w-4xl">
             {/* Search Bar */}
             <form className="mb-6" onSubmit={handleSearch}>
-              <label className="mb-2 text-sm font-medium text-white sr-only">
-                Search
-              </label>
+              <label className="field-label sr-only">Search</label>
               <div className="relative">
-                <div className="absolute inset-y-0 start-0 flex items-center ps-4 pointer-events-none">
-                  <FaSearch className="text-gray-400" />
+                <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-4">
+                  <FaSearch className="text-ink-mute" />
                 </div>
                 <input
                   type="search"
                   id="default-search"
-                  className="block w-full p-4 ps-12 text-sm text-white border border-gray-600 rounded-xl bg-gray-700/70 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 placeholder-gray-400 transition-all duration-200 backdrop-blur-sm"
+                  className="field ps-11 pe-28"
                   placeholder="Search by name, location, or description..."
                   value={searchTerm}
                   onChange={handleSearchInputChange}
                 />
                 <button
                   type="submit"
-                  className="text-white absolute end-3 bottom-2.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 focus:ring-4 focus:outline-none focus:ring-cyan-300 font-medium rounded-lg text-sm px-6 py-2 transition-all duration-200 shadow-lg hover:shadow-xl"
+                  className="btn btn-brand absolute end-2.5 top-1/2 -translate-y-1/2"
                 >
                   Search
                 </button>
@@ -154,14 +152,14 @@ const FoundItemsPage = () => {
             </form>
 
             {/* Filters Row */}
-            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+            <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
               {/* Sort Controls */}
-              <div className="flex items-center gap-3 w-full sm:w-auto">
-                <FaFilter className="text-gray-400" />
+              <div className="flex w-full items-center gap-3 sm:w-auto">
+                <FaFilter className="shrink-0 text-ink-mute" />
                 <select
                   value={`${sortBy}-${sortOrder}`}
                   onChange={handleSortChange}
-                  className="block w-full sm:w-64 p-3 text-sm text-white border border-gray-600 rounded-lg bg-gray-700/70 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all duration-200 backdrop-blur-sm"
+                  className="field w-full sm:w-64"
                 >
                   <option value="foundItemName-asc">Name (A-Z)</option>
                   <option value="foundItemName-desc">Name (Z-A)</option>
@@ -174,10 +172,8 @@ const FoundItemsPage = () => {
 
               {/* Clear Search Button */}
               {searchTerm && (
-                <button
-                  onClick={clearSearch}
-                  className="text-cyan-400 hover:text-cyan-300 text-sm font-medium bg-cyan-900/30 px-4 py-2 rounded-lg hover:bg-cyan-900/50 transition-all duration-200 border border-cyan-600/50"
-                >
+                <button onClick={clearSearch} className="btn btn-outline">
+                  <FaTimes />
                   Clear search
                 </button>
               )}
@@ -187,7 +183,7 @@ const FoundItemsPage = () => {
 
         {/* Results Info */}
         <div className="mb-6">
-          <p className="text-center font-medium text-gray-400">
+          <p className="text-center text-sm font-medium text-ink-mute">
             {searchTerm
               ? `Search results for "${searchTerm}" - ${
                   foundItems?.data?.length || 0
@@ -199,39 +195,36 @@ const FoundItemsPage = () => {
       {/* card items */}
       <div className="container mx-auto px-4">
         {foundItems?.data?.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="bg-gray-800/50 rounded-full w-24 h-24 mx-auto mb-6 flex items-center justify-center backdrop-blur-sm border border-gray-700">
-              <FaSearch className="text-gray-400 text-3xl" />
+          <div className="py-16 text-center">
+            <div className="mx-auto mb-6 grid h-24 w-24 place-items-center rounded-2xl border border-line bg-surface shadow-card">
+              <FaSearch className="text-2xl text-ink-mute" />
             </div>
-            <h3 className="text-xl font-semibold text-white mb-2">
+            <h3 className="mb-2 text-xl font-semibold text-ink">
               {searchTerm ? "No items found" : "No found items yet"}
             </h3>
-            <p className="text-gray-400 mb-6 max-w-md mx-auto">
+            <p className="mx-auto mb-6 max-w-md text-ink-dim">
               {searchTerm
                 ? `No items found for "${searchTerm}". Try adjusting your search terms or browse all items.`
                 : "No found items have been reported yet. Check back later or be the first to report a found item!"}
             </p>
             {searchTerm && (
-              <button
-                onClick={clearSearch}
-                className="inline-flex items-center px-6 py-3 text-sm font-medium text-white bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
-              >
+              <button onClick={clearSearch} className="btn btn-outline">
                 Clear search and view all items
               </button>
             )}
           </div>
         ) : (
-          <div className="grid gap-6 mx-auto grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="mx-auto grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {foundItems?.data?.map((foundItem: FoundItem) => {
               return (
                 <div
                   key={foundItem.id}
-                  className="group relative bg-gradient-to-br from-gray-800 via-gray-900 to-black rounded-xl overflow-hidden shadow-2xl transition-all duration-300 transform hover:scale-105 hover:shadow-cyan-500/10 border border-gray-700 hover:border-gray-600 max-w-sm"
+                  className="card card-hover group overflow-hidden"
                 >
                   <div className="relative overflow-hidden">
-                    <div className="h-56 w-full overflow-hidden">
+                    <div className="h-56 w-full overflow-hidden bg-surface-2">
                       <img
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
                         src={foundItem?.img}
                         alt={foundItem?.foundItemName}
                         width={500}
@@ -244,46 +237,49 @@ const FoundItemsPage = () => {
                     </div>
 
                     {foundItem?.isClaimed ? (
-                      <div className="absolute top-3 right-3 bg-gradient-to-r from-green-500 to-green-600 text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg backdrop-blur-sm border border-green-400/50">
-                        ✓ Claimed
-                      </div>
+                      <span className="badge badge-ok absolute right-3 top-3 bg-surface/90 backdrop-blur-md">
+                        <FaCheckCircle />
+                        Claimed
+                      </span>
                     ) : (
-                      <div className="absolute top-3 right-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg backdrop-blur-sm border border-cyan-400/50">
-                        ✦ Available
-                      </div>
+                      <span className="badge badge-accent absolute right-3 top-3 bg-surface/90 backdrop-blur-md">
+                        <FaBoxOpen />
+                        Available
+                      </span>
                     )}
                   </div>
 
-                  <div className="p-5 text-white">
-                    <h3 className="text-xl font-bold mb-3 text-white group-hover:text-cyan-400 transition-colors duration-300 line-clamp-1">
+                  <div className="p-5">
+                    <h3 className="mb-3 line-clamp-1 text-lg font-bold text-ink transition-colors group-hover:text-accent">
                       {foundItem?.foundItemName}
                     </h3>
 
-                    <p className="text-gray-300 text-sm mb-4 line-clamp-2 leading-relaxed">
+                    <p className="mb-4 line-clamp-2 text-sm leading-relaxed text-ink-dim">
                       {foundItem?.description}
                     </p>
 
-                    <div className="space-y-2 mb-4">
-                      <div className="flex items-center text-sm">
-                        <span className="text-gray-400 mr-2">📅</span>
-                        <span className="text-gray-200">
+                    <div className="mb-5 space-y-2">
+                      <div className="flex items-center gap-2 text-sm">
+                        <FaCalendarAlt className="shrink-0 text-ink-mute" />
+                        <span className="text-ink-dim">
                           {formatDate(
                             foundItem?.date || foundItem?.createdAt
                           )}
                         </span>
                       </div>
-                      <div className="flex items-center text-sm">
-                        <span className="text-gray-400 mr-2">📍</span>
-                        <span className="text-gray-200 line-clamp-1">
+                      <div className="flex items-center gap-2 text-sm">
+                        <FaMapMarkerAlt className="shrink-0 text-ink-mute" />
+                        <span className="line-clamp-1 text-ink-dim">
                           {foundItem?.location}
                         </span>
                       </div>
                     </div>
 
-                    <Link to={`/foundItems/${foundItem?.id}`} className="block">
-                      <button className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-gray-900 shadow-lg hover:shadow-xl">
-                        View Details
-                      </button>
+                    <Link
+                      to={`/foundItems/${foundItem?.id}`}
+                      className="btn btn-outline w-full"
+                    >
+                      View Details
                     </Link>
                   </div>
                 </div>
@@ -295,30 +291,30 @@ const FoundItemsPage = () => {
 
       {/* Enhanced Pagination */}
       {totalPages > 1 && (
-        <div className="flex flex-col items-center mt-12 pb-8 space-y-4">
+        <div className="mt-12 flex flex-col items-center space-y-4 pb-8">
           {/* Page Info */}
-          <div className="text-sm text-gray-400">
+          <div className="text-sm text-ink-mute">
             Showing page {currentPage} of {totalPages} (
             {foundItems?.meta?.total || 0} total items)
           </div>
 
-          <nav className="inline-flex items-center space-x-1 bg-gray-800/50 rounded-2xl shadow-lg p-2 backdrop-blur-sm border border-gray-700">
+          <nav className="inline-flex items-center gap-1 rounded-2xl border border-line bg-surface p-2 shadow-card">
             {/* Previous Button */}
             <button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded-xl transition-all duration-200 ${
+              className={`inline-flex items-center rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
                 currentPage === 1
-                  ? "text-gray-500 cursor-not-allowed"
-                  : "text-gray-300 bg-gray-700/50 hover:bg-gray-600/70 hover:scale-105"
+                  ? "cursor-not-allowed text-ink-mute"
+                  : "text-ink-dim hover:bg-white/5 hover:text-ink"
               }`}
             >
-              <FaChevronLeft className="w-3 h-3 mr-2" />
+              <FaChevronLeft className="mr-2 h-3 w-3" />
               Previous
             </button>
 
             {/* Page Numbers */}
-            <div className="flex items-center space-x-1">
+            <div className="flex items-center gap-1">
               {(() => {
                 const pages = [];
                 const maxVisiblePages = 5;
@@ -339,14 +335,14 @@ const FoundItemsPage = () => {
                     <button
                       key={1}
                       onClick={() => handlePageChange(1)}
-                      className="px-3 py-2 text-sm font-medium rounded-lg text-gray-300 bg-gray-700/50 hover:bg-gray-600/70 transition-all duration-200 hover:scale-105"
+                      className="rounded-lg px-3 py-2 text-sm font-medium text-ink-dim transition-colors hover:bg-white/5"
                     >
                       1
                     </button>
                   );
                   if (startPage > 2) {
                     pages.push(
-                      <span key="ellipsis1" className="px-2 text-gray-400">
+                      <span key="ellipsis1" className="px-2 text-ink-mute">
                         ...
                       </span>
                     );
@@ -359,10 +355,10 @@ const FoundItemsPage = () => {
                     <button
                       key={i}
                       onClick={() => handlePageChange(i)}
-                      className={`px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:scale-105 ${
+                      className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                         currentPage === i
-                          ? "text-white bg-gradient-to-r from-cyan-600 to-blue-600 shadow-lg"
-                          : "text-gray-300 bg-gray-700/50 hover:bg-gray-600/70"
+                          ? "bg-accent-strong text-accent-ink"
+                          : "text-ink-dim hover:bg-white/5"
                       }`}
                     >
                       {i}
@@ -374,7 +370,7 @@ const FoundItemsPage = () => {
                 if (endPage < totalPages) {
                   if (endPage < totalPages - 1) {
                     pages.push(
-                      <span key="ellipsis2" className="px-2 text-gray-400">
+                      <span key="ellipsis2" className="px-2 text-ink-mute">
                         ...
                       </span>
                     );
@@ -383,7 +379,7 @@ const FoundItemsPage = () => {
                     <button
                       key={totalPages}
                       onClick={() => handlePageChange(totalPages)}
-                      className="px-3 py-2 text-sm font-medium rounded-lg text-gray-300 bg-gray-700/50 hover:bg-gray-600/70 transition-all duration-200 hover:scale-105"
+                      className="rounded-lg px-3 py-2 text-sm font-medium text-ink-dim transition-colors hover:bg-white/5"
                     >
                       {totalPages}
                     </button>
@@ -398,21 +394,21 @@ const FoundItemsPage = () => {
             <button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded-xl transition-all duration-200 ${
+              className={`inline-flex items-center rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
                 currentPage === totalPages
-                  ? "text-gray-500 cursor-not-allowed"
-                  : "text-gray-300 bg-gray-700/50 hover:bg-gray-600/70 hover:scale-105"
+                  ? "cursor-not-allowed text-ink-mute"
+                  : "text-ink-dim hover:bg-white/5 hover:text-ink"
               }`}
             >
               Next
-              <FaChevronRight className="w-3 h-3 ml-2" />
+              <FaChevronRight className="ml-2 h-3 w-3" />
             </button>
           </nav>
 
           {/* Quick Jump */}
           {totalPages > 10 && (
-            <div className="flex items-center space-x-2 text-sm">
-              <span className="text-gray-400">Go to page:</span>
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-ink-mute">Go to page:</span>
               <input
                 type="number"
                 min="1"
@@ -424,9 +420,9 @@ const FoundItemsPage = () => {
                     handlePageChange(page);
                   }
                 }}
-                className="w-16 px-2 py-1 text-center border border-gray-600 rounded bg-gray-700 text-white"
+                className="field w-16 px-2 py-1 text-center"
               />
-              <span className="text-gray-400">of {totalPages}</span>
+              <span className="text-ink-mute">of {totalPages}</span>
             </div>
           )}
         </div>

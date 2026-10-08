@@ -1,5 +1,19 @@
 import React, { useState } from "react";
-import { FaSearch, FaRobot, FaBrain, FaSpinner, FaEye, FaMapMarkerAlt, FaCalendarAlt, FaUser, FaTags } from "react-icons/fa";
+import {
+  FaSearch,
+  FaRobot,
+  FaBrain,
+  FaSpinner,
+  FaEye,
+  FaMapMarkerAlt,
+  FaCalendarAlt,
+  FaUser,
+  FaTags,
+  FaPaperPlane,
+  FaLightbulb,
+  FaCheckCircle,
+  FaExclamationTriangle,
+} from "react-icons/fa";
 import { useAiSearchMutation } from "../../redux/api/api";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -36,6 +50,30 @@ interface SearchResult {
   totalFound: number;
   totalLost: number;
 }
+
+const SEARCH_TIPS = [
+  {
+    title: "Be Descriptive",
+    example:
+      '"I lost a black iPhone 13 with a cracked screen and blue case"',
+  },
+  {
+    title: "Include Location",
+    example: '"near the library", "in the cafeteria", "at the parking lot"',
+  },
+  {
+    title: "Mention Timing",
+    example: '"yesterday afternoon", "last week", "this morning"',
+  },
+  {
+    title: "Add Unique Features",
+    example: '"silver keychain attached", "has a sticker", "scratched surface"',
+  },
+  {
+    title: "Use Natural Language",
+    example: "Our AI understands context - speak naturally!",
+  },
+];
 
 const AiSearch: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -76,50 +114,53 @@ const AiSearch: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <div className="flex items-center justify-center mb-6">
-            <div className="w-16 h-16 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-2xl mr-4">
-              <FaBrain className="text-3xl text-white" />
-            </div>
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
-              AI-Powered Search
-            </h1>
+    <div className="page">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        {/* Hero header */}
+        <header className="section-head">
+          <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl border border-accent/30 bg-accent/10 shadow-glow">
+            <FaBrain className="text-2xl text-accent" />
           </div>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-            Harness the power of artificial intelligence to find lost or found items.
-            Simply describe what you're looking for in natural language!
+          <span className="eyebrow">
+            <FaRobot />
+            AI search
+          </span>
+          <h1 className="section-title">
+            <span className="text-gradient">AI-Powered</span> Search
+          </h1>
+          <p className="section-sub">
+            Harness the power of artificial intelligence to find lost or found
+            items. Simply describe what you're looking for in natural language!
           </p>
-        </div>
+        </header>
 
-        {/* Search Form */}
-        <div className="max-w-5xl mx-auto mb-10">
-          <form onSubmit={handleSearch} className="bg-gradient-to-r from-gray-800 to-gray-700 rounded-2xl shadow-2xl p-8 border border-gray-600">
-            <div className="flex flex-col lg:flex-row items-center space-y-4 lg:space-y-0 lg:space-x-6">
-              <div className="flex-1 w-full">
-                <div className="relative">
-                  <FaRobot className="absolute left-4 top-1/2 transform -translate-y-1/2 text-cyan-400 text-xl" />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="e.g., I lost a black iPhone 13 with a cracked screen near the library yesterday..."
-                    className="w-full pl-12 pr-6 py-4 bg-gray-900 border border-gray-600 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent text-white placeholder-gray-400 text-lg"
-                    disabled={isLoading}
-                  />
-                </div>
+        {/* Prompt command bar */}
+        <div className="mx-auto mb-10 max-w-5xl">
+          <form
+            onSubmit={handleSearch}
+            className="rounded-2xl border border-line bg-surface p-4 shadow-card sm:p-6"
+          >
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <div className="relative flex-1">
+                <FaRobot className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-accent" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="e.g., I lost a black iPhone 13 with a cracked screen near the library yesterday..."
+                  className="field pl-11"
+                  disabled={isLoading}
+                />
               </div>
               <button
                 type="submit"
                 disabled={isLoading}
-                className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 disabled:from-gray-600 disabled:to-gray-700 text-white px-8 py-4 rounded-xl flex items-center space-x-3 transition-all duration-300 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                className="btn btn-brand w-full sm:w-auto"
               >
                 {isLoading ? (
-                  <FaSpinner className="animate-spin text-xl" />
+                  <FaSpinner className="animate-spin" />
                 ) : (
-                  <FaSearch className="text-xl" />
+                  <FaPaperPlane />
                 )}
                 <span>{isLoading ? "Searching..." : "Search with AI"}</span>
               </button>
@@ -127,195 +168,247 @@ const AiSearch: React.FC = () => {
           </form>
         </div>
 
+        {/* Loading state */}
+        {isLoading && !searchResults && (
+          <div className="mx-auto max-w-7xl space-y-6" aria-hidden="true">
+            <div className="skeleton h-40 w-full rounded-2xl" />
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="skeleton h-64" />
+              <div className="skeleton h-64" />
+              <div className="skeleton h-64" />
+            </div>
+          </div>
+        )}
+
         {/* Search Results */}
         {searchResults && (
-          <div className="max-w-7xl mx-auto">
+          <div className="mx-auto max-w-7xl space-y-8">
             {/* AI Reasoning */}
-            <div className="bg-gradient-to-r from-gray-800 to-gray-700 rounded-2xl shadow-2xl p-8 mb-8 border border-gray-600">
-              <h3 className="text-2xl font-semibold text-white mb-4 flex items-center">
-                <FaBrain className="mr-3 text-cyan-400 text-3xl" />
-                AI Analysis
-              </h3>
-              <div className="bg-gradient-to-r from-cyan-900/30 to-blue-900/30 p-6 rounded-xl border border-cyan-500/20">
-                <p className="text-gray-200 text-lg leading-relaxed">
-                  {searchResults.reasoning}
-                </p>
+            <section className="card p-6 md:p-8">
+              <div className="mb-4 flex items-center gap-3">
+                <span className="grid h-9 w-9 place-items-center rounded-lg bg-accent/10 text-accent">
+                  <FaBrain />
+                </span>
+                <h2 className="text-xl font-semibold text-ink">AI Analysis</h2>
               </div>
-            </div>
+              <p className="rounded-xl border border-line bg-surface-2 p-5 text-[15px] leading-relaxed text-ink-dim">
+                {searchResults.reasoning}
+              </p>
+            </section>
 
             {/* Results Summary */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-              <div className="bg-gradient-to-r from-emerald-600 to-green-600 rounded-2xl p-6 text-center shadow-xl">
-                <h4 className="text-xl font-semibold text-white mb-2">Found Items</h4>
-                <p className="text-4xl font-bold text-white">{searchResults.totalFound}</p>
-                <p className="text-green-100 mt-2">Items waiting to be claimed</p>
+            <div className="grid gap-6 sm:grid-cols-2">
+              <div className="card p-6 text-center">
+                <span className="mx-auto grid h-10 w-10 place-items-center rounded-xl bg-ok/10 text-ok">
+                  <FaCheckCircle />
+                </span>
+                <h3 className="mt-3 text-xs font-semibold uppercase tracking-wider text-ink-mute">
+                  Found Items
+                </h3>
+                <p className="mt-1 text-4xl font-bold text-ink">
+                  {searchResults.totalFound}
+                </p>
+                <p className="mt-2 text-sm text-ink-dim">
+                  Items waiting to be claimed
+                </p>
               </div>
-              <div className="bg-gradient-to-r from-red-600 to-pink-600 rounded-2xl p-6 text-center shadow-xl">
-                <h4 className="text-xl font-semibold text-white mb-2">Lost Items</h4>
-                <p className="text-4xl font-bold text-white">{searchResults.totalLost}</p>
-                <p className="text-red-100 mt-2">Items looking for owners</p>
+              <div className="card p-6 text-center">
+                <span className="mx-auto grid h-10 w-10 place-items-center rounded-xl bg-bad/10 text-bad">
+                  <FaExclamationTriangle />
+                </span>
+                <h3 className="mt-3 text-xs font-semibold uppercase tracking-wider text-ink-mute">
+                  Lost Items
+                </h3>
+                <p className="mt-1 text-4xl font-bold text-ink">
+                  {searchResults.totalLost}
+                </p>
+                <p className="mt-2 text-sm text-ink-dim">
+                  Items looking for owners
+                </p>
               </div>
             </div>
 
             {/* Found Items Results */}
             {searchResults.foundItems.length > 0 && (
-              <div className="bg-gradient-to-r from-gray-800 to-gray-700 rounded-2xl shadow-2xl p-8 mb-8 border border-gray-600">
-                <h3 className="text-2xl font-semibold text-white mb-6 flex items-center">
-
-                  Found Items That Match Your Search
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <section>
+                <div className="mb-5 flex items-center gap-3">
+                  <span className="grid h-9 w-9 place-items-center rounded-lg bg-ok/10 text-ok">
+                    <FaCheckCircle />
+                  </span>
+                  <h2 className="text-xl font-semibold text-ink">
+                    Found Items That Match Your Search
+                  </h2>
+                </div>
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {searchResults.foundItems.map((item) => (
-                    <div
+                    <article
                       key={item.id}
-                      className="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-600 rounded-xl p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 hover:border-emerald-500/50"
+                      className="card card-hover flex flex-col p-5"
                     >
                       {item.img && (
                         <div className="relative mb-4">
                           <img
                             src={item.img}
                             alt={item.foundItemName}
-                            className="w-full h-40 object-cover rounded-lg"
+                            className="h-40 w-full rounded-xl object-cover"
                             onError={(e) => {
                               (e.target as HTMLImageElement).src = "/bgimg.png";
                             }}
                           />
+                          <div className="pointer-events-none absolute inset-0 rounded-xl bg-gradient-to-b from-black/55 via-black/10 to-transparent" />
                           {item.isClaimed ? (
-                            <div className="absolute top-2 right-2 bg-emerald-500 text-white px-2 py-1 rounded-lg text-xs font-semibold">
-                              ✓ Claimed
-                            </div>
+                            <span className="badge badge-ok absolute right-2 top-2">
+                              Claimed
+                            </span>
                           ) : (
-                            <div className="absolute top-2 right-2 bg-cyan-500 text-white px-2 py-1 rounded-lg text-xs font-semibold">
-                              ✦ Available
-                            </div>
+                            <span className="badge badge-accent absolute right-2 top-2">
+                              Available
+                            </span>
                           )}
                         </div>
                       )}
-                      <h4 className="font-bold text-white text-lg mb-3 overflow-hidden text-ellipsis whitespace-nowrap">
+                      <h3 className="mb-3 truncate text-base font-semibold text-ink">
                         {item.foundItemName}
-                      </h4>
-                      <p className="text-gray-300 text-sm mb-4 overflow-hidden" style={{
-                        display: '-webkit-box',
-                        WebkitLineClamp: 3,
-                        WebkitBoxOrient: 'vertical',
-                        lineHeight: '1.4em',
-                        maxHeight: '4.2em'
-                      }}>
+                      </h3>
+                      <p
+                        className="mb-4 text-sm text-ink-dim"
+                        style={{
+                          display: "-webkit-box",
+                          WebkitLineClamp: 3,
+                          WebkitBoxOrient: "vertical",
+                          lineHeight: "1.4em",
+                          maxHeight: "4.2em",
+                          overflow: "hidden",
+                        }}
+                      >
                         {item.description}
                       </p>
-                      <div className="space-y-2 mb-4">
-                        <div className="flex items-center text-gray-400 text-sm">
-                          <FaTags className="mr-2 text-cyan-400" />
-                          <span className="text-cyan-300">{item.category?.name || "No category"}</span>
+                      <div className="mb-5 space-y-2 text-sm text-ink-dim">
+                        <div className="flex items-center gap-2">
+                          <FaTags className="text-accent" />
+                          <span className="text-accent-soft">
+                            {item.category?.name || "No category"}
+                          </span>
                         </div>
-                        <div className="flex items-center text-gray-400 text-sm">
-                          <FaMapMarkerAlt className="mr-2 text-cyan-400" />
+                        <div className="flex items-center gap-2">
+                          <FaMapMarkerAlt className="text-accent" />
                           <span>{item.location}</span>
                         </div>
-                        <div className="flex items-center text-gray-400 text-sm">
-                          <FaCalendarAlt className="mr-2 text-cyan-400" />
+                        <div className="flex items-center gap-2">
+                          <FaCalendarAlt className="text-accent" />
                           <span>{formatDate(item.date)}</span>
                         </div>
-                        <div className="flex items-center text-gray-400 text-sm">
-                          <FaUser className="mr-2 text-cyan-400" />
+                        <div className="flex items-center gap-2">
+                          <FaUser className="text-accent" />
                           <span>{item.user?.username}</span>
                         </div>
                       </div>
                       <button
                         onClick={() => navigate(`/foundItems/${item.id}`)}
-                        className="w-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white py-2 px-4 rounded-lg flex items-center justify-center space-x-2 transition-all duration-300 font-semibold"
+                        className="btn btn-outline mt-auto w-full"
                       >
                         <FaEye />
                         <span>View Details</span>
                       </button>
-                    </div>
+                    </article>
                   ))}
                 </div>
-              </div>
+              </section>
             )}
 
             {/* Lost Items Results */}
             {searchResults.lostItems.length > 0 && (
-              <div className="bg-gradient-to-r from-gray-800 to-gray-700 rounded-2xl shadow-2xl p-8 mb-8 border border-gray-600">
-                <h3 className="text-2xl font-semibold text-white mb-6 flex items-center">
-                 
-                  Lost Items That Match Your Search
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <section>
+                <div className="mb-5 flex items-center gap-3">
+                  <span className="grid h-9 w-9 place-items-center rounded-lg bg-bad/10 text-bad">
+                    <FaExclamationTriangle />
+                  </span>
+                  <h2 className="text-xl font-semibold text-ink">
+                    Lost Items That Match Your Search
+                  </h2>
+                </div>
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {searchResults.lostItems.map((item) => (
-                    <div
+                    <article
                       key={item.id}
-                      className="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-600 rounded-xl p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 hover:border-red-500/50"
+                      className="card card-hover flex flex-col p-5"
                     >
                       {item.img && (
                         <div className="relative mb-4">
                           <img
                             src={item.img}
                             alt={item.lostItemName}
-                            className="w-full h-40 object-cover rounded-lg"
+                            className="h-40 w-full rounded-xl object-cover"
                             onError={(e) => {
                               (e.target as HTMLImageElement).src = "/bgimg.png";
                             }}
                           />
-                          <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-lg text-xs font-semibold">
-                            LOST
-                          </div>
+                          <div className="pointer-events-none absolute inset-0 rounded-xl bg-gradient-to-b from-black/55 via-black/10 to-transparent" />
+                          <span className="badge badge-danger absolute right-2 top-2">
+                            Lost
+                          </span>
                         </div>
                       )}
-                      <h4 className="font-bold text-white text-lg mb-3 overflow-hidden text-ellipsis whitespace-nowrap">
+                      <h3 className="mb-3 truncate text-base font-semibold text-ink">
                         {item.lostItemName}
-                      </h4>
-                      <p className="text-gray-300 text-sm mb-4 overflow-hidden" style={{
-                        display: '-webkit-box',
-                        WebkitLineClamp: 3,
-                        WebkitBoxOrient: 'vertical',
-                        lineHeight: '1.4em',
-                        maxHeight: '4.2em'
-                      }}>
+                      </h3>
+                      <p
+                        className="mb-4 text-sm text-ink-dim"
+                        style={{
+                          display: "-webkit-box",
+                          WebkitLineClamp: 3,
+                          WebkitBoxOrient: "vertical",
+                          lineHeight: "1.4em",
+                          maxHeight: "4.2em",
+                          overflow: "hidden",
+                        }}
+                      >
                         {item.description}
                       </p>
-                      <div className="space-y-2 mb-4">
-                        <div className="flex items-center text-gray-400 text-sm">
-                          <FaTags className="mr-2 text-cyan-400" />
-                          <span className="text-cyan-300">{item.category?.name || "No category"}</span>
+                      <div className="mb-5 space-y-2 text-sm text-ink-dim">
+                        <div className="flex items-center gap-2">
+                          <FaTags className="text-accent" />
+                          <span className="text-accent-soft">
+                            {item.category?.name || "No category"}
+                          </span>
                         </div>
-                        <div className="flex items-center text-gray-400 text-sm">
-                          <FaMapMarkerAlt className="mr-2 text-cyan-400" />
+                        <div className="flex items-center gap-2">
+                          <FaMapMarkerAlt className="text-accent" />
                           <span>{item.location}</span>
                         </div>
-                        <div className="flex items-center text-gray-400 text-sm">
-                          <FaCalendarAlt className="mr-2 text-cyan-400" />
+                        <div className="flex items-center gap-2">
+                          <FaCalendarAlt className="text-accent" />
                           <span>{formatDate(item.date)}</span>
                         </div>
-                        <div className="flex items-center text-gray-400 text-sm">
-                          <FaUser className="mr-2 text-cyan-400" />
+                        <div className="flex items-center gap-2">
+                          <FaUser className="text-accent" />
                           <span>{item.user?.username}</span>
                         </div>
                       </div>
                       <button
                         onClick={() => navigate(`/lostItems/${item.id}`)}
-                        className="w-full bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white py-2 px-4 rounded-lg flex items-center justify-center space-x-2 transition-all duration-300 font-semibold"
+                        className="btn btn-outline mt-auto w-full"
                       >
                         <FaEye />
                         <span>View Details</span>
                       </button>
-                    </div>
+                    </article>
                   ))}
                 </div>
-              </div>
+              </section>
             )}
 
             {/* No Results */}
             {searchResults.totalFound === 0 && searchResults.totalLost === 0 && (
-              <div className="bg-gradient-to-r from-gray-800 to-gray-700 rounded-2xl shadow-2xl p-12 text-center border border-gray-600">
-                <div className="w-20 h-20 bg-gradient-to-r from-gray-600 to-gray-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <FaSearch className="text-3xl text-gray-300" />
-                </div>
-                <h3 className="text-2xl font-semibold text-white mb-4">
-                  No items found
-                </h3>
-                <p className="text-gray-300 text-lg max-w-md mx-auto">
-                  Try adjusting your search query or check back later for new items. Our AI is constantly learning to provide better results!
+              <div className="rounded-2xl border border-bad/30 bg-bad/10 p-10 text-center text-rose-300 md:p-14">
+                <span className="mx-auto mb-5 grid h-14 w-14 place-items-center rounded-2xl bg-bad/15">
+                  <FaSearch className="text-xl" />
+                </span>
+                <h2 className="text-xl font-semibold">No items found</h2>
+                <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-rose-300/80">
+                  Try adjusting your search query or check back later for new
+                  items. Our AI is constantly learning to provide better
+                  results!
                 </p>
               </div>
             )}
@@ -323,79 +416,53 @@ const AiSearch: React.FC = () => {
         )}
 
         {/* Search Tips */}
-        <div className="max-w-5xl mx-auto mt-12">
-          <div className="bg-gradient-to-r from-gray-800 to-gray-700 rounded-2xl shadow-2xl p-8 border border-gray-600">
-            <h3 className="text-2xl font-semibold text-white mb-6 flex items-center">
-              <div className="w-8 h-8 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-lg flex items-center justify-center mr-3">
-                💡
+        <div className="mx-auto mt-14 max-w-5xl">
+          <div className="card p-6 md:p-8">
+            <div className="mb-6 flex items-center gap-3">
+              <span className="grid h-9 w-9 place-items-center rounded-lg bg-warn/10 text-warn">
+                <FaLightbulb />
+              </span>
+              <div>
+                <h2 className="text-lg font-semibold text-ink">
+                  Search Tips for Better Results
+                </h2>
+                <p className="text-sm text-ink-mute">
+                  Small details help the AI match items faster and more
+                  accurately.
+                </p>
               </div>
-              Search Tips for Better Results
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div className="flex items-start space-x-3">
-                  <div className="w-6 h-6 bg-cyan-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <span className="text-white text-xs font-bold">1</span>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              {SEARCH_TIPS.map((tip, index) => (
+                <div
+                  key={tip.title}
+                  className="rounded-xl border border-line bg-surface-2 p-4"
+                >
+                  <div className="mb-2 flex items-center gap-2">
+                    <span className="badge badge-neutral">{index + 1}</span>
+                    <h3 className="text-sm font-semibold text-ink">
+                      {tip.title}
+                    </h3>
                   </div>
-                  <div>
-                    <h4 className="text-cyan-300 font-semibold">Be Descriptive</h4>
-                    <p className="text-gray-300 text-sm">
-                      "I lost a black iPhone 13 with a cracked screen and blue case"
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-3">
-                  <div className="w-6 h-6 bg-cyan-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <span className="text-white text-xs font-bold">2</span>
-                  </div>
-                  <div>
-                    <h4 className="text-cyan-300 font-semibold">Include Location</h4>
-                    <p className="text-gray-300 text-sm">
-                      "near the library", "in the cafeteria", "at the parking lot"
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-3">
-                  <div className="w-6 h-6 bg-cyan-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <span className="text-white text-xs font-bold">3</span>
-                  </div>
-                  <div>
-                    <h4 className="text-cyan-300 font-semibold">Mention Timing</h4>
-                    <p className="text-gray-300 text-sm">
-                      "yesterday afternoon", "last week", "this morning"
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="space-y-4">
-                <div className="flex items-start space-x-3">
-                  <div className="w-6 h-6 bg-cyan-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <span className="text-white text-xs font-bold">4</span>
-                  </div>
-                  <div>
-                    <h4 className="text-cyan-300 font-semibold">Add Unique Features</h4>
-                    <p className="text-gray-300 text-sm">
-                      "silver keychain attached", "has a sticker", "scratched surface"
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-3">
-                  <div className="w-6 h-6 bg-cyan-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <span className="text-white text-xs font-bold">5</span>
-                  </div>
-                  <div>
-                    <h4 className="text-cyan-300 font-semibold">Use Natural Language</h4>
-                    <p className="text-gray-300 text-sm">
-                      Our AI understands context - speak naturally!
-                    </p>
-                  </div>
-                </div>
-                <div className="bg-gradient-to-r from-cyan-900/30 to-blue-900/30 p-4 rounded-lg border border-cyan-500/20">
-                  <p className="text-cyan-200 text-sm font-medium">
-                    🤖 Powered by advanced AI that learns from every search to provide more accurate results
+                  <p className="text-sm leading-relaxed text-ink-dim">
+                    {tip.example}
                   </p>
                 </div>
+              ))}
+            </div>
+
+            <div className="mt-4 rounded-xl border border-accent/30 bg-accent/10 p-4">
+              <div className="mb-2">
+                <span className="badge badge-accent">
+                  <FaRobot />
+                  AI-powered
+                </span>
               </div>
+              <p className="text-sm leading-relaxed text-ink-dim">
+                Powered by advanced AI that learns from every search to provide
+                more accurate results
+              </p>
             </div>
           </div>
         </div>

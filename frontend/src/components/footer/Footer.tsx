@@ -1,125 +1,115 @@
 import { Link } from "react-router-dom";
-import {
-  FaLinkedin,
-  FaGithub,
-  FaSearch,
-  FaExclamationTriangle,
-  FaBrain,
-  FaHandshake,
-} from "react-icons/fa";
+import { FaLinkedin, FaGithub, FaSearch } from "react-icons/fa";
 
 const Footers = () => {
   const year = new Date().getFullYear();
 
   const quickLinks = [
-    { label: "Found Items", to: "/foundItems", icon: <FaSearch /> },
-    { label: "Lost Items", to: "/lostItems", icon: <FaExclamationTriangle /> },
-    { label: "AI Search", to: "/ai-search", icon: <FaBrain /> },
-    { label: "How It Works", to: "/#howItWorks", icon: <FaHandshake /> },
+    { label: "Found Items", to: "/foundItems" },
+    { label: "Lost Items", to: "/lostItems" },
+    { label: "AI Search", to: "/ai-search" },
+    { label: "About us", to: "/#aboutUs" },
   ];
 
   const actions = [
     { label: "Report a Lost Item", to: "/reportlostItem" },
     { label: "Report a Found Item", to: "/reportFoundItem" },
-    { label: "Login", to: "/login" },
-    { label: "Create an Account", to: "/register" },
+    { label: "Log in", to: "/login" },
+    { label: "Create an account", to: "/register" },
   ];
 
   return (
-    <footer className="relative bottom-0 pt-16 pb-8 bg-gradient-to-br from-gray-900 via-gray-800 to-black border-t border-gray-700">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="md:flex md:justify-between">
-          <div className="mb-8 md:mb-0">
-            <Link to="/" className="flex items-center">
-              <div className="w-9 h-9 mr-3 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center">
-                <FaSearch className="text-white text-sm" />
-              </div>
-              <span className="self-center text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-                Lost & Found
+    <footer className="border-t border-line bg-surface/40">
+      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
+          {/* Brand */}
+          <div className="lg:col-span-1">
+            <Link to="/" className="flex items-center gap-3">
+              <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-accent to-indigo-500">
+                <FaSearch className="text-sm text-white" />
+              </span>
+              <span className="text-lg font-extrabold tracking-tight text-ink">
+                Lost &amp; Found
               </span>
             </Link>
-            <p className="mt-4 text-gray-300 max-w-md">
+            <p className="mt-4 max-w-xs text-sm leading-relaxed text-ink-mute">
               Connecting people with their lost belongings, one item at a time.
-              <br />
-              We are here to help you find what you have lost.
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-8 sm:gap-12 sm:grid-cols-3">
-            <div>
-              <h2 className="mb-6 text-sm font-semibold text-white uppercase">
-                Quick Links
-              </h2>
-              <ul className="text-gray-400 space-y-3">
-                {quickLinks.map((link) => (
-                  <li key={link.label}>
-                    <Link
-                      to={link.to}
-                      className="hover:text-white transition-colors duration-200 inline-flex items-center gap-2"
-                    >
-                      <span className="text-cyan-500 text-xs">{link.icon}</span>
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
+          {/* Quick links */}
+          <div>
+            <h2 className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-ink-mute">
+              Quick Links
+            </h2>
+            <ul className="space-y-2.5 text-sm">
+              {quickLinks.map((link) => (
+                <li key={link.label}>
+                  <Link
+                    to={link.to}
+                    className="text-ink-dim transition-colors hover:text-ink"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
 
-            <div>
-              <h2 className="mb-6 text-sm font-semibold text-white uppercase">
-                Get Involved
-              </h2>
-              <ul className="text-gray-400 space-y-3">
-                {actions.map((action) => (
-                  <li key={action.label}>
-                    <Link
-                      to={action.to}
-                      className="hover:text-white transition-colors duration-200"
-                    >
-                      {action.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
+          {/* Get involved */}
+          <div>
+            <h2 className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-ink-mute">
+              Get Involved
+            </h2>
+            <ul className="space-y-2.5 text-sm">
+              {actions.map((action) => (
+                <li key={action.label}>
+                  <Link
+                    to={action.to}
+                    className="text-ink-dim transition-colors hover:text-ink"
+                  >
+                    {action.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
 
-            <div>
-              <h2 className="mb-6 text-sm font-semibold text-white uppercase">
-                About The Project
-              </h2>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                A full-stack demo built with React, Node.js, Prisma &amp;
-                PostgreSQL. Report items, file claims, and let AI-powered search
-                find what matters.
-              </p>
-            </div>
+          {/* About the project */}
+          <div>
+            <h2 className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-ink-mute">
+              About The Project
+            </h2>
+            <p className="text-sm leading-relaxed text-ink-mute">
+              A full-stack demo built with React, Node.js, Prisma &amp;
+              PostgreSQL. Report items, file claims, and let AI-powered search
+              find what matters.
+            </p>
           </div>
         </div>
 
-        <hr className="my-8 border-gray-700" />
-
-        <div className="sm:flex sm:items-center sm:justify-between">
-          <span className="text-sm text-gray-400 sm:text-center">
-            © {year} Lost & Found Management. All Rights Reserved.
+        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-line pt-6 sm:flex-row">
+          <span className="text-sm text-ink-mute">
+            © {year} Lost &amp; Found Management. All rights reserved.
           </span>
-          <div className="flex mt-4 space-x-6 sm:justify-center sm:mt-0">
+          <div className="flex items-center gap-2">
             <a
               href="https://github.com/alamin147"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-400 hover:text-blue-400 transition-colors duration-200"
+              className="grid h-9 w-9 place-items-center rounded-lg text-ink-dim transition hover:bg-white/5 hover:text-ink"
               aria-label="GitHub profile"
             >
-              <FaGithub size={20} />
+              <FaGithub size={18} />
             </a>
             <a
               href="https://www.linkedin.com/in/alamin-developer/"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-400 hover:text-blue-400 transition-colors duration-200"
+              className="grid h-9 w-9 place-items-center rounded-lg text-ink-dim transition hover:bg-white/5 hover:text-ink"
               aria-label="LinkedIn profile"
             >
-              <FaLinkedin size={20} />
+              <FaLinkedin size={18} />
             </a>
           </div>
         </div>

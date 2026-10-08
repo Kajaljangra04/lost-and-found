@@ -18,9 +18,6 @@ import {
 import { removeUserLocalStorage, useUserVerification } from "../../auth/auth";
 import { useNavigate } from "react-router-dom";
 
-const inputClass =
-  "w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400";
-
 const Settings = () => {
   const navigate = useNavigate();
   const user = useUserVerification();
@@ -111,8 +108,10 @@ const Settings = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-white">Account Settings</h1>
-        <p className="text-gray-400 mt-1">
+        <h1 className="text-2xl font-bold tracking-tight text-ink">
+          Account Settings
+        </h1>
+        <p className="mt-1 text-sm text-ink-mute">
           Manage your login credentials and profile details
         </p>
       </div>
@@ -120,18 +119,18 @@ const Settings = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Account info */}
         <div className="lg:col-span-1">
-          <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-white text-xl font-bold">
+          <div className="card p-6">
+            <div className="mb-6 flex items-center gap-4">
+              <div className="grid h-14 w-14 shrink-0 place-items-center rounded-full border border-line-strong bg-surface-3 text-xl font-bold text-ink">
                 {user?.username?.charAt(0)?.toUpperCase() ||
                   user?.email?.charAt(0)?.toUpperCase() ||
                   "U"}
               </div>
               <div>
-                <p className="text-white font-semibold text-lg">
+                <p className="text-lg font-semibold text-ink">
                   {user?.name || user?.username || "User"}
                 </p>
-                <p className="text-gray-400 text-sm">{user?.role}</p>
+                <p className="text-sm text-ink-mute">{user?.role}</p>
               </div>
             </div>
 
@@ -139,18 +138,18 @@ const Settings = () => {
               {accountFields.map((field) => (
                 <div
                   key={field.label}
-                  className="flex items-center justify-between bg-gray-700/60 rounded-lg px-4 py-3"
+                  className="flex items-center justify-between rounded-xl bg-surface-2 px-4 py-3"
                 >
-                  <span className="text-gray-400 text-sm">{field.label}</span>
-                  <span className="text-white text-sm font-medium">
+                  <span className="text-sm text-ink-mute">{field.label}</span>
+                  <span className="text-sm font-medium text-ink">
                     {field.value}
                   </span>
                 </div>
               ))}
             </div>
 
-            <div className="mt-6 flex items-start gap-3 text-sm text-gray-400 bg-gray-700/40 rounded-lg p-4">
-              <FaShieldAlt className="text-green-400 mt-0.5 flex-shrink-0" />
+            <div className="mt-6 flex items-start gap-3 rounded-xl border border-line bg-surface-2 p-4 text-sm text-ink-dim">
+              <FaShieldAlt className="mt-0.5 flex-shrink-0 text-ok" />
               <p>
                 Changing your email or username signs you out so you can log in
                 with the new details.
@@ -162,10 +161,10 @@ const Settings = () => {
         {/* Forms */}
         <div className="lg:col-span-2 space-y-6">
           {/* Change Password */}
-          <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
-            <div className="flex items-center gap-3 mb-5">
-              <FaKey className="text-cyan-400" />
-              <h2 className="text-xl font-semibold text-white">
+          <div className="card p-6">
+            <div className="mb-5 flex items-center gap-3">
+              <FaKey className="text-accent" />
+              <h2 className="text-lg font-semibold text-ink">
                 Change Password
               </h2>
             </div>
@@ -178,7 +177,7 @@ const Settings = () => {
                 <div>
                   <label
                     htmlFor="currentPassword"
-                    className="block text-sm font-medium text-gray-300 mb-2"
+                    className="field-label"
                   >
                     Current Password
                   </label>
@@ -189,13 +188,13 @@ const Settings = () => {
                       {...passwordForm.register("currentPassword", {
                         required: "Current password is required",
                       })}
-                      className={`${inputClass} pr-10`}
+                      className="field pr-10"
                       placeholder="Enter current password"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-white"
+                      className="absolute inset-y-0 right-0 flex items-center pr-3 text-ink-mute transition-colors hover:text-ink"
                       aria-label="Toggle password visibility"
                     >
                       {showPassword ? (
@@ -206,7 +205,7 @@ const Settings = () => {
                     </button>
                   </div>
                   {passwordForm.formState.errors.currentPassword && (
-                    <p className="text-red-400 text-sm mt-1">
+                    <p className="field-error">
                       {passwordForm.formState.errors.currentPassword.message}
                     </p>
                   )}
@@ -215,7 +214,7 @@ const Settings = () => {
                 <div>
                   <label
                     htmlFor="newPassword"
-                    className="block text-sm font-medium text-gray-300 mb-2"
+                    className="field-label"
                   >
                     New Password
                   </label>
@@ -229,11 +228,11 @@ const Settings = () => {
                         message: "Password must be at least 6 characters",
                       },
                     })}
-                    className={inputClass}
+                    className="field"
                     placeholder="Enter new password"
                   />
                   {passwordForm.formState.errors.newPassword && (
-                    <p className="text-red-400 text-sm mt-1">
+                    <p className="field-error">
                       {passwordForm.formState.errors.newPassword.message}
                     </p>
                   )}
@@ -243,7 +242,7 @@ const Settings = () => {
               <button
                 type="submit"
                 disabled={isPasswordLoading}
-                className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg transition-colors"
+                className="btn btn-primary"
               >
                 {isPasswordLoading ? "Changing..." : "Change Password"}
               </button>
@@ -251,12 +250,10 @@ const Settings = () => {
           </div>
 
           {/* Change Email */}
-          <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
-            <div className="flex items-center gap-3 mb-5">
-              <FaEnvelope className="text-green-400" />
-              <h2 className="text-xl font-semibold text-white">
-                Change Email
-              </h2>
+          <div className="card p-6">
+            <div className="mb-5 flex items-center gap-3">
+              <FaEnvelope className="text-ok" />
+              <h2 className="text-lg font-semibold text-ink">Change Email</h2>
             </div>
 
             <form
@@ -266,7 +263,7 @@ const Settings = () => {
               <div className="max-w-md">
                 <label
                   htmlFor="changeEmail"
-                  className="block text-sm font-medium text-gray-300 mb-2"
+                  className="field-label"
                 >
                   New Email Address
                 </label>
@@ -280,11 +277,11 @@ const Settings = () => {
                       message: "Invalid email address",
                     },
                   })}
-                  className={inputClass}
+                  className="field"
                   placeholder="Enter new email address"
                 />
                 {emailForm.formState.errors.email && (
-                  <p className="text-red-400 text-sm mt-1">
+                  <p className="field-error">
                     {emailForm.formState.errors.email.message}
                   </p>
                 )}
@@ -293,7 +290,7 @@ const Settings = () => {
               <button
                 type="submit"
                 disabled={isEmailLoading}
-                className="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white rounded-lg transition-colors"
+                className="btn btn-primary"
               >
                 {isEmailLoading ? "Changing..." : "Change Email"}
               </button>
@@ -301,10 +298,10 @@ const Settings = () => {
           </div>
 
           {/* Change Username */}
-          <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
-            <div className="flex items-center gap-3 mb-5">
-              <FaUserTag className="text-purple-400" />
-              <h2 className="text-xl font-semibold text-white">
+          <div className="card p-6">
+            <div className="mb-5 flex items-center gap-3">
+              <FaUserTag className="text-indigo-300" />
+              <h2 className="text-lg font-semibold text-ink">
                 Change Username
               </h2>
             </div>
@@ -316,7 +313,7 @@ const Settings = () => {
               <div className="max-w-md">
                 <label
                   htmlFor="changeUsername"
-                  className="block text-sm font-medium text-gray-300 mb-2"
+                  className="field-label"
                 >
                   New Username
                 </label>
@@ -335,11 +332,11 @@ const Settings = () => {
                         "Username can only contain letters, numbers, and underscores",
                     },
                   })}
-                  className={inputClass}
+                  className="field"
                   placeholder="Enter new username"
                 />
                 {usernameForm.formState.errors.username && (
-                  <p className="text-red-400 text-sm mt-1">
+                  <p className="field-error">
                     {usernameForm.formState.errors.username.message}
                   </p>
                 )}
@@ -348,7 +345,7 @@ const Settings = () => {
               <button
                 type="submit"
                 disabled={isUsernameLoading}
-                className="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white rounded-lg transition-colors"
+                className="btn btn-primary"
               >
                 {isUsernameLoading ? "Changing..." : "Change Username"}
               </button>

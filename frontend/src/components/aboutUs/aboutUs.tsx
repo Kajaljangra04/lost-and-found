@@ -1,18 +1,16 @@
+import { FaSearch, FaHandshake, FaShieldAlt, FaUsers } from "react-icons/fa";
+
 const AboutUs = () => {
   return (
-    <section
-      id="aboutUs"
-      className="py-16 lg:py-20 bg-gradient-to-br from-gray-900 via-gray-800 to-black"
-    >
-      <div className="px-4 sm:px-6 lg:px-8 mx-auto max-w-7xl">
-        <div className="mx-auto max-w-4xl text-center mb-12">
-          <h2 className="mb-6 text-4xl md:text-5xl tracking-tight font-extrabold leading-tight text-white">
-            About{" "}
-            <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-              Us
-            </span>
-          </h2>
-          <p className="mb-8 font-light text-gray-300 text-lg md:text-xl">
+    <section id="aboutUs" className="py-16 lg:py-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="section-head">
+          <span className="eyebrow">
+            <FaUsers />
+            Who we are
+          </span>
+          <h2 className="section-title">About Us</h2>
+          <p className="section-sub">
             Don't let lost items remain lost. Lost and Found Management bridges
             the gap between lost and found, reuniting you with what matters
             most.
@@ -20,8 +18,8 @@ const AboutUs = () => {
         </div>
 
         <div className="mx-auto max-w-5xl">
-          <div className="bg-gradient-to-br from-gray-800 via-gray-900 to-black rounded-xl border border-gray-700 p-8 md:p-12">
-            <p className="font-light text-gray-300 text-lg md:text-xl leading-relaxed text-center">
+          <div className="card p-8 md:p-12">
+            <p className="text-center text-lg leading-relaxed text-ink-dim md:text-xl">
               We emphasize your commitment to reuniting lost items with their
               owners and maintaining a seamless process. We operate with
               honesty, transparency, and empathy. Our commitment to doing what's
@@ -31,31 +29,35 @@ const AboutUs = () => {
               continually.
             </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
+            <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3">
               <div className="text-center">
-                <div className="text-blue-400 text-4xl mb-4">🔍</div>
-                <h3 className="text-xl font-semibold text-white mb-2">
-                  Search & Find
+                <div className="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-xl bg-accent/10 text-xl text-accent">
+                  <FaSearch />
+                </div>
+                <h3 className="mb-2 text-lg font-semibold text-ink">
+                  Search &amp; Find
                 </h3>
-                <p className="text-gray-400 text-sm">
+                <p className="text-sm text-ink-mute">
                   Advanced search capabilities to help locate lost items quickly
                 </p>
               </div>
               <div className="text-center">
-                <div className="text-green-400 text-4xl mb-4">🤝</div>
-                <h3 className="text-xl font-semibold text-white mb-2">
+                <div className="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-xl bg-ok/10 text-xl text-ok">
+                  <FaHandshake />
+                </div>
+                <h3 className="mb-2 text-lg font-semibold text-ink">
                   Community
                 </h3>
-                <p className="text-gray-400 text-sm">
+                <p className="text-sm text-ink-mute">
                   Connecting people through our community-driven platform
                 </p>
               </div>
               <div className="text-center">
-                <div className="text-cyan-400 text-4xl mb-4">🛡️</div>
-                <h3 className="text-xl font-semibold text-white mb-2">
-                  Secure
-                </h3>
-                <p className="text-gray-400 text-sm">
+                <div className="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-xl bg-accent/10 text-xl text-accent">
+                  <FaShieldAlt />
+                </div>
+                <h3 className="mb-2 text-lg font-semibold text-ink">Secure</h3>
+                <p className="text-sm text-ink-mute">
                   Safe and secure item management with privacy protection
                 </p>
               </div>

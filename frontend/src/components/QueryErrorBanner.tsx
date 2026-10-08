@@ -6,8 +6,8 @@ import { FaExclamationTriangle } from "react-icons/fa";
  */
 const QueryErrorBanner = ({ message }: { message?: string }) => {
   return (
-    <div className="flex items-center gap-3 rounded-xl border border-red-500/40 bg-red-900/20 px-4 py-3 mb-6 text-sm text-red-300">
-      <FaExclamationTriangle className="flex-shrink-0 text-red-400" />
+    <div className="mb-6 flex items-center gap-3 rounded-xl border border-bad/30 bg-bad/10 px-4 py-3 text-sm text-rose-300">
+      <FaExclamationTriangle className="flex-shrink-0 text-rose-400" />
       <span>
         {message ||
           "Something went wrong while loading this data. Please try again."}

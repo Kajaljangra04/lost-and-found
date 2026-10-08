@@ -1,57 +1,66 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import {
+  FaBoxOpen,
+  FaHandHoldingHeart,
+  FaListAlt,
+  FaPlusCircle,
+  FaSearch,
+} from "react-icons/fa";
 
 const Banner = () => {
-  const [bgImg] = useState("/bgimg.png");
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const slides = [
     {
       badge: "Lost something? Report here!",
       title: "Welcome to Lost and Found Management",
+      highlight: "Lost and Found",
       description:
         "Lost and Found Management is your reliable partner in handling lost items. Whether you've misplaced your belongings or found something left behind, we're here to assist with our modern, efficient system.",
       primaryButton: {
         text: "Report a Lost Item",
         href: "/reportlostItem",
-        icon: "📋",
+        icon: <FaPlusCircle />,
       },
       secondaryButton: {
         text: "Report a Found Item",
         href: "/reportFoundItem",
-        icon: "🔍",
+        icon: <FaHandHoldingHeart />,
       },
     },
     {
       badge: "Found something? Help others!",
       title: "Help Reunite Items with Their Owners",
+      highlight: "Reunite Items",
       description:
         "Join our community of helpful citizens. By reporting found items, you're making a difference in someone's day. Every item reported brings us closer to a more connected community.",
       primaryButton: {
         text: "Report Found Item",
         href: "/reportFoundItem",
-        icon: "🤝",
+        icon: <FaHandHoldingHeart />,
       },
       secondaryButton: {
         text: "Browse Lost Items",
         href: "/lostItems",
-        icon: "🔍",
+        icon: <FaListAlt />,
       },
     },
     {
       badge: "Need help? We're here!",
       title: "Track Your Items & Claims",
+      highlight: "Items & Claims",
       description:
         "Stay updated on your lost item reports and claim requests. Our advanced tracking system ensures you never miss an update when your belongings are found.",
       primaryButton: {
         text: "View My Found Items",
         href: "/dashboard/myFoundItems",
-        icon: "📱",
+        icon: <FaBoxOpen />,
       },
       secondaryButton: {
         text: "Browse Found Items",
         href: "/foundItems",
-        icon: "👀",
+        icon: <FaSearch />,
       },
     },
   ];
@@ -70,83 +79,84 @@ const Banner = () => {
 
   const currentSlideData = slides[currentSlide];
 
-  return (
-    <section className="relative flex items-center min-h-[70vh] bg-gradient-to-br from-gray-900 via-gray-800 to-black overflow-hidden">
-      <div
-        className="absolute inset-0 bg-black/60"
-        style={{
-          backgroundImage: `url('${bgImg}')`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          zIndex: 0,
-        }}
-      ></div>
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40 z-10"></div>
+  // Split the headline so .text-gradient lands on the key phrase only
+  const highlightIndex = currentSlideData.title.indexOf(
+    currentSlideData.highlight
+  );
 
-      <div className="relative z-10 px-4 sm:px-6 lg:px-8 py-8 mx-auto max-w-7xl text-center">
-        <div className="animate-fade-in" key={currentSlide}>
-          <div className="inline-flex justify-between items-center py-2 px-4 mb-8 text-sm bg-gradient-to-r from-blue-600/20 to-cyan-600/20 backdrop-blur-sm border border-blue-500/30 rounded-full text-white hover:from-blue-600/30 hover:to-cyan-600/30 transition-all duration-300 cursor-pointer group">
-            <span className="text-sm font-medium">
-              {currentSlideData.badge}
-              <span className="ml-2 group-hover:translate-x-1 transition-transform duration-200 inline-block">
-                →
-              </span>
-            </span>
+  return (
+    <section className="relative flex min-h-[75vh] items-center overflow-hidden py-24 lg:py-28">
+      {/* Ambient accent glow + faint grid (page canvas shows through) */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+        <div className="absolute left-1/2 top-0 h-[34rem] w-[58rem] -translate-x-1/2 rounded-full bg-accent/[0.07] blur-[110px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px)] [background-size:56px_56px] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_20%,black,transparent)]" />
+      </div>
+
+      <div className="relative mx-auto w-full max-w-4xl px-4 text-center sm:px-6 lg:px-8">
+        <div key={currentSlide} className="animate-fade-up">
+          {/* Badge pill */}
+          <div className="mb-7 inline-flex items-center gap-2.5 rounded-full border border-line-strong bg-surface/60 px-4 py-1.5 text-sm text-ink-dim backdrop-blur">
+            <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+            {currentSlideData.badge}
           </div>
 
-          <h1 className="mb-6 text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-none text-white transition-all duration-500">
-            {currentSlideData.title.includes("Lost and Found") ? (
+          {/* Headline */}
+          <h1 className="mb-6 text-4xl font-extrabold leading-[1.06] tracking-tight text-ink md:text-5xl lg:text-6xl">
+            {highlightIndex >= 0 ? (
               <>
-                Welcome to{" "}
-                <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-green-400 bg-clip-text text-transparent">
-                  Lost and Found
-                </span>{" "}
-                Management
+                {currentSlideData.title.slice(0, highlightIndex)}
+                <span className="text-gradient">
+                  {currentSlideData.highlight}
+                </span>
+                {currentSlideData.title.slice(
+                  highlightIndex + currentSlideData.highlight.length
+                )}
               </>
             ) : (
-              <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-green-400 bg-clip-text text-transparent">
-                {currentSlideData.title}
-              </span>
+              currentSlideData.title
             )}
           </h1>
 
-          <p className="mb-10 text-lg lg:text-xl font-normal text-gray-300 max-w-4xl mx-auto transition-all duration-500">
+          <p className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-ink-dim lg:text-xl">
             {currentSlideData.description}
           </p>
 
-          <div className="flex flex-col gap-4 sm:flex-row sm:justify-center sm:gap-6 mb-8">
+          {/* CTAs */}
+          <div className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
             <Link
               to={currentSlideData.primaryButton.href}
-              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 group"
+              className="btn btn-brand btn-lg group"
             >
-              <span>{currentSlideData.primaryButton.text}</span>
-              <span className="ml-2 group-hover:translate-x-1 transition-transform duration-200">
+              {currentSlideData.primaryButton.text}
+              <span className="transition-transform duration-200 group-hover:translate-x-0.5">
                 {currentSlideData.primaryButton.icon}
               </span>
             </Link>
             <Link
               to={currentSlideData.secondaryButton.href}
-              className="bg-gradient-to-r from-cyan-600 to-cyan-700 hover:from-cyan-700 hover:to-cyan-800 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-gray-900 group"
+              className="btn btn-outline btn-lg group"
             >
-              <span>{currentSlideData.secondaryButton.text}</span>
-              <span className="ml-2 group-hover:translate-x-1 transition-transform duration-200">
+              {currentSlideData.secondaryButton.text}
+              <span className="transition-transform duration-200 group-hover:translate-x-0.5">
                 {currentSlideData.secondaryButton.icon}
               </span>
             </Link>
           </div>
 
-          {/* Carousel Dots */}
-          <div className="flex justify-center space-x-3">
+          {/* Carousel indicators */}
+          <div className="mt-10 flex items-center justify-center gap-2">
             {slides.map((_, index) => (
               <button
                 key={index}
+                type="button"
                 onClick={() => handleDotClick(index)}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                className={`h-1.5 rounded-full transition-all duration-300 ${
                   index === currentSlide
-                    ? "bg-white scale-125"
-                    : "bg-white/50 hover:bg-white/70"
+                    ? "w-6 bg-accent"
+                    : "w-3 bg-white/20 hover:bg-white/40"
                 }`}
                 aria-label={`Go to slide ${index + 1}`}
+                aria-current={index === currentSlide ? "true" : undefined}
               />
             ))}
           </div>

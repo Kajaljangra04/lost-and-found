@@ -27,12 +27,12 @@ const activityStyles: Record<
   string,
   { dot: string; badge: string }
 > = {
-  found: { dot: "bg-blue-500", badge: "bg-blue-900 text-blue-300" },
-  lost: { dot: "bg-red-500", badge: "bg-red-900 text-red-300" },
-  claim: { dot: "bg-yellow-500", badge: "bg-yellow-900 text-yellow-300" },
-  approved: { dot: "bg-green-500", badge: "bg-green-900 text-green-300" },
-  rejected: { dot: "bg-red-500", badge: "bg-red-900 text-red-300" },
-  default: { dot: "bg-gray-500", badge: "bg-gray-700 text-gray-300" },
+  found: { dot: "bg-accent", badge: "badge-accent" },
+  lost: { dot: "bg-bad", badge: "badge-danger" },
+  claim: { dot: "bg-warn", badge: "badge-warn" },
+  approved: { dot: "bg-ok", badge: "badge-ok" },
+  rejected: { dot: "bg-bad", badge: "badge-danger" },
+  default: { dot: "bg-ink-mute", badge: "badge-neutral" },
 };
 
 const Dashboard = () => {
@@ -41,42 +41,42 @@ const Dashboard = () => {
   if (isLoading) {
     return (
       <div className="space-y-6 p-6">
-        <div className="animate-pulse">
+        <div>
           {/* Welcome Section Skeleton */}
-          <div className="bg-gray-700 rounded-2xl h-32 mb-6"></div>
+          <div className="skeleton mb-6 h-32"></div>
 
           {/* Stats Grid Skeleton */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+          <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="bg-gray-700 rounded-xl h-24"></div>
+              <div key={i} className="skeleton h-24"></div>
             ))}
           </div>
 
           {/* Recent Activity Section Skeleton */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             {/* Activity Feed Skeleton */}
-            <div className="bg-gray-700 rounded-2xl p-6">
-              <div className="h-6 bg-gray-600 rounded w-1/3 mb-6"></div>
+            <div className="card p-6">
+              <div className="skeleton mb-6 h-6 w-1/3"></div>
               <div className="space-y-4">
                 {[1, 2, 3, 4].map((i) => (
                   <div key={i} className="flex items-start space-x-3 p-3">
-                    <div className="w-2 h-2 bg-gray-600 rounded-full mt-2"></div>
+                    <div className="skeleton mt-2 h-2 w-2 rounded-full"></div>
                     <div className="flex-1 space-y-2">
-                      <div className="h-4 bg-gray-600 rounded w-3/4"></div>
-                      <div className="h-3 bg-gray-600 rounded w-1/4"></div>
+                      <div className="skeleton h-4 w-3/4"></div>
+                      <div className="skeleton h-3 w-1/4"></div>
                     </div>
-                    <div className="h-6 bg-gray-600 rounded-full w-16"></div>
+                    <div className="skeleton h-6 w-16 rounded-full"></div>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Quick Actions Skeleton */}
-            <div className="bg-gray-700 rounded-2xl p-6">
-              <div className="h-6 bg-gray-600 rounded w-1/3 mb-6"></div>
+            <div className="card p-6">
+              <div className="skeleton mb-6 h-6 w-1/3"></div>
               <div className="space-y-3">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-16 bg-gray-600 rounded-lg"></div>
+                  <div key={i} className="skeleton h-16"></div>
                 ))}
               </div>
             </div>
@@ -90,84 +90,84 @@ const Dashboard = () => {
   return (
     <div className="space-y-6">
       {/* Welcome Section */}
-      <div className="bg-gradient-to-r from-cyan-600 to-blue-600 rounded-2xl p-6 text-white">
-        <h1 className="text-2xl font-bold mb-2">
+      <div className="card p-6">
+        <h1 className="text-2xl font-bold tracking-tight text-ink">
           Welcome back to the Dashboard!
         </h1>
-        <p className="text-cyan-100">
+        <p className="mt-2 text-ink-dim">
           Here's what's happening with your lost and found system today.
         </p>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="card card-hover p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">Total Found Items</p>
-              <p className="text-2xl font-bold text-white">
+              <p className="text-sm text-ink-mute">Total Found Items</p>
+              <p className="text-2xl font-bold tabular-nums text-ink">
                 {adminStats?.data?.foundItems || "0"}
               </p>
             </div>
-            <div className="bg-gray-500 p-3 rounded-lg">
-              <FaBoxOpen className="text-white" />
+            <div className="grid h-10 w-10 place-items-center rounded-xl bg-accent/10 text-accent">
+              <FaBoxOpen />
             </div>
           </div>
         </div>
 
-        <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+        <div className="card card-hover p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">Total Lost Items</p>
-              <p className="text-2xl font-bold text-red-500">
+              <p className="text-sm text-ink-mute">Total Lost Items</p>
+              <p className="text-2xl font-bold tabular-nums text-ink">
                 {adminStats?.data?.lostItems || "0"}
               </p>
             </div>
-            <div className="bg-gray-500 p-3 rounded-lg">
-              <FaExclamationTriangle className="text-white" />
+            <div className="grid h-10 w-10 place-items-center rounded-xl bg-accent/10 text-accent">
+              <FaExclamationTriangle />
             </div>
           </div>
         </div>
 
-        <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+        <div className="card card-hover p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">Pending Claims</p>
-              <p className="text-2xl font-bold text-yellow-500">
+              <p className="text-sm text-ink-mute">Pending Claims</p>
+              <p className="text-2xl font-bold tabular-nums text-ink">
                 {adminStats?.data?.pendingClaims || "0"}
               </p>
             </div>
-            <div className="bg-gray-500 p-3 rounded-lg">
-              <FaClipboardList className="text-white" />
+            <div className="grid h-10 w-10 place-items-center rounded-xl bg-accent/10 text-accent">
+              <FaClipboardList />
             </div>
           </div>
         </div>
 
-        <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+        <div className="card card-hover p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">Active Users</p>
-              <p className="text-2xl font-bold text-green-500">
+              <p className="text-sm text-ink-mute">Active Users</p>
+              <p className="text-2xl font-bold tabular-nums text-ink">
                 {adminStats?.data?.totalUsers || "0"}
               </p>
             </div>
-            <div className="bg-gray-500 p-3 rounded-lg">
-              <FaUsers className="text-white" />
+            <div className="grid h-10 w-10 place-items-center rounded-xl bg-accent/10 text-accent">
+              <FaUsers />
             </div>
           </div>
         </div>
       </div>
 
       {/* Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Activity Feed */}
-        <div className="bg-gradient-to-br from-gray-800 rounded-2xl p-6 border border-gray-700">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-white">Recent Activity</h2>
+        <div className="card p-6">
+          <div className="mb-6 flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-ink">Recent Activity</h2>
           </div>
-          <div className="space-y-4">
+          <div className="space-y-2">
             {recentActivity.length === 0 && (
-              <p className="text-gray-400 text-sm py-4">
+              <p className="py-4 text-sm text-ink-mute">
                 No recent activity yet — new items and claims will show up
                 here.
               </p>
@@ -178,24 +178,22 @@ const Dashboard = () => {
               return (
                 <div
                   key={activity.id}
-                  className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-700/50 transition-colors"
+                  className="flex items-start space-x-3 rounded-lg p-3 transition-colors hover:bg-white/[0.03]"
                 >
                   <div
                     className={`w-2 h-2 rounded-full mt-2 ${style.dot}`}
                   />
 
                   <div className="flex-1 min-w-0">
-                    <p className="text-white text-sm font-medium">
+                    <p className="text-sm font-medium text-ink">
                       {activity.title}
                     </p>
-                    <p className="text-gray-400 text-xs">
+                    <p className="text-xs text-ink-mute">
                       {timeAgo(activity.time)}
                     </p>
                   </div>
 
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${style.badge}`}
-                  >
+                  <span className={`badge capitalize ${style.badge}`}>
                     {activity.type}
                   </span>
                 </div>
@@ -205,28 +203,28 @@ const Dashboard = () => {
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-gray-700">
-          <h2 className="text-xl font-bold text-white mb-6">Quick Actions</h2>
+        <div className="card p-6">
+          <h2 className="mb-6 text-lg font-semibold text-ink">Quick Actions</h2>
 
           <div className="space-y-3">
             <Link to="/dashboard/categories">
-              <button className="w-full flex items-center justify-between p-4 hover:bg-gray-700/50 transition-color rounded-lg transition-all duration-200 text-white font-medium">
+              <button className="flex w-full items-center justify-between rounded-xl border border-line bg-surface-2 p-4 text-sm font-medium text-ink transition-colors hover:border-line-strong hover:bg-surface-3">
                 <span>Add New Category</span>
-                <FaChartLine className="w-5 h-5" />
+                <FaChartLine className="w-5 h-5 text-accent" />
               </button>
             </Link>
 
             <Link to="/dashboard/users">
-              <button className="w-full flex items-center justify-between p-4 hover:bg-gray-700/50 transition-color rounded-lg transition-all duration-200 text-white font-medium">
+              <button className="flex w-full items-center justify-between rounded-xl border border-line bg-surface-2 p-4 text-sm font-medium text-ink transition-colors hover:border-line-strong hover:bg-surface-3">
                 <span>Manage Users</span>
-                <FaUsers className="w-5 h-5" />
+                <FaUsers className="w-5 h-5 text-accent" />
               </button>
             </Link>
 
             <Link to="/dashboard/settings">
-              <button className="w-full flex items-center justify-between p-4 hover:bg-gray-700/50 transition-color rounded-lg transition-all duration-200 text-white font-medium">
+              <button className="flex w-full items-center justify-between rounded-xl border border-line bg-surface-2 p-4 text-sm font-medium text-ink transition-colors hover:border-line-strong hover:bg-surface-3">
                 <span>Settings</span>
-                <FaBoxOpen className="w-5 h-5" />
+                <FaBoxOpen className="w-5 h-5 text-accent" />
               </button>
             </Link>
           </div>

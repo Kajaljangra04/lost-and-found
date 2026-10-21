@@ -13,7 +13,7 @@ import { FaBullhorn } from "react-icons/fa";
 import type { ItemCategory } from "../../types/types";
 
 type ReportFoundForm = {
-  imgUrl: string;
+  image: FileList;
   foundItemName: string;
   description: string;
   location: string;
@@ -39,15 +39,14 @@ const ReportFoundItem = () => {
     if (!categoryId) return;
 
     try {
-      const foundData = {
-        img: data.imgUrl,
-        categoryId,
-        foundItemName: data.foundItemName,
-        description: data.description,
-        location: data.location,
-        date: startDate,
-        claimProcess: data.claimProcess,
-      };
+      const foundData = new FormData();
+      foundData.append("image", data.image[0]);
+      foundData.append("categoryId", categoryId);
+      foundData.append("foundItemName", data.foundItemName);
+      foundData.append("description", data.description);
+      foundData.append("location", data.location);
+      foundData.append("date", startDate.toISOString());
+      foundData.append("claimProcess", data.claimProcess);
 
       const res = await createFoundItem(foundData);
 
@@ -122,21 +121,33 @@ const ReportFoundItem = () => {
             </div>
 
             <div>
-              <label htmlFor="imgUrl" className="field-label">
-                Image url
+              <label htmlFor="image" className="field-label">
+                Item image
               </label>
               <input
-                id="imgUrl"
-                type="text"
+                id="image"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
                 className="field"
-                placeholder="http://found-image.com"
-                {...register("imgUrl", {
-                  required: "Image url is required",
+                {...register("image", {
+                  required: "Please select an item image",
+                  validate: {
+                    oneFile: (files) =>
+                      files?.length === 1 || "Select one image",
+                    size: (files) =>
+                      !files?.[0] ||
+                      files[0].size <= 5 * 1024 * 1024 ||
+                      "Image must be 5 MB or smaller",
+                    type: (files) =>
+                      !files?.[0] ||
+                      ["image/jpeg", "image/png", "image/webp"].includes(files[0].type) ||
+                      "Use a JPEG, PNG, or WebP image",
+                  },
                 })}
               />
-              {errors.imgUrl && (
+              {errors.image && (
                 <p className="field-error">
-                  {errors.imgUrl?.message as string}
+                  {errors.image.message as string}
                 </p>
               )}
             </div>

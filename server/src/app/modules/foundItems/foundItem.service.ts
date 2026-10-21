@@ -109,7 +109,14 @@ const getMyFoundItem = async (user: JwtPayload) => {
       isDeleted: false,
     },
     include: {
-      user: true,
+      user: {
+        select: {
+          id: true,
+          username: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      },
       category: true,
     },
   });

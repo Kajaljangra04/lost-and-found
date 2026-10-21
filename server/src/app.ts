@@ -1,3 +1,4 @@
+import path from "path";
 import express, { Application, Request, Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -17,6 +18,15 @@ app.use(
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(
+  "/uploads",
+  express.static(path.resolve(process.cwd(), "uploads"), {
+    dotfiles: "deny",
+    index: false,
+    fallthrough: false,
+    maxAge: "1d",
+  }),
+);
 
 app.get("/", (req: Request, res: Response) => {
   res.send({ message: "Welcome to Lost and found services!" });

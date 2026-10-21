@@ -68,7 +68,14 @@ const getLostItem = async () => {
       isDeleted: false, 
     },
     include: {
-      user: true,
+      user: {
+        select: {
+          id: true,
+          username: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      },
       category: true,
     },
   });
@@ -83,7 +90,14 @@ const getSingleLostItem = async (singleId: string) => {
       isDeleted: false, // Only get non-deleted items
     },
     include: {
-      user: true,
+      user: {
+        select: {
+          id: true,
+          username: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      },
       category: true,
     },
   });
@@ -97,7 +111,14 @@ const getMyLostItem = async (user: JwtPayload) => {
       isDeleted: false,
     },
     include: {
-      user: true,
+      user: {
+        select: {
+          id: true,
+          username: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      },
       category: true,
     },
   });

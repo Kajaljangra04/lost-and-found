@@ -15,7 +15,7 @@ import type { ItemCategory } from "../../types/types";
 type ReportLostForm = {
   lostItemName: string;
   description: string;
-  imgUrl: string;
+  image: FileList;
   location: string;
 };
 
@@ -38,14 +38,13 @@ const ReportLostItem = () => {
     if (!categoryId) return;
 
     try {
-      const lostData = {
-        lostItemName: data.lostItemName,
-        description: data.description,
-        categoryId,
-        img: data.imgUrl,
-        location: data.location,
-        date: startDate,
-      };
+      const lostData = new FormData();
+      lostData.append("image", data.image[0]);
+      lostData.append("lostItemName", data.lostItemName);
+      lostData.append("description", data.description);
+      lostData.append("categoryId", categoryId);
+      lostData.append("location", data.location);
+      lostData.append("date", startDate.toISOString());
       const res = await createLostItem(lostData);
       if (res?.data?.success == false) {
         toastNotify({ message: "Failed to create Lost item", status: false });
@@ -117,21 +116,33 @@ const ReportLostItem = () => {
               )}
             </div>
             <div>
-              <label htmlFor="imgUrl" className="field-label">
-                Image url
+              <label htmlFor="image" className="field-label">
+                Item image
               </label>
               <input
-                id="imgUrl"
-                type="text"
+                id="image"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
                 className="field"
-                placeholder="http://lost-image.com"
-                {...register("imgUrl", {
-                  required: "Image url is required",
+                {...register("image", {
+                  required: "Please select an item image",
+                  validate: {
+                    oneFile: (files) =>
+                      files?.length === 1 || "Select one image",
+                    size: (files) =>
+                      !files?.[0] ||
+                      files[0].size <= 5 * 1024 * 1024 ||
+                      "Image must be 5 MB or smaller",
+                    type: (files) =>
+                      !files?.[0] ||
+                      ["image/jpeg", "image/png", "image/webp"].includes(files[0].type) ||
+                      "Use a JPEG, PNG, or WebP image",
+                  },
                 })}
               />
-              {errors.imgUrl && (
+              {errors.image && (
                 <p className="field-error">
-                  {errors.imgUrl?.message as string}
+                  {errors.image.message as string}
                 </p>
               )}
             </div>

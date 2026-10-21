@@ -82,6 +82,9 @@ const blockUser = async (id: string) => {
 };
 
 const changeUserRole = async (id: string, role: string) => {
+  if (role !== "ADMIN" && role !== "USER") {
+    throw new Error("Invalid user role.");
+  }
   const updatedUser = await prisma.user.update({
     where: {
       id,

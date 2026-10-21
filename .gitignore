@@ -36,3 +36,38 @@ frontend/dist
 frontend/.env
 frontend/.vercel
 server/.env.bak*
+server/uploads/
+
+# Local secrets
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# Local database backups and data
+backups/
+*.dump
+*.db
+
+# Python environments and caches
+.venv/
+.venv-*/
+__pycache__/
+*.py[cod]
+
+# Local dependencies
+node_modules/
+
+# Local security/debug backups
+.security-patch-backup-*/
+*.security-backup-*
+*.before-*
+*.debug-backup
+*.pre-ai-backup
+
+# AI and source backup files
+ai-service/*.backup-*
+ai-service/*.clip-backup-*
+ai-service/*.redirect-backup-*
+server/src/**/*.backup-*
+server/src/**/*.before-*

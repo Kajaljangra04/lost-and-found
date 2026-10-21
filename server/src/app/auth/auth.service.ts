@@ -23,8 +23,16 @@ const loginUser = async (data: any) => {
     throw new AppError(StatusCodes.UNAUTHORIZED, "User does not exist");
   }
 
-  if (password && !(await utils.comparePasswords(password, user.password))) {
-    throw new AppError(StatusCodes.FORBIDDEN, "Password is incorrect");
+  if (typeof password !== "string" || password.length === 0) {
+    throw new AppError(StatusCodes.BAD_REQUEST, "Password is required");
+  }
+
+  if (!(await utils.comparePasswords(password, user.password))) {
+    throw new AppError(StatusCodes.UNAUTHORIZED, "Invalid credentials");
+  }
+
+  if (!user.activated || user.isDeleted) {
+    throw new AppError(StatusCodes.UNAUTHORIZED, "Account is inactive or unavailable");
   }
 
   const { id, name, email, role, userImg, username } = user;
@@ -41,7 +49,6 @@ const loginUser = async (data: any) => {
 };
 
 const newPasswords = async (data: any, user: JwtPayload) => {
-  console.log(data.newPassword);
   if (data.currentPassword === data.newPassword) {
     throw new AppError(StatusCodes.BAD_REQUEST, "Password is same");
   }

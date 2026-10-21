@@ -1,3 +1,4 @@
+import fs from "fs";
 import { Request, Response } from "express";
 import sendResponse from "../../global/response";
 import { StatusCodes } from "http-status-codes";
@@ -18,6 +19,10 @@ const toggleFoundStatus = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (error: any) {
+    const uploadedPath = (req as any).uploadedImagePath as string | undefined;
+    if (uploadedPath) {
+      await fs.promises.unlink(uploadedPath).catch(() => {});
+    }
     sendResponse(res, {
       statusCode: StatusCodes.BAD_REQUEST,
       success: false,

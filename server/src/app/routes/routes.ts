@@ -1,8 +1,11 @@
+import { aiMatchesController } from "../modules/aiMatches/aiMatches.controller";
 import express from "express";
 import { userController } from "../modules/user/user.controllers";
 import { authController } from "../auth/auth.controller";
 import { itemcategoryController } from "../modules/itemCategory/itemcategory.controller";
 import auth from "../midddlewares/auth";
+import adminAuth from "../midddlewares/adminAuth";
+import { uploadItemImage } from "../midddlewares/itemImageUpload";
 import { foundItemController } from "../modules/foundItems/foundItem.controller";
 import { claimsController } from "../modules/claim/claim.controller";
 import validateRequest from "../midddlewares/validate";
@@ -28,7 +31,8 @@ router.post(
 //get users
 router.get(
   "/users",
-  // auth(),
+  auth(),
+  adminAuth,
   userController.allUsers
 );
 
@@ -66,6 +70,7 @@ router.post(
   "/item-categories",
   validateRequest(FoundItemCategorySchema.createFoundItemCategory),
   auth(),
+  adminAuth,
   itemcategoryController.createItemCategory
 );
 
@@ -80,6 +85,7 @@ router.put(
   "/item-categories/:id",
   validateRequest(FoundItemCategorySchema.createFoundItemCategory),
   auth(),
+  adminAuth,
   itemcategoryController.updateItemCategory
 );
 
@@ -87,12 +93,15 @@ router.put(
 router.delete(
   "/item-categories/:id",
   auth(),
+  adminAuth,
   itemcategoryController.deleteItemCategory
 );
 // found item create
-router.post("/found-items",
-  validateRequest(FoundItemSchema.createFoundItem),
+router.post(
+  "/found-items",
   auth(),
+  uploadItemImage,
+  validateRequest(FoundItemSchema.createFoundItem),
   foundItemController.createFoundItem
 );
 // found item get
@@ -109,7 +118,7 @@ router.post(
 );
 
 // claims get all
-router.get("/claims", auth(), claimsController.getClaim);
+router.get("/claims", auth(), adminAuth, claimsController.getClaim);
 
 // my claims get
 router.get("/my/claims", auth(), claimsController.getMyClaim);
@@ -119,6 +128,7 @@ router.put(
   "/claims/:claimId",
   validateRequest(ItemClaimSchema.updateClaim),
   auth(),
+  adminAuth,
   claimsController.updateClaimStatus
 );
 ///////////////////////////////////////////////////lost item//////////////////////////////////////////////
@@ -126,7 +136,12 @@ router.put(
 // lost item mark as found
 router.put("/found-lost", auth(), lostItemController.toggleFoundStatus);
 // create lost item
-router.post("/lostItem", auth(), lostItemController.createLostItem);
+router.post(
+  "/lostItem",
+  auth(),
+  uploadItemImage,
+  lostItemController.createLostItem
+);
 // get lost item
 router.get("/lostItem", lostItemController.getLostItem);
 // get single lost item
@@ -148,16 +163,16 @@ router.delete("/my/foundItem/:id",auth(), foundItemController.deleteMyFoundItem)
 
 
 // get stats for admin
-router.get("/admin/stats",auth(), adminStats);
+router.get("/admin/stats", auth(), adminAuth, adminStats);
 
 // block a user
-router.put("/block/user/:id",auth(), userController.blockUser);
+router.put("/block/user/:id", auth(), adminAuth, userController.blockUser);
 
 // change user role
-router.put("/change-role/:id",auth(), userController.changeUserRole);
+router.put("/change-role/:id", auth(), adminAuth, userController.changeUserRole);
 
 // soft delete user
-router.delete("/delete-user/:id",auth(), userController.softDeleteUser);
+router.delete("/delete-user/:id", auth(), adminAuth, userController.softDeleteUser);
 
 // AI search
 router.post(
@@ -167,6 +182,10 @@ router.post(
 );
 
 // recent activity (admin dashboard feed)
-router.get("/recent-activity", auth(), recentActivity);
+router.get("/recent-activity", auth(), adminAuth, recentActivity);
+
+
+// AI-ranked candidates; this endpoint does not approve or claim items.
+router.get("/ai-matches/lost/:id", aiMatchesController.aiMatches);
 
 export default router;

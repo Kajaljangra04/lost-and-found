@@ -29,7 +29,7 @@ app.use(
 );
 
 app.get("/", (req: Request, res: Response) => {
-  res.send({ message: "Welcome to Lost and found services!" });
+  res.send({ message: "Welcome to Findora API!" });
 });
 
 app.use("/api", router);

@@ -1,165 +1,56 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import {
-  FaBoxOpen,
-  FaHandHoldingHeart,
-  FaListAlt,
-  FaPlusCircle,
-  FaSearch,
-} from "react-icons/fa";
+import { useState, type FormEvent } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { FaArrowRight, FaExternalLinkAlt, FaBrain, FaSearch, FaShieldAlt, FaMagic } from "react-icons/fa";
 
 const Banner = () => {
-  const [currentSlide, setCurrentSlide] = useState(0);
-
-  const slides = [
-    {
-      badge: "Lost something? Report here!",
-      title: "Welcome to Lost and Found Management",
-      highlight: "Lost and Found",
-      description:
-        "Lost and Found Management is your reliable partner in handling lost items. Whether you've misplaced your belongings or found something left behind, we're here to assist with our modern, efficient system.",
-      primaryButton: {
-        text: "Report a Lost Item",
-        href: "/reportlostItem",
-        icon: <FaPlusCircle />,
-      },
-      secondaryButton: {
-        text: "Report a Found Item",
-        href: "/reportFoundItem",
-        icon: <FaHandHoldingHeart />,
-      },
-    },
-    {
-      badge: "Found something? Help others!",
-      title: "Help Reunite Items with Their Owners",
-      highlight: "Reunite Items",
-      description:
-        "Join our community of helpful citizens. By reporting found items, you're making a difference in someone's day. Every item reported brings us closer to a more connected community.",
-      primaryButton: {
-        text: "Report Found Item",
-        href: "/reportFoundItem",
-        icon: <FaHandHoldingHeart />,
-      },
-      secondaryButton: {
-        text: "Browse Lost Items",
-        href: "/lostItems",
-        icon: <FaListAlt />,
-      },
-    },
-    {
-      badge: "Need help? We're here!",
-      title: "Track Your Items & Claims",
-      highlight: "Items & Claims",
-      description:
-        "Stay updated on your lost item reports and claim requests. Our advanced tracking system ensures you never miss an update when your belongings are found.",
-      primaryButton: {
-        text: "View My Found Items",
-        href: "/dashboard/myFoundItems",
-        icon: <FaBoxOpen />,
-      },
-      secondaryButton: {
-        text: "Browse Found Items",
-        href: "/foundItems",
-        icon: <FaSearch />,
-      },
-    },
-  ];
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 5000); // Change slide every 5 seconds
-
-    return () => clearInterval(timer);
-  }, [slides.length]);
-
-  const handleDotClick = (index: number) => {
-    setCurrentSlide(index);
+  const [query, setQuery] = useState("");
+  const navigate = useNavigate();
+  const submit = (event: FormEvent) => {
+    event.preventDefault();
+    navigate(`/ai-search?q=${encodeURIComponent(query.trim())}`);
   };
 
-  const currentSlideData = slides[currentSlide];
-
-  // Split the headline so .text-gradient lands on the key phrase only
-  const highlightIndex = currentSlideData.title.indexOf(
-    currentSlideData.highlight
-  );
-
   return (
-    <section className="relative flex min-h-[75vh] items-center overflow-hidden py-24 lg:py-28">
-      {/* Ambient accent glow + faint grid (page canvas shows through) */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <div className="absolute left-1/2 top-0 h-[34rem] w-[58rem] -translate-x-1/2 rounded-full bg-accent/[0.07] blur-[110px]" />
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px)] [background-size:56px_56px] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_20%,black,transparent)]" />
+    <section className="relative isolate overflow-hidden px-4 pb-20 pt-20 sm:px-6 sm:pt-28 lg:pb-28 lg:pt-32">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute left-1/2 top-[-18rem] h-[46rem] w-[68rem] -translate-x-1/2 rounded-full bg-accent/[0.11] blur-[120px]"/>
+        <div className="absolute right-[-12rem] top-24 h-80 w-80 rounded-full bg-indigo-500/[0.09] blur-[100px]"/>
+        <div className="absolute inset-0 opacity-[0.22] [background-image:linear-gradient(rgba(255,255,255,.045)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.045)_1px,transparent_1px)] [background-size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_72%)]"/>
       </div>
-
-      <div className="relative mx-auto w-full max-w-4xl px-4 text-center sm:px-6 lg:px-8">
-        <div key={currentSlide} className="animate-fade-up">
-          {/* Badge pill */}
-          <div className="mb-7 inline-flex items-center gap-2.5 rounded-full border border-line-strong bg-surface/60 px-4 py-1.5 text-sm text-ink-dim backdrop-blur">
-            <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-            {currentSlideData.badge}
+      <div className="mx-auto max-w-6xl text-center">
+        <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-accent/25 bg-accent/[0.08] px-4 py-2 text-xs font-semibold tracking-wide text-accent-soft">
+          <FaMagic className="text-accent"/> AI-powered item recovery
+          <span className="h-1 w-1 rounded-full bg-emerald-400"/>
+          Built for real-world reunions
+        </div>
+        <h1 className="mx-auto max-w-5xl text-5xl font-extrabold leading-[1.02] tracking-[-0.055em] text-ink sm:text-6xl lg:text-7xl">
+          Every lost belonging
+          <span className="block text-gradient">has a story.</span>
+          <span className="block">Let's bring it home.</span>
+        </h1>
+        <p className="mx-auto mt-7 max-w-2xl text-base leading-7 text-ink-dim sm:text-lg sm:leading-8">
+          Findora connects lost and found reports with intelligent matching, private ownership checks and a safer path to handover.
+        </p>
+        <form onSubmit={submit} className="mx-auto mt-10 flex max-w-3xl flex-col gap-2 rounded-2xl border border-line-strong bg-surface/90 p-2 shadow-[0_24px_90px_rgba(0,0,0,.25)] backdrop-blur-xl sm:flex-row sm:items-center">
+          <div className="flex min-w-0 flex-1 items-center gap-3 px-3">
+            <FaSearch className="shrink-0 text-accent"/>
+            <input value={query} onChange={(event)=>setQuery(event.target.value)} className="w-full border-0 bg-transparent py-3 text-sm text-ink outline-none placeholder:text-ink-mute focus:ring-0" placeholder="Describe what you lost or found…" aria-label="Search lost and found items"/>
           </div>
-
-          {/* Headline */}
-          <h1 className="mb-6 text-4xl font-extrabold leading-[1.06] tracking-tight text-ink md:text-5xl lg:text-6xl">
-            {highlightIndex >= 0 ? (
-              <>
-                {currentSlideData.title.slice(0, highlightIndex)}
-                <span className="text-gradient">
-                  {currentSlideData.highlight}
-                </span>
-                {currentSlideData.title.slice(
-                  highlightIndex + currentSlideData.highlight.length
-                )}
-              </>
-            ) : (
-              currentSlideData.title
-            )}
-          </h1>
-
-          <p className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-ink-dim lg:text-xl">
-            {currentSlideData.description}
-          </p>
-
-          {/* CTAs */}
-          <div className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
-            <Link
-              to={currentSlideData.primaryButton.href}
-              className="btn btn-brand btn-lg group"
-            >
-              {currentSlideData.primaryButton.text}
-              <span className="transition-transform duration-200 group-hover:translate-x-0.5">
-                {currentSlideData.primaryButton.icon}
-              </span>
-            </Link>
-            <Link
-              to={currentSlideData.secondaryButton.href}
-              className="btn btn-outline btn-lg group"
-            >
-              {currentSlideData.secondaryButton.text}
-              <span className="transition-transform duration-200 group-hover:translate-x-0.5">
-                {currentSlideData.secondaryButton.icon}
-              </span>
-            </Link>
-          </div>
-
-          {/* Carousel indicators */}
-          <div className="mt-10 flex items-center justify-center gap-2">
-            {slides.map((_, index) => (
-              <button
-                key={index}
-                type="button"
-                onClick={() => handleDotClick(index)}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  index === currentSlide
-                    ? "w-6 bg-accent"
-                    : "w-3 bg-white/20 hover:bg-white/40"
-                }`}
-                aria-label={`Go to slide ${index + 1}`}
-                aria-current={index === currentSlide ? "true" : undefined}
-              />
-            ))}
-          </div>
+          <button className="btn btn-brand btn-lg shrink-0" type="submit">Search with AI <FaArrowRight/></button>
+        </form>
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-ink-mute">
+          <span>Try: “Black wallet near the library”</span><span className="hidden sm:inline">·</span><span>“Blue backpack found yesterday”</span>
+        </div>
+        <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <Link to="/reportLostItem" className="btn btn-outline btn-lg group">Report a lost item <FaExternalLinkAlt className="transition-transform group-hover:translate-x-0.5"/></Link>
+          <Link to="/reportFoundItem" className="btn btn-ghost btn-lg">I found something <FaArrowRight/></Link>
+        </div>
+        <div className="mx-auto mt-16 grid max-w-4xl gap-3 text-left sm:grid-cols-3">
+          {[
+            {icon:<FaBrain/>,title:"Intelligent matching",text:"Ranks reports by the details that matter."},
+            {icon:<FaShieldAlt/>,title:"Private verification",text:"Ownership answers stay protected."},
+            {icon:<FaArrowRight/>,title:"Safer handover",text:"Confirm receipt only after verification."},
+          ].map((item)=><div key={item.title} className="rounded-2xl border border-line bg-surface/55 p-4 backdrop-blur"><div className="mb-3 grid h-9 w-9 place-items-center rounded-xl bg-accent/10 text-accent">{item.icon}</div><h3 className="text-sm font-bold text-ink">{item.title}</h3><p className="mt-1 text-xs leading-5 text-ink-dim">{item.text}</p></div>)}
         </div>
       </div>
     </section>

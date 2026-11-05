@@ -1,0 +1,11 @@
+import { useGetRecoveredItemsQuery } from "../../redux/api/api";
+import { FaHeart, FaMapMarkerAlt } from "react-icons/fa";
+
+export default function RecoveredItems() {
+  const { data: response, isLoading } = useGetRecoveredItemsQuery({});
+  const items = response?.data || [];
+  return <section className="px-4 py-16 sm:px-6 lg:py-20"><div className="mx-auto max-w-6xl">
+    <div className="mb-9 flex flex-col justify-between gap-4 sm:flex-row sm:items-end"><div><span className="eyebrow"><FaHeart/> Returned with care</span><h2 className="section-title mt-3">Good things find their way home.</h2><p className="section-sub mt-3">Real recoveries confirmed through the platform's handover process.</p></div><span className="text-xs text-ink-mute">Only confirmed receipts appear here</span></div>
+    {isLoading ? <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{[1,2,3].map((i)=><div key={i} className="skeleton h-56 rounded-2xl"/>)}</div> : items.length ? <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{items.map((item:any)=><article key={item.id} className="card overflow-hidden"><div className="grid grid-cols-2 gap-1 bg-surface-2 p-1"><div className="h-36 overflow-hidden rounded-xl bg-surface-3">{item.lostItem.img&&<img src={item.lostItem.img} alt={item.lostItem.lostItemName} className="h-full w-full object-cover"/>}</div><div className="h-36 overflow-hidden rounded-xl bg-surface-3">{item.foundItem.img&&<img src={item.foundItem.img} alt={item.foundItem.foundItemName} className="h-full w-full object-cover"/>}</div></div><div className="p-5"><span className="badge badge-ok">Successfully received</span><h3 className="mt-3 font-bold text-ink">{item.lostItem.lostItemName}</h3><p className="mt-1 text-sm text-ink-dim">Matched with {item.foundItem.foundItemName}</p><p className="mt-3 flex items-center gap-2 text-xs text-ink-mute"><FaMapMarkerAlt/>{item.foundItem.location}</p></div></article>)}</div> : <div className="card p-8 text-center"><FaHeart className="mx-auto text-3xl text-ink-mute"/><h3 className="mt-3 font-bold text-ink">The next reunion could be yours.</h3><p className="mt-1 text-sm text-ink-dim">Confirmed recovery stories will appear here once a handover is completed.</p></div>}
+  </div></section>;
+}

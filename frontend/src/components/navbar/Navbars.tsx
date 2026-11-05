@@ -3,6 +3,7 @@ import { signOut, useUserVerification } from "../../auth/auth";
 import { Dropdown, DropdownHeader, DropdownItem, DropdownDivider } from "flowbite-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import toastNotify from "../modal/toastNotify";
+import ThemeToggle from "../../theme/ThemeToggle";
 import {
   FaSearch,
   FaUser,
@@ -12,15 +13,19 @@ import {
   FaTachometerAlt,
   FaBars,
   FaTimes,
+  FaBell,
+  FaRobot,
 } from "react-icons/fa";
 
 const NAV_LINKS = [
   { label: "Home", to: "/" },
-  { label: "Report Lost", to: "/reportlostItem" },
+  { label: "Report Lost", to: "/reportLostItem" },
   { label: "Report Found", to: "/reportFoundItem" },
   { label: "Lost Items", to: "/lostItems" },
   { label: "Found Items", to: "/foundItems" },
   { label: "AI Search", to: "/ai-search" },
+  { label: "Matches", to: "/matches" },
+  { label: "Notifications", to: "/notifications" },
 ];
 
 export function Navbars() {
@@ -61,10 +66,10 @@ export function Navbars() {
           </span>
           <span className="hidden sm:block leading-tight">
             <span className="block text-[15px] font-extrabold tracking-tight text-ink">
-              Lost &amp; Found
+              Findora
             </span>
             <span className="block text-[11px] font-medium text-ink-mute">
-              Find what matters
+              AI-powered item recovery
             </span>
           </span>
         </Link>
@@ -92,6 +97,7 @@ export function Navbars() {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
+          <ThemeToggle compact />
           {users?.email ? (
             <div className="flex items-center gap-3">
               <div className="hidden text-right lg:block">
@@ -160,6 +166,20 @@ export function Navbars() {
                   >
                     <FaCog className="text-accent" />
                     <span>Settings</span>
+                  </Link>
+                </DropdownItem>
+
+                <DropdownItem className="rounded-lg text-ink-dim hover:bg-white/5 hover:text-ink">
+                  <Link to="/matches" className="flex w-full items-center gap-2.5">
+                    <FaRobot className="text-accent" />
+                    <span>AI matches</span>
+                  </Link>
+                </DropdownItem>
+
+                <DropdownItem className="rounded-lg text-ink-dim hover:bg-white/5 hover:text-ink">
+                  <Link to="/notifications" className="flex w-full items-center gap-2.5">
+                    <FaBell className="text-accent" />
+                    <span>Notifications</span>
                   </Link>
                 </DropdownItem>
 

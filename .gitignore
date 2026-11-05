@@ -1,12 +1,6 @@
 server/node_modules
 server/.env
-server/*.txt
 server/.vercel
-server/prisma/migrations
-server/dist
-server//dist/*
-server/#ignore dist folder
-server//dist/**
 
 
 
@@ -71,3 +65,4 @@ ai-service/*.clip-backup-*
 ai-service/*.redirect-backup-*
 server/src/**/*.backup-*
 server/src/**/*.before-*
+server/test-db-create-user.js

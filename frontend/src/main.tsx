@@ -20,12 +20,15 @@ import ClaimsManagement from "./dashboard/pages/ClaimsManagement.tsx";
 import UsersManagement from "./dashboard/pages/UsersManagement.tsx";
 import CategoriesManagement from "./dashboard/pages/CategoriesManagement.tsx";
 import Settings from "./dashboard/pages/Settings.tsx";
+import DatasetManagement from "./dashboard/pages/DatasetManagement.tsx";
 import MyFoundItems from "./dashboard/myFoundItems/MyFoundItems.tsx";
 import MyLostItems from "./dashboard/myLostItems/MyLostItems.tsx";
 import ReportLostItem from "./pages/reportlostItem/ReportLostItem.tsx";
 import ReportFoundItem from "./pages/reportFoundItem/ReportFoundItem.tsx";
 import AiSearch from "./pages/aiSearch/AiSearch.tsx";
 import NotFound from "./pages/notFound/NotFound.tsx";
+import Matches from "./pages/matches/Matches.tsx";
+import Notifications from "./pages/notifications/Notifications.tsx";
 import { RequireAuth, RequireAdmin } from "./components/guards/ProtectedRoute.tsx";
 
 const router = createBrowserRouter([
@@ -63,15 +66,23 @@ const router = createBrowserRouter([
       },
       {
         path: "/reportLostItem",
-        element: <ReportLostItem />,
+        element: <RequireAuth><ReportLostItem /></RequireAuth>,
       },
       {
         path: "/reportFoundItem",
-        element: <ReportFoundItem />,
+        element: <RequireAuth><ReportFoundItem /></RequireAuth>,
       },
       {
         path: "/ai-search",
         element: <AiSearch />,
+      },
+      {
+        path: "/matches",
+        element: <RequireAuth><Matches /></RequireAuth>,
+      },
+      {
+        path: "/notifications",
+        element: <RequireAuth><Notifications /></RequireAuth>,
       },
       {
         path: "*",
@@ -135,6 +146,16 @@ const router = createBrowserRouter([
       <RequireAdmin>
         <DashboardLayout>
           <CategoriesManagement />
+        </DashboardLayout>
+      </RequireAdmin>
+    ),
+  },
+  {
+    path: "/dashboard/dataset",
+    element: (
+      <RequireAdmin>
+        <DashboardLayout>
+          <DatasetManagement />
         </DashboardLayout>
       </RequireAdmin>
     ),

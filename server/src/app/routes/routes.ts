@@ -14,11 +14,15 @@ import { FoundItemCategorySchema } from "../modules/itemCategory/itemCategory.va
 import { FoundItemSchema } from "../modules/foundItems/foundItems.validate";
 import { ItemClaimSchema } from "../modules/claim/claim.validate";
 import { lostItemController } from "../modules/lostItem/lost.controller";
+import { LostItemSchema } from "../modules/lostItem/lostItem.validate";
 import { utils } from "../utils/utils";
 import { adminStats } from "../utils/adminStats";
 import { aiSearchController } from "../modules/aiSearch/aiSearch.controller";
 import { aiSearchValidation } from "../modules/aiSearch/aiSearch.validate";
 import { recentActivity } from "../utils/recentActivity";
+import prisma from "../config/prisma";
+import { uploadCsv } from "../midddlewares/csvUpload";
+import { bulkImport } from "../modules/admin/bulkImport.controller";
 
 const router = express.Router();
 ////////////////////////////////////////////////// user //////////////////////////////////////////////
@@ -140,6 +144,7 @@ router.post(
   "/lostItem",
   auth(),
   uploadItemImage,
+  validateRequest(LostItemSchema.createLostItem),
   lostItemController.createLostItem
 );
 // get lost item
@@ -186,6 +191,58 @@ router.get("/recent-activity", auth(), adminAuth, recentActivity);
 
 
 // AI-ranked candidates; this endpoint does not approve or claim items.
-router.get("/ai-matches/lost/:id", aiMatchesController.aiMatches);
+router.get("/ai-matches/lost/:id", auth(), aiMatchesController.aiMatches);
+router.get("/ai-matches/found/:id", auth(), aiMatchesController.aiMatchesForFound);
+router.get("/ai-matches/:matchId/challenge", auth(), aiMatchesController.getChallenge);
+router.post("/ai-matches/:matchId/verify", auth(), aiMatchesController.verifyOwnership);
+router.post("/ai-matches/:matchId/handover", auth(), aiMatchesController.startHandover);
+router.post("/ai-matches/:matchId/received", auth(), aiMatchesController.confirmHandover);
+
+// Admin-only CSV bulk import (XLSX requires an additional parser dependency).
+router.post("/admin/bulk-import", auth(), adminAuth, uploadCsv, bulkImport);
+
+// Public recovered-item stories; contact details and private answers are excluded.
+router.get("/recovered-items", async (_req, res) => {
+  const items = await prisma.matchCandidate.findMany({
+    where: { status: "RECEIVED" },
+    orderBy: { updatedAt: "desc" },
+    take: 6,
+    select: {
+      id: true,
+      updatedAt: true,
+      lostItem: { select: { lostItemName: true, img: true, location: true } },
+      foundItem: { select: { foundItemName: true, img: true, location: true } },
+    },
+  });
+  res.json({ success: true, data: items });
+});
+
+// Public aggregate counts; no user or contact data is returned.
+router.get("/public/stats", async (_req, res) => {
+  const [lost, found, matches, received] = await Promise.all([
+    prisma.lostItem.count({ where: { isDeleted: false, isFound: false } }),
+    prisma.foundItem.count({ where: { isDeleted: false, isClaimed: false } }),
+    prisma.matchCandidate.count({ where: { status: "POTENTIAL_MATCH" } }),
+    prisma.matchCandidate.count({ where: { status: "RECEIVED" } }),
+  ]);
+  res.json({ success: true, data: { lost, found, matches, received } });
+});
+
+// Private notifications for the signed-in account.
+router.get("/notifications", auth(), async (req, res) => {
+  const notifications = await prisma.notification.findMany({
+    where: { userId: req.user.id },
+    orderBy: { createdAt: "desc" },
+    take: 50,
+  });
+  res.json({ success: true, data: notifications });
+});
+router.put("/notifications/:id/read", auth(), async (req, res) => {
+  const result = await prisma.notification.updateMany({
+    where: { id: req.params.id, userId: req.user.id },
+    data: { readAt: new Date() },
+  });
+  res.json({ success: true, data: { updated: result.count } });
+});
 
 export default router;

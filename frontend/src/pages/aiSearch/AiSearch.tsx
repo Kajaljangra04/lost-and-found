@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   FaSearch,
   FaRobot,
@@ -16,7 +16,9 @@ import {
 } from "react-icons/fa";
 import { useAiSearchMutation } from "../../redux/api/api";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useCategoryQuery } from "../../redux/api/api";
+import type { ItemCategory } from "../../types/types";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 
 interface AISearchFoundItem {
@@ -76,10 +78,23 @@ const SEARCH_TIPS = [
 ];
 
 const AiSearch: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchParams] = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
+  const [typeFilter, setTypeFilter] = useState<"ALL" | "LOST" | "FOUND">("ALL");
+  const [locationFilter, setLocationFilter] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const { data: categoryResponse } = useCategoryQuery({});
+  const categories = categoryResponse?.data || [];
   const [searchResults, setSearchResults] = useState<SearchResult | null>(null);
   const [aiSearch, { isLoading }] = useAiSearchMutation();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const incoming = searchParams.get("q");
+    if (incoming) setSearchQuery(incoming);
+  }, [searchParams]);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,7 +105,14 @@ const AiSearch: React.FC = () => {
     }
 
     try {
-      const response = await aiSearch({ query: searchQuery }).unwrap();
+      const response = await aiSearch({
+        query: searchQuery,
+        type: typeFilter,
+        location: locationFilter.trim() || undefined,
+        category: categoryFilter || undefined,
+        dateFrom: dateFrom || undefined,
+        dateTo: dateTo || undefined,
+      }).unwrap();
 
       // The response might be wrapped in a data property
       const result = response.data || response;
@@ -140,7 +162,7 @@ const AiSearch: React.FC = () => {
             onSubmit={handleSearch}
             className="rounded-2xl border border-line bg-surface p-4 shadow-card sm:p-6"
           >
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="grid gap-3">
               <div className="relative flex-1">
                 <FaRobot className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-accent" />
                 <input
@@ -151,6 +173,20 @@ const AiSearch: React.FC = () => {
                   className="field pl-11"
                   disabled={isLoading}
                 />
+              </div>
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+                <select className="field min-w-0" aria-label="Item type" value={typeFilter} onChange={(e) => setTypeFilter(e.target.value as "ALL" | "LOST" | "FOUND")}>
+                  <option value="ALL">All items</option>
+                  <option value="LOST">Lost only</option>
+                  <option value="FOUND">Found only</option>
+                </select>
+                <input className="field min-w-0" aria-label="Filter by location" placeholder="Location filter" value={locationFilter} onChange={(e) => setLocationFilter(e.target.value)} />
+                <select className="field min-w-0" aria-label="Filter by category" value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
+                  <option value="">All categories</option>
+                  {categories.map((category: ItemCategory) => <option key={category.id} value={category.name}>{category.name}</option>)}
+                </select>
+                <input className="field min-w-0" type="date" aria-label="Date from" value={dateFrom} onChange={(e)=>setDateFrom(e.target.value)} />
+                <input className="field min-w-0" type="date" aria-label="Date to" value={dateTo} onChange={(e)=>setDateTo(e.target.value)} />
               </div>
               <button
                 type="submit"
@@ -166,6 +202,12 @@ const AiSearch: React.FC = () => {
               </button>
             </div>
           </form>
+          <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-ink-mute">
+            <span>Try:</span>
+            {["Black wallet near college", "Blue backpack lost last week", "iPhone found near metro"].map((example) => (
+              <button key={example} type="button" onClick={() => setSearchQuery(example)} className="rounded-full border border-line bg-surface/70 px-3 py-1.5 transition hover:border-accent/40 hover:text-ink">{example}</button>
+            ))}
+          </div>
         </div>
 
         {/* Loading state */}

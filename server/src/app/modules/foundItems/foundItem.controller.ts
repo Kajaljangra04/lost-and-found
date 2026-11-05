@@ -4,6 +4,7 @@ import sendResponse, { Tmeta } from "../../global/response";
 import { Request, Response } from "express";
 import { foundItemService } from "./foundItem.service";
 import { utils } from "../../utils/utils";
+import { matchingService } from "../aiMatches/matching.service";
 
 const createFoundItem = async (req: Request, res: Response) => {
   try {
@@ -13,11 +14,15 @@ const createFoundItem = async (req: Request, res: Response) => {
       req.body,
       req.user.id
     );
+    const matches = await matchingService.forFoundItem(result.id).catch((error) => {
+      console.error("Automatic matching after found report failed:", error);
+      return [];
+    });
     sendResponse(res, {
       statusCode: StatusCodes.CREATED,
       success: true,
       message: "Found item reported successfully",
-      data: result,
+      data: { ...result, matching: { candidatesFound: matches.length } },
     });
   } catch (error: any) {
     const uploadedPath = (req as any).uploadedImagePath as string | undefined;
@@ -77,9 +82,8 @@ const getSingleFoundItem = async (req: Request, res: Response) => {
 };
 
 const getMyFoundItem = async (req: Request, res: Response) => {
- 
-  const result = await foundItemService.getMyFoundItem(req.user);
   try {
+    const result = await foundItemService.getMyFoundItem(req.user);
     sendResponse(res, {
       statusCode: StatusCodes.OK,
       success: true,
@@ -96,19 +100,14 @@ const getMyFoundItem = async (req: Request, res: Response) => {
   }
 };
 
-
-
-
-
 const editMyFoundItem = async (req: Request, res: Response) => {
-  const data = req.body;
-  await foundItemService.editMyFoundItem(data);
   try {
+    const result = await foundItemService.editMyFoundItem(req.body, req.user.id);
     sendResponse(res, {
       statusCode: StatusCodes.OK,
       success: true,
       message: "Found item edited successfully",
-      data: null,
+      data: result,
     });
   } catch (error: any) {
     sendResponse(res, {
@@ -121,9 +120,8 @@ const editMyFoundItem = async (req: Request, res: Response) => {
 };
 
 const deleteMyFoundItem = async (req: Request, res: Response) => {
-  const id=req.params.id
-  await foundItemService.deleteMyFoundItem(id);
   try {
+    await foundItemService.deleteMyFoundItem(req.params.id, req.user.id);
     sendResponse(res, {
       statusCode: StatusCodes.OK,
       success: true,

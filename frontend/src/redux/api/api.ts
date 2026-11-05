@@ -85,6 +85,7 @@ const api = baseApi.injectEndpoints({
           body: data,
         };
       },
+      invalidatesTags: ["mylostItems", "matches", "notifications", "adminData"],
     }),
     getSingleLostItem: builder.query({
       query: (id: string) => {
@@ -141,6 +142,7 @@ const api = baseApi.injectEndpoints({
           body: data,
         };
       },
+      invalidatesTags: ["myFoundItems", "foundItems", "matches", "notifications", "adminData"],
     }),
     getFoundItems: builder.query({
       query: (data: any) => {
@@ -383,6 +385,61 @@ const api = baseApi.injectEndpoints({
       invalidatesTags: ["faqs"],
     }),
 
+    bulkImportCsv: builder.mutation({
+      query: (file: File) => {
+        const body = new FormData();
+        body.append("file", file);
+        return { url: "/admin/bulk-import", method: "POST", body };
+      },
+      invalidatesTags: ["adminData", "matches", "notifications"],
+    }),
+
+    getPublicStats: builder.query({
+      query: () => ({ url: "/public/stats", method: "GET" }),
+      providesTags: ["adminData"],
+    }),
+    getRecoveredItems: builder.query({
+      query: () => ({ url: "/recovered-items", method: "GET" }),
+      providesTags: ["recoveredItems"],
+    }),
+
+    getAiMatchesForFound: builder.query({
+      query: (id: string) => ({ url: `/ai-matches/found/${id}`, method: "GET" }),
+      providesTags: ["matches"],
+    }),
+    getAiMatchesForLost: builder.query({
+      query: (id: string) => ({ url: `/ai-matches/lost/${id}`, method: "GET" }),
+      providesTags: ["matches"],
+    }),
+    getOwnershipChallenge: builder.query({
+      query: (matchId: string) => ({ url: `/ai-matches/${matchId}/challenge`, method: "GET" }),
+    }),
+    verifyOwnership: builder.mutation({
+      query: ({ matchId, answers }: { matchId: string; answers: string[] }) => ({
+        url: `/ai-matches/${matchId}/verify`, method: "POST", body: { answers },
+      }),
+      invalidatesTags: ["matches", "notifications", "adminData"],
+    }),
+    startHandover: builder.mutation({
+      query: (matchId: string) => ({ url: `/ai-matches/${matchId}/handover`, method: "POST" }),
+      invalidatesTags: ["matches", "notifications", "adminData"],
+    }),
+    confirmHandover: builder.mutation({
+      query: ({ matchId, otp }: { matchId: string; otp: string }) => ({
+        url: `/ai-matches/${matchId}/received`, method: "POST", body: { otp },
+      }),
+      invalidatesTags: ["matches", "notifications", "adminData", "recoveredItems"],
+    }),
+
+    getNotifications: builder.query({
+      query: () => ({ url: "/notifications", method: "GET" }),
+      providesTags: ["notifications"],
+    }),
+    markNotificationRead: builder.mutation({
+      query: (id: string) => ({ url: `/notifications/${id}/read`, method: "PUT" }),
+      invalidatesTags: ["notifications"],
+    }),
+
     // recent activity for dashboard
     getRecentActivity: builder.query({
       query: () => {
@@ -396,7 +453,7 @@ const api = baseApi.injectEndpoints({
 
     // AI search
     aiSearch: builder.mutation({
-      query: (data: { query: string }) => {
+      query: (data: { query: string; type?: "ALL" | "LOST" | "FOUND"; location?: string; category?: string; dateFrom?: string; dateTo?: string }) => {
         return {
           url: "/ai-search",
           method: "POST",
@@ -446,5 +503,16 @@ export const {
   useGetFaqsQuery,
   useCreateFaqMutation,
   useGetRecentActivityQuery,
+  useGetPublicStatsQuery,
+  useGetRecoveredItemsQuery,
+  useBulkImportCsvMutation,
+  useGetNotificationsQuery,
+  useMarkNotificationReadMutation,
+  useLazyGetAiMatchesForFoundQuery,
+  useLazyGetAiMatchesForLostQuery,
+  useLazyGetOwnershipChallengeQuery,
+  useVerifyOwnershipMutation,
+  useStartHandoverMutation,
+  useConfirmHandoverMutation,
   useAiSearchMutation,
 } = api;

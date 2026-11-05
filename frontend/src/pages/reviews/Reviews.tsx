@@ -16,7 +16,7 @@ const fallbackTestimonials: Testimonial[] = [
   {
     rating: 5,
     feedback:
-      "The Lost and Found system has streamlined our process of returning lost items to their owners. It's incredibly user-friendly and efficient.",
+      "Findora has streamlined our process of returning lost items to their owners. It's incredibly user-friendly and efficient.",
     name: "Michael T.",
     position: "Operations Manager",
   },

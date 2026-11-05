@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { getUserLocalStorage } from "../../auth/auth";
 
 const serverUrl = import.meta.env.VITE_SERVER_URL?.replace(/\/+$/, "");
-const fallbackUrl = "http://localhost:5000/api";
+const fallbackUrl = "http://localhost:5001/api";
 const baseUrl = serverUrl ? `${serverUrl}/api` : fallbackUrl;
 
 export const baseApi = createApi({
@@ -31,6 +31,9 @@ export const baseApi = createApi({
     "foundItems",
     "claims",
     "categories",
+    "notifications",
+    "matches",
+    "recoveredItems",
   ],
 
   endpoints: () => ({}),

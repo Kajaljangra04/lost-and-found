@@ -16,6 +16,7 @@ import {
   FaSignOutAlt,
   FaUser,
   FaList,
+  FaFileCsv,
 } from "react-icons/fa";
 import { useUserVerification, signOut } from "../auth/auth";
 import "react-toastify/dist/ReactToastify.css";
@@ -26,6 +27,7 @@ import {
   DropdownDivider,
 } from "flowbite-react";
 import toastNotify from "../components/modal/toastNotify";
+import ThemeToggle from "../theme/ThemeToggle";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -77,6 +79,13 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       title: "Categories",
       icon: <FaBoxOpen />,
       path: "/dashboard/categories",
+      badge: null,
+      adminOnly: true,
+    },
+    {
+      title: "Dataset Import",
+      icon: <FaFileCsv />,
+      path: "/dashboard/dataset",
       badge: null,
       adminOnly: true,
     },
@@ -149,7 +158,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
               </span>
               <div className="leading-tight">
                 <h1 className="text-[15px] font-extrabold tracking-tight text-ink">
-                  Lost &amp; Found
+                  Findora
                 </h1>
                 <p className="text-[11px] font-medium text-ink-mute">
                   Dashboard
@@ -298,6 +307,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                   "Lost Items Management"}
                 {location.pathname.includes("/claims") && "Claims Management"}
                 {location.pathname.includes("/users") && "User Management"}
+                {location.pathname.includes("/dataset") && "Dataset Import"}
                 {location.pathname.includes("/categories") &&
                   "Category Management"}
                 {location.pathname.includes("/settings") && "Settings"}
@@ -306,6 +316,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
             {/* User Actions */}
             <div className="flex items-center gap-3">
+              <ThemeToggle compact />
               <div className="hidden text-right sm:block">
                 <p className="text-sm font-semibold text-ink">
                   {user?.name || "User"}

@@ -5,6 +5,7 @@ import { StatusCodes } from "http-status-codes";
 import { lostTItemServices } from "../modules/lostItem/lostItem.service";
 import { userService } from "../modules/user/user.service";
 import { claimsService } from "../modules/claim/claim.service";
+import prisma from "../config/prisma";
 
 export const adminStats = async (req: Request, res: Response) => {
   const result: any = {};
@@ -13,6 +14,14 @@ export const adminStats = async (req: Request, res: Response) => {
     const lostItems = await lostTItemServices.getLostItem();
     const totalUsers = await userService.allUsers();
     const claims = await claimsService.getClaim();
+    const [potentialMatches, verifiedMatches, recoveredItems] = await Promise.all([
+      prisma.matchCandidate.count({ where: { status: "POTENTIAL_MATCH" } }),
+      prisma.matchCandidate.count({ where: { status: { in: ["MATCHED", "HANDOVER_PENDING"] } } }),
+      prisma.matchCandidate.count({ where: { status: "RECEIVED" } }),
+    ]);
+    result.potentialMatches = potentialMatches;
+    result.verifiedMatches = verifiedMatches;
+    result.recoveredItems = recoveredItems;
     let pendingClaims = 0;
     if (claims) {
       pendingClaims = claims.filter((claim) => claim.status === "PENDING").length;

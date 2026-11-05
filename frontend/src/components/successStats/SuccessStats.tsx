@@ -9,17 +9,21 @@ import {
   useGetFoundItemsQuery,
   useGetLostItemsQuery,
   useCategoryQuery,
+  useGetPublicStatsQuery,
 } from "../../redux/api/api";
 
 const SuccessStats = () => {
   const { data: foundData } = useGetFoundItemsQuery({ page: 1, limit: 1 });
   const { data: lostData } = useGetLostItemsQuery({ page: 1, limit: 1 });
   const { data: categoryData } = useCategoryQuery({});
+  const { data: publicStats } = useGetPublicStatsQuery({});
 
-  const foundCount = foundData?.meta?.total || 0;
-  const lostCount = lostData?.meta?.total || 0;
+  const foundCount = publicStats?.data?.found ?? foundData?.meta?.total ?? 0;
+  const lostCount = publicStats?.data?.lost ?? lostData?.meta?.total ?? 0;
   const categoryCount = categoryData?.data?.length || 0;
   const total = foundCount + lostCount;
+  const potentialMatches = publicStats?.data?.matches ?? 0;
+  const recovered = publicStats?.data?.received ?? 0;
 
   const stats = [
     {
@@ -42,9 +46,21 @@ const SuccessStats = () => {
     },
     {
       icon: <FaBrain className="h-5 w-5" />,
+      number: potentialMatches.toLocaleString(),
+      label: "Potential Matches",
+      description: "Ranked for private ownership verification",
+    },
+    {
+      icon: <FaHeart className="h-5 w-5" />,
+      number: recovered.toLocaleString(),
+      label: "Items Received",
+      description: "Confirmed handovers completed",
+    },
+    {
+      icon: <FaBrain className="h-5 w-5" />,
       number: String(categoryCount),
       label: "Item Categories",
-      description: "Searchable with descriptions & AI matching",
+      description: "Organized for easier discovery",
     },
   ];
 
@@ -65,7 +81,7 @@ const SuccessStats = () => {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {stats.map((stat, index) => (
             <div key={index} className="card card-hover p-6 text-center">
               <div className="mx-auto mb-4 grid h-11 w-11 place-items-center rounded-xl bg-accent/10 text-accent">

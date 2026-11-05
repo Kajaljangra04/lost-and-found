@@ -5,78 +5,77 @@ export default {
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
-    ".flowbite-react/class-list.json"
+    ".flowbite-react/class-list.json",
   ],
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"Plus Jakarta Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        sans: ['"Plus Jakarta Sans"', "ui-sans-serif", "system-ui", "sans-serif"],
       },
       colors: {
-        // ── Refined dark design tokens ─────────────────────────────
-        canvas: '#0a0a0c',                       // page background
-        surface: {                               // panels / cards
-          DEFAULT: '#101014',
-          2: '#15151a',                          // inputs, inset areas
-          3: '#1c1c22',                          // raised / hover fill
-          4: '#24242c',                          // strongest fill
+        canvas: "rgb(var(--canvas) / <alpha-value>)",
+        surface: {
+          DEFAULT: "rgb(var(--surface) / <alpha-value>)",
+          2: "rgb(var(--surface-2) / <alpha-value>)",
+          3: "rgb(var(--surface-3) / <alpha-value>)",
+          4: "rgb(var(--surface-4) / <alpha-value>)",
         },
-        line: {                                  // hairline borders
-          DEFAULT: 'rgba(255,255,255,0.07)',
-          strong: 'rgba(255,255,255,0.14)',
+        line: {
+          DEFAULT: "rgb(var(--line) / 0.07)",
+          strong: "rgb(var(--line-strong) / 0.14)",
         },
-        ink: {                                   // text ramp (all ≥4.5:1 on canvas/surface)
-          DEFAULT: '#f4f4f5',
-          dim: '#a1a1aa',
-          mute: '#83838d',
+        ink: {
+          DEFAULT: "rgb(var(--ink) / <alpha-value>)",
+          dim: "rgb(var(--ink-dim) / <alpha-value>)",
+          mute: "rgb(var(--ink-mute) / <alpha-value>)",
         },
         accent: {
-          DEFAULT: '#38bdf8',                    // sky-400
-          soft: '#7dd3fc',                       // sky-300
-          strong: '#0ea5e9',                     // sky-500
-          deep: '#0284c7',                       // sky-600
-          ink: '#06121c',                        // text on accent fills
+          DEFAULT: "rgb(var(--accent) / <alpha-value>)",
+          soft: "rgb(var(--accent-soft) / <alpha-value>)",
+          strong: "rgb(var(--accent-strong) / <alpha-value>)",
+          deep: "rgb(var(--accent-deep) / <alpha-value>)",
+          ink: "rgb(var(--accent-ink) / <alpha-value>)",
         },
-        ok: '#34d399',
-        warn: '#fbbf24',
-        bad: '#fb7185',
+        ok: "rgb(var(--ok) / <alpha-value>)",
+        warn: "rgb(var(--warn) / <alpha-value>)",
+        bad: "rgb(var(--bad) / <alpha-value>)",
       },
       boxShadow: {
-        card: '0 1px 0 0 rgba(255,255,255,0.03) inset, 0 12px 32px -18px rgba(0,0,0,0.9)',
-        pop: '0 24px 48px -20px rgba(0,0,0,0.85)',
-        glow: '0 10px 30px -12px rgba(56,189,248,0.45)',
-        ring: '0 0 0 1px rgba(255,255,255,0.06)',
+        card: "var(--shadow-card)",
+        pop: "var(--shadow-pop)",
+        glow: "var(--shadow-glow)",
+        ring: "var(--shadow-ring)",
       },
       animation: {
-        'fade-in': 'fadeIn 0.5s ease-out both',
-        'fade-up': 'fadeUp 0.55s cubic-bezier(0.22,1,0.36,1) both',
-        'slide-in': 'slideIn 0.3s ease-out',
-        'scale-in': 'scaleIn 0.2s ease-out',
-        'shimmer': 'shimmer 1.6s linear infinite',
+        "fade-in": "fadeIn 0.5s ease-out both",
+        "fade-up": "fadeUp 0.55s cubic-bezier(0.22,1,0.36,1) both",
+        "slide-in": "slideIn 0.3s ease-out",
+        "scale-in": "scaleIn 0.2s ease-out",
+        shimmer: "shimmer 1.6s linear infinite",
       },
       keyframes: {
         fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
         },
         fadeUp: {
-          '0%': { opacity: '0', transform: 'translateY(14px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
+          "0%": { opacity: "0", transform: "translateY(14px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
         },
         slideIn: {
-          '0%': { transform: 'translateY(10px)', opacity: '0' },
-          '100%': { transform: 'translateY(0)', opacity: '1' },
+          "0%": { transform: "translateY(10px)", opacity: "0" },
+          "100%": { transform: "translateY(0)", opacity: "1" },
         },
         scaleIn: {
-          '0%': { transform: 'scale(0.9)', opacity: '0' },
-          '100%': { transform: 'scale(1)', opacity: '1' },
+          "0%": { transform: "scale(0.9)", opacity: "0" },
+          "100%": { transform: "scale(1)", opacity: "1" },
         },
         shimmer: {
-          '0%': { backgroundPosition: '-200% 0' },
-          '100%': { backgroundPosition: '200% 0' },
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
         },
       },
     },
   },
   plugins: [flowbiteReact],
-}
+};

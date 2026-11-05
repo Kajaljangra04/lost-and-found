@@ -1,3 +1,85 @@
+
+:root,
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --canvas: 10 10 12;
+  --surface: 16 16 20;
+  --surface-2: 21 21 26;
+  --surface-3: 28 28 34;
+  --surface-4: 36 36 44;
+
+  --line: 255 255 255;
+  --line-strong: 255 255 255;
+
+  --ink: 244 244 245;
+  --ink-dim: 161 161 170;
+  --ink-mute: 131 131 141;
+
+  --accent: 56 189 248;
+  --accent-soft: 125 211 252;
+  --accent-strong: 14 165 233;
+  --accent-deep: 2 132 199;
+  --accent-ink: 6 18 28;
+
+  --ok: 52 211 153;
+  --warn: 251 191 36;
+  --bad: 251 113 133;
+
+  --shadow-card: 0 1px 0 0 rgba(255,255,255,0.03) inset, 0 12px 32px -18px rgba(0,0,0,0.9);
+  --shadow-pop: 0 24px 48px -20px rgba(0,0,0,0.85);
+  --shadow-glow: 0 10px 30px -12px rgba(56,189,248,0.45);
+  --shadow-ring: 0 0 0 1px rgba(255,255,255,0.06);
+
+  --ambient-one: rgba(56,189,248,0.10);
+  --ambient-two: rgba(99,102,241,0.08);
+  --scrollbar-thumb: rgba(255,255,255,0.12);
+  --scrollbar-thumb-hover: rgba(255,255,255,0.24);
+  --button-primary-bg: #ffffff;
+  --button-primary-text: #0a0a0c;
+  --button-primary-hover: #e4e4e7;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --canvas: 250 249 255;
+  --surface: 255 255 255;
+  --surface-2: 245 243 250;
+  --surface-3: 238 234 247;
+  --surface-4: 229 223 242;
+
+  --line: 57 42 82;
+  --line-strong: 57 42 82;
+
+  --ink: 30 24 43;
+  --ink-dim: 91 82 108;
+  --ink-mute: 124 115 140;
+
+  --accent: 124 58 237;
+  --accent-soft: 139 92 246;
+  --accent-strong: 109 40 217;
+  --accent-deep: 91 33 182;
+  --accent-ink: 255 255 255;
+
+  --ok: 5 150 105;
+  --warn: 217 119 6;
+  --bad: 225 29 72;
+
+  --shadow-card: 0 1px 2px rgba(35,20,60,0.04), 0 8px 28px -16px rgba(35,20,60,0.18);
+  --shadow-pop: 0 20px 45px -18px rgba(35,20,60,0.22);
+  --shadow-glow: 0 8px 24px -12px rgba(124,58,237,0.35);
+  --shadow-ring: 0 0 0 1px rgba(57,42,82,0.08);
+
+  --ambient-one: rgba(139,92,246,0.10);
+  --ambient-two: rgba(196,181,253,0.16);
+  --scrollbar-thumb: rgba(57,42,82,0.20);
+  --scrollbar-thumb-hover: rgba(57,42,82,0.34);
+  --button-primary-bg: #29213a;
+  --button-primary-text: #ffffff;
+  --button-primary-hover: #403354;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -21,8 +103,8 @@
     inset: 0;
     z-index: -1;
     background:
-      radial-gradient(55rem 38rem at 12% -8%, rgba(56, 189, 248, 0.1), transparent 62%),
-      radial-gradient(48rem 32rem at 88% 4%, rgba(99, 102, 241, 0.08), transparent 60%);
+      radial-gradient(55rem 38rem at 12% -8%, var(--ambient-one), transparent 62%),
+      radial-gradient(48rem 32rem at 88% 4%, var(--ambient-two), transparent 60%);
     pointer-events: none;
   }
 
@@ -51,13 +133,13 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.12);
+    background: var(--scrollbar-thumb);
     border-radius: 999px;
     border: 3px solid transparent;
     background-clip: content-box;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.24);
+    background: var(--scrollbar-thumb-hover);
     background-clip: content-box;
   }
 
@@ -102,7 +184,9 @@
   }
   /* Primary: crisp white on dark (modern SaaS default) */
   .btn-primary {
-    @apply bg-white text-canvas shadow-sm hover:bg-zinc-200 active:scale-[0.98];
+    background: var(--button-primary-bg);
+    color: var(--button-primary-text);
+    @apply shadow-sm transition-colors hover:opacity-90 active:scale-[0.98];
   }
   /* Brand: accent fill for high-emphasis actions (dark ink keeps 6.9:1 contrast) */
   .btn-brand {

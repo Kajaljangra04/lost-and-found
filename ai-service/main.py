@@ -50,6 +50,12 @@ class MatchRequest(BaseModel):
     found: Item
 
 
+
+class BatchMatchRequest(BaseModel):
+    anchor: Item
+    candidates: list[Item] = Field(min_length=1, max_length=500)
+
+
 def make_text(item: Item) -> str:
     return (
         f"Item name: {item.name}. "
@@ -182,7 +188,6 @@ def image_similarity(url_a: str, url_b: str):
     with torch.inference_mode():
         outputs = model.vision_model(
             pixel_values=inputs["pixel_values"],
-            return_dict=True,
         )
         features = model.visual_projection(outputs.pooler_output)
         features = F.normalize(features, p=2, dim=-1)
@@ -239,6 +244,80 @@ def match_items(payload: MatchRequest):
         raise HTTPException(
             status_code=503,
             detail=f"Matching service unavailable: {type(exc).__name__}",
+        ) from exc
+
+
+@app.post("/match/batch")
+def match_batch(payload: BatchMatchRequest):
+    """
+    Rank up to 500 candidates against one anchor item using a single
+    SentenceTransformer encoding call. Scores are ranking signals,
+    not probabilities or proof of ownership.
+    """
+    try:
+        model = get_model()
+
+        texts = [
+            make_text(payload.anchor),
+            *[make_text(candidate) for candidate in payload.candidates],
+        ]
+
+        embeddings = model.encode(
+            texts,
+            convert_to_tensor=True,
+            normalize_embeddings=True,
+        )
+
+        # All embeddings are normalized, so their dot product is cosine similarity.
+        semantic_scores = torch.mv(
+            embeddings[1:],
+            embeddings[0],
+        ).clamp(min=0.0, max=1.0).tolist()
+
+        results = []
+
+        for index, candidate in enumerate(payload.candidates):
+            text_score = float(semantic_scores[index])
+            location_score = lexical_similarity(
+                payload.anchor.location,
+                candidate.location,
+            )
+            time_score = date_similarity(
+                payload.anchor.date,
+                candidate.date,
+            )
+
+            combined_score = (
+                0.70 * text_score
+                + 0.15 * location_score
+                + 0.15 * time_score
+            )
+
+            results.append({
+                "index": index,
+                "text_similarity": round(text_score, 4),
+                "location_similarity": round(location_score, 4),
+                "date_similarity": round(time_score, 4),
+                "combined_score": round(combined_score, 4),
+            })
+
+        return {
+            "count": len(results),
+            "text_model": MODEL_NAME,
+            "ranking_method": "batch semantic text and baseline context",
+            "results": results,
+            "disclaimer": (
+                "Scores are experimental ranking signals, "
+                "not probabilities or proof of ownership."
+            ),
+        }
+
+    except Exception as exc:
+        import logging
+        logging.exception("Batch matching failed")
+        raise HTTPException(
+            status_code=503,
+            detail=f"Batch matching unavailable: {type(exc).__name__}",
         ) from exc
 
 

@@ -29,7 +29,7 @@ const Footers = () => {
                 <FaSearch className="text-sm text-white" />
               </span>
               <span className="text-lg font-extrabold tracking-tight text-ink">
-                Lost &amp; Found
+                Findora
               </span>
             </Link>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-ink-mute">
@@ -90,7 +90,7 @@ const Footers = () => {
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-line pt-6 sm:flex-row">
           <span className="text-sm text-ink-mute">
-            © {year} Lost &amp; Found Management. All rights reserved.
+            © {year} Findora. All rights reserved.
           </span>
           <div className="flex items-center gap-2">
             <a

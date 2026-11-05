@@ -6,12 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Lost & Found — a community platform to report lost items, browse found belongings, submit claims, and search with AI. Reunite people with what matters."
+      content="Findora — an AI-powered recovery platform to report lost items, browse found belongings, submit claims, and search with AI. Reunite people with what matters."
     />
-    <meta property="og:title" content="Lost & Found" />
+    <meta property="og:title" content="Findora" />
     <meta
       property="og:description"
-      content="Report lost & found items, submit claims, and use AI-powered search to reunite people with their belongings."
+      content="Report lost and found items, discover intelligent matches, verify ownership privately and coordinate safe handovers."
     />
     <meta property="og:type" content="website" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -20,7 +20,18 @@
       href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
-    <title>Lost & Found — Reuniting People with Their Belongings</title>
+    <script>
+      (() => {
+        try {
+          const theme = localStorage.getItem("findora-theme");
+          document.documentElement.dataset.theme =
+            theme === "light" || theme === "dark" ? theme : "dark";
+        } catch {
+          document.documentElement.dataset.theme = "dark";
+        }
+      })();
+    </script>
+    <title>Findora — Every Lost Belonging Has a Story</title>
   </head>
   <body>
     <div id="root"></div>

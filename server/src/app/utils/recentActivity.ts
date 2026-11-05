@@ -3,7 +3,7 @@ import prisma from "../config/prisma";
 import sendResponse from "../global/response";
 import { StatusCodes } from "http-status-codes";
 
-type ActivityType = "found" | "lost" | "claim";
+type ActivityType = "found" | "lost" | "claim" | "match" | "received";
 
 type Activity = {
   id: string;
@@ -17,7 +17,7 @@ export const recentActivity = async (req: Request, res: Response) => {
   try {
     const limit = 10;
 
-    const [foundItems, lostItems, claims] = await Promise.all([
+    const [foundItems, lostItems, claims, matches] = await Promise.all([
       prisma.foundItem.findMany({
         where: { isDeleted: false },
         orderBy: { createdAt: "desc" },
@@ -35,6 +35,14 @@ export const recentActivity = async (req: Request, res: Response) => {
         orderBy: { createdAt: "desc" },
         take: limit,
         include: { foundItem: { select: { foundItemName: true } } },
+      }),
+      prisma.matchCandidate.findMany({
+        orderBy: { updatedAt: "desc" },
+        take: limit,
+        include: {
+          lostItem: { select: { lostItemName: true } },
+          foundItem: { select: { foundItemName: true } },
+        },
       }),
     ]);
 
@@ -59,6 +67,13 @@ export const recentActivity = async (req: Request, res: Response) => {
         title: `Claim ${claim.status.toLowerCase()} for "${claim.foundItem.foundItemName}"`,
         time: claim.createdAt,
         status: claim.status.toLowerCase(),
+      })),
+      ...matches.map((match) => ({
+        id: `match-${match.id}`,
+        type: (match.status === "RECEIVED" ? "received" : "match") as ActivityType,
+        title: `Match ${match.status.toLowerCase().replace(/_/g, " ")}: "${match.lostItem.lostItemName}" ↔ "${match.foundItem.foundItemName}"`,
+        time: match.updatedAt,
+        status: match.status.toLowerCase(),
       })),
     ]
       .sort(

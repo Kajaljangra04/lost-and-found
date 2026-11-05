@@ -29,7 +29,6 @@ const getClaim = async () => {
             select: {
               id: true,
               username: true,
-              email: true,
               createdAt: true,
               updatedAt: true,
             },
@@ -56,7 +55,6 @@ const getMyClaim = async (user: JwtPayload) => {
             select: {
               id: true,
               username: true,
-              email: true,
               createdAt: true,
               updatedAt: true,
             },
@@ -72,7 +70,10 @@ const getMyClaim = async (user: JwtPayload) => {
       },
     },
   });
-  return result;
+  return result.map(({ foundItem, ...claim }) => {
+    const { contactName, contactPhone, contactPhoneHash, ...publicFoundItem } = foundItem as any;
+    return { ...claim, foundItem: publicFoundItem };
+  });
 };
 
 const updateClaimStatus = async (claimId: string, data: Partial<Claim>) => {

@@ -44,6 +44,10 @@ const allUsers = async () => {
     where: {
       isDeleted: false,
     },
+    select: {
+      id: true, name: true, username: true, email: true, role: true,
+      activated: true, userImg: true, createdAt: true, updatedAt: true,
+    },
     orderBy: {
       activated: "desc",
     },

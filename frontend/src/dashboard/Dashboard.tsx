@@ -4,6 +4,9 @@ import {
   FaClipboardList,
   FaExclamationTriangle,
   FaChartLine,
+  FaBrain,
+  FaCheckCircle,
+  FaHeart,
 } from "react-icons/fa";
 import { useAdminStatsQuery, useGetRecentActivityQuery } from "../redux/api/api";
 import type { RecentActivity } from "../types/types";
@@ -32,6 +35,8 @@ const activityStyles: Record<
   claim: { dot: "bg-warn", badge: "badge-warn" },
   approved: { dot: "bg-ok", badge: "badge-ok" },
   rejected: { dot: "bg-bad", badge: "badge-danger" },
+  match: { dot: "bg-accent", badge: "badge-accent" },
+  received: { dot: "bg-ok", badge: "badge-ok" },
   default: { dot: "bg-ink-mute", badge: "badge-neutral" },
 };
 
@@ -46,7 +51,7 @@ const Dashboard = () => {
           <div className="skeleton mb-6 h-32"></div>
 
           {/* Stats Grid Skeleton */}
-          <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
             {[1, 2, 3, 4].map((i) => (
               <div key={i} className="skeleton h-24"></div>
             ))}
@@ -156,6 +161,11 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
+        <div className="mt-4 grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div className="card card-hover p-5"><div className="flex items-center justify-between"><div><p className="text-sm text-ink-mute">Potential matches</p><p className="text-2xl font-bold text-ink">{adminStats?.data?.potentialMatches || 0}</p></div><FaBrain className="text-xl text-accent"/></div></div>
+          <div className="card card-hover p-5"><div className="flex items-center justify-between"><div><p className="text-sm text-ink-mute">Verified matches</p><p className="text-2xl font-bold text-ink">{adminStats?.data?.verifiedMatches || 0}</p></div><FaCheckCircle className="text-xl text-emerald-400"/></div></div>
+          <div className="card card-hover p-5"><div className="flex items-center justify-between"><div><p className="text-sm text-ink-mute">Recovered items</p><p className="text-2xl font-bold text-ink">{adminStats?.data?.recoveredItems || 0}</p></div><FaHeart className="text-xl text-rose-300"/></div></div>
+        </div>
       </div>
 
       {/* Recent Activity */}
@@ -218,6 +228,13 @@ const Dashboard = () => {
               <button className="flex w-full items-center justify-between rounded-xl border border-line bg-surface-2 p-4 text-sm font-medium text-ink transition-colors hover:border-line-strong hover:bg-surface-3">
                 <span>Manage Users</span>
                 <FaUsers className="w-5 h-5 text-accent" />
+              </button>
+            </Link>
+
+            <Link to="/dashboard/dataset">
+              <button className="flex w-full items-center justify-between rounded-xl border border-line bg-surface-2 p-4 text-sm font-medium text-ink transition-colors hover:border-line-strong hover:bg-surface-3">
+                <span>Import CSV Dataset</span>
+                <FaChartLine className="w-5 h-5 text-accent" />
               </button>
             </Link>
 

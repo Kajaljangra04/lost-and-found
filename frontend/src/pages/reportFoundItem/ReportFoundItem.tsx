@@ -1,260 +1,89 @@
-import { useForm } from "react-hook-form";
-import { Spinner } from "flowbite-react";
-import toastNotify from "../../components/modal/toastNotify";
-import { useState } from "react";
-import {
-  useCategoryQuery,
-  useCreateFoundItemMutation,
-} from "../../redux/api/api";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import { IoIosArrowDown } from "react-icons/io";
-import { FaBullhorn } from "react-icons/fa";
+import { useEffect, useState, type FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
+import { useCreateFoundItemMutation } from "../../redux/api/api";
+import { useCategoryQuery } from "../../redux/api/api";
 import type { ItemCategory } from "../../types/types";
+import { FaArrowLeft, FaCloudUploadAlt, FaHandHoldingHeart, FaRobot, FaShieldAlt } from "react-icons/fa";
+import toastNotify from "../../components/modal/toastNotify";
 
-type ReportFoundForm = {
-  image: FileList;
-  foundItemName: string;
-  description: string;
-  location: string;
-  claimProcess: string;
-};
-
-const ReportFoundItem = () => {
-  const {
-    handleSubmit,
-    register,
-    formState: { errors },
-    reset,
-  } = useForm<ReportFoundForm>();
-
-  const [categoryId, setCategoryId] = useState("");
-  const [submitted, setSubmitted] = useState(false);
+export default function ReportFoundItem() {
+  const navigate = useNavigate();
+  const { data: categoriesResponse, isLoading: categoriesLoading } = useCategoryQuery({});
   const [createFoundItem, { isLoading }] = useCreateFoundItemMutation();
-  const { data: Category } = useCategoryQuery("");
-  const [startDate, setStartDate] = useState(new Date());
+  const categories = categoriesResponse?.data || [];
+  const [categoryId, setCategoryId] = useState("");
+  const [image, setImage] = useState<File | null>(null);
+  const [preview, setPreview] = useState("");
+  const [savedMatches, setSavedMatches] = useState<number | null>(null);
 
-  const onSubmit = async (data: ReportFoundForm) => {
-    setSubmitted(true);
-    if (!categoryId) return;
+  useEffect(() => {
+    if (!image) { setPreview(""); return; }
+    const url = URL.createObjectURL(image);
+    setPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [image]);
 
+  const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    if (!image || !categoryId) {
+      toastNotify({ message: "Add an image and select a category to continue.", status: false });
+      return;
+    }
+    if (image.size > 5 * 1024 * 1024 || !["image/jpeg", "image/png", "image/webp"].includes(image.type)) {
+      toastNotify({ message: "Choose a JPEG, PNG or WebP image up to 5 MB.", status: false });
+      return;
+    }
+    const payload = new FormData();
+    payload.append("image", image);
+    payload.append("categoryId", categoryId);
+    ["foundItemName", "description", "location", "date", "claimProcess", "contactName", "contactPhone"].forEach((key) => {
+      payload.append(key, String(form.get(key) || ""));
+    });
     try {
-      const foundData = new FormData();
-      foundData.append("image", data.image[0]);
-      foundData.append("categoryId", categoryId);
-      foundData.append("foundItemName", data.foundItemName);
-      foundData.append("description", data.description);
-      foundData.append("location", data.location);
-      foundData.append("date", startDate.toISOString());
-      foundData.append("claimProcess", data.claimProcess);
-
-      const res = await createFoundItem(foundData);
-
-      if (res?.data?.success == false) {
-        toastNotify({ message: "Failed to create Found item", status: false });
-      } else {
-        toastNotify({ message: "Found item created successfully", status: true });
-        reset();
-        setCategoryId("");
-        setSubmitted(false);
-      }
-    } catch {
-      toastNotify({ message: "Failed to create Found item", status: false });
+      const response = await createFoundItem(payload).unwrap();
+      const count = Number(response?.data?.matching?.candidatesFound || 0);
+      setSavedMatches(count);
+      toastNotify({ message: "Found item saved and potential matches ranked.", status: true });
+      setTimeout(() => navigate("/dashboard/myFoundItems"), 1200);
+    } catch (error: any) {
+      toastNotify({ message: error?.data?.message || error?.message || "Your report could not be saved.", status: false });
     }
   };
 
   return (
-    <section className="page flex items-center justify-center px-4 py-12 sm:px-6">
-      <div className="card w-full max-w-3xl p-6 md:p-8">
-        <header className="mb-8 text-center">
-          <span className="eyebrow">
-            <FaBullhorn />
-            Report a find
-          </span>
-          <h1 className="mt-3 text-2xl font-bold text-ink md:text-3xl">
-            Report Found Item
-          </h1>
-          <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-ink-dim md:text-base">
-            Found something? Let the community know so it can find its way home.
-          </p>
-        </header>
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-2">
-            <div>
-              <label htmlFor="foundItemName" className="field-label">
-                Found item name
-              </label>
-              <input
-                id="foundItemName"
-                {...register("foundItemName", {
-                  required: "Found item name is required",
-                })}
-                type="text"
-                className="field"
-                placeholder="Laptop/Phone"
-              />
-              {errors.foundItemName && (
-                <p className="field-error">
-                  {errors.foundItemName?.message as string}
-                </p>
-              )}
-            </div>
-            <div>
-              <label htmlFor="description" className="field-label">
-                Description
-              </label>
-              <input
-                id="description"
-                type="text"
-                className="field"
-                placeholder="What does it look like, color, brand"
-                {...register("description", {
-                  required: "Description is required",
-                })}
-              />
-              {errors.description && (
-                <p className="field-error">
-                  {errors.description?.message as string}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="image" className="field-label">
-                Item image
-              </label>
-              <input
-                id="image"
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                className="field"
-                {...register("image", {
-                  required: "Please select an item image",
-                  validate: {
-                    oneFile: (files) =>
-                      files?.length === 1 || "Select one image",
-                    size: (files) =>
-                      !files?.[0] ||
-                      files[0].size <= 5 * 1024 * 1024 ||
-                      "Image must be 5 MB or smaller",
-                    type: (files) =>
-                      !files?.[0] ||
-                      ["image/jpeg", "image/png", "image/webp"].includes(files[0].type) ||
-                      "Use a JPEG, PNG, or WebP image",
-                  },
-                })}
-              />
-              {errors.image && (
-                <p className="field-error">
-                  {errors.image.message as string}
-                </p>
-              )}
-            </div>
-            <div>
-              <label htmlFor="location" className="field-label">
-                Location
-              </label>
-              <input
-                id="location"
-                type="text"
-                className="field"
-                placeholder="City, Country"
-                {...register("location", {
-                  required: "Location is required",
-                })}
-              />
-              {errors.location && (
-                <p className="field-error">
-                  {errors.location?.message as string}
-                </p>
-              )}
-            </div>
-            <div>
-              <label htmlFor="claimProcess" className="field-label">
-                Claim Process
-              </label>
-              <input
-                id="claimProcess"
-                type="text"
-                className="field"
-                placeholder="How should someone claim this item?"
-                {...register("claimProcess", {
-                  required: "Claim process is required",
-                })}
-              />
-              {errors.claimProcess && (
-                <p className="field-error">
-                  {errors.claimProcess?.message as string}
-                </p>
-              )}
-            </div>
-            <div>
-              <label htmlFor="foundDate" className="field-label">
-                Date
-              </label>
-              <DatePicker
-                wrapperClassName="w-full"
-                className="field"
-                selected={startDate}
-                onChange={(date) => {
-                  if (date) setStartDate(date);
-                }}
-                dateFormat="yyyy-MM-dd"
-                placeholderText="Select date"
-                showYearDropdown
-                showMonthDropdown
-                dropdownMode="select"
-                maxDate={new Date()}
-              />
-            </div>
-
-            <div>
-              <label htmlFor="category" className="field-label">
-                Category
-              </label>
-              <div className="relative">
-                <select
-                  id="category"
-                  className="field cursor-pointer appearance-none pr-10"
-                  value={categoryId}
-                  onChange={(e) => setCategoryId(e.target.value)}
-                >
-                  <option value="" disabled className="bg-surface-2 text-ink-mute">
-                    Select a category
-                  </option>
-                  {Category?.data?.map((category: ItemCategory) => (
-                    <option
-                      key={category?.id}
-                      value={category?.id}
-                      className="bg-surface-2 text-ink"
-                    >
-                      {category?.name}
-                    </option>
-                  ))}
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-ink-mute">
-                  <IoIosArrowDown className="h-4 w-4" />
-                </div>
-              </div>
-              {submitted && !categoryId && (
-                <p className="field-error">Category is required</p>
-              )}
-            </div>
+    <main className="page px-4 py-10 sm:px-6 lg:py-14">
+      <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <section className="card overflow-hidden">
+          <div className="border-b border-line bg-gradient-to-r from-emerald-500/[0.10] to-accent/[0.08] px-6 py-7 sm:px-9">
+            <button type="button" onClick={() => navigate(-1)} className="mb-5 inline-flex items-center gap-2 text-sm text-ink-dim hover:text-ink"><FaArrowLeft /> Back</button>
+            <span className="eyebrow"><FaHandHoldingHeart /> Found item report</span>
+            <h1 className="mt-3 text-3xl font-extrabold text-ink sm:text-4xl">You could make someone's day.</h1>
+            <p className="mt-3 max-w-xl text-sm leading-6 text-ink-dim sm:text-base">Tell us what you found. We'll compare it with active lost-item reports and help the right person verify it.</p>
           </div>
-
-          {isLoading ? (
-            <div className="flex justify-center">
-              <Spinner size="lg" className="text-accent" />
+          <form onSubmit={onSubmit} className="space-y-6 p-6 sm:p-9">
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div><label className="field-label" htmlFor="foundItemName">What did you find?</label><input className="field" id="foundItemName" name="foundItemName" placeholder="e.g. Blue backpack" required maxLength={120}/></div>
+              <div><label className="field-label" htmlFor="category">Category</label><select className="field" id="category" value={categoryId} onChange={(e)=>setCategoryId(e.target.value)} required disabled={categoriesLoading}><option value="">{categoriesLoading ? "Loading categories…" : "Choose a category"}</option>{categories.map((category: ItemCategory)=><option key={category.id} value={category.id}>{category.name}</option>)}</select></div>
+              <div className="sm:col-span-2"><label className="field-label" htmlFor="description">Describe the item</label><textarea className="field min-h-28 resize-y" id="description" name="description" placeholder="Color, brand, condition, distinctive details…" required maxLength={3000}/></div>
+              <div><label className="field-label" htmlFor="location">Where did you find it?</label><input className="field" id="location" name="location" placeholder="Building, area, city…" required maxLength={300}/></div>
+              <div><label className="field-label" htmlFor="date">Date found</label><input className="field" id="date" name="date" type="date" max={new Date().toISOString().slice(0,10)} defaultValue={new Date().toISOString().slice(0,10)} required/></div>
+              <div><label className="field-label" htmlFor="contactName">Finder name</label><input className="field" id="contactName" name="contactName" placeholder="Your name" required maxLength={100}/></div>
+              <div><label className="field-label" htmlFor="contactPhone">Finder phone</label><input className="field" id="contactPhone" name="contactPhone" type="tel" placeholder="+91 98XXXXXX10" required pattern="[+0-9 ()-]{7,20}"/></div>
+              <div className="sm:col-span-2"><label className="field-label" htmlFor="claimProcess">Safe collection instructions</label><textarea className="field min-h-20 resize-y" id="claimProcess" name="claimProcess" placeholder="e.g. Item is secured with campus security at the main reception." required maxLength={1000}/></div>
             </div>
-          ) : (
-            <button type="submit" className="btn btn-brand w-full sm:w-auto">
-              Submit Found Item
-            </button>
-          )}
-        </form>
+            <div><label className="field-label">Item photograph</label><label className="group flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-line-strong bg-surface-2/70 px-5 py-7 text-center transition hover:border-accent/60 hover:bg-accent/[0.04]">{preview ? <img src={preview} alt="Selected item preview" className="mb-4 max-h-56 max-w-full rounded-xl object-contain"/> : <FaCloudUploadAlt className="mb-3 text-3xl text-accent"/>}<span className="text-sm font-semibold text-ink">{image ? image.name : "Choose an item photo"}</span><span className="mt-1 text-xs text-ink-mute">JPEG, PNG or WebP · up to 5 MB</span><input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(e)=>setImage(e.target.files?.[0] || null)}/></label></div>
+            {isLoading && <div className="rounded-xl border border-line bg-surface-2 p-4"><div className="mb-2 flex items-center gap-2 text-sm font-semibold text-ink"><FaRobot className="text-accent"/> Findora is processing your report</div><div className="flex flex-wrap gap-2 text-xs text-ink-dim"><span className="badge badge-ok">Image validated</span><span className="badge badge-accent">Uploading and saving</span><span className="badge badge-neutral">Ranking potential matches</span></div></div>}
+            {savedMatches !== null && <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/[0.05] p-4 text-sm text-emerald-300"><FaRobot className="mr-2 inline"/> Report saved. {savedMatches} potential lost-item candidate{savedMatches===1?"":"s"} ranked. Ownership still requires verification.</div>}
+            <button className="btn btn-brand btn-lg w-full" type="submit" disabled={isLoading}>{isLoading ? "Uploading & matching…" : "Submit found-item report"}</button>
+            <p className="text-center text-xs text-ink-mute">Your contact information is kept out of public item listings.</p>
+          </form>
+        </section>
+        <aside className="space-y-4 lg:pt-2">
+          <div className="card p-6"><span className="eyebrow">Help it get home</span><h2 className="mt-3 text-xl font-bold text-ink">A few details make a big difference.</h2><p className="mt-3 text-sm leading-6 text-ink-dim">A clear photo, accurate location and useful description help our matching engine identify the most relevant lost reports.</p></div>
+          <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.05] p-5"><div className="flex items-center gap-2 text-emerald-300"><FaShieldAlt/><span className="text-sm font-semibold">Safe handover</span></div><p className="mt-2 text-sm leading-6 text-ink-dim">Do not publish private details or hand over an item based only on an AI score. Use the platform's ownership verification and receipt confirmation flow.</p></div>
+        </aside>
       </div>
-    </section>
+    </main>
   );
-};
-export default ReportFoundItem;
+}

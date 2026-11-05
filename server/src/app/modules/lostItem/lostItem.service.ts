@@ -1,11 +1,13 @@
+import bcrypt from "bcrypt";
+import { hashPhone } from "../../utils/phoneHash";
 import { LostItem } from "@prisma/client";
 import { JwtPayload } from "jsonwebtoken";
 import prisma from "../../config/prisma";
 
-const toggleFoundStatus = async (id: string) => {
+const toggleFoundStatus = async (id: string, userId: string) => {
   // First get the current item to check its status
   const currentItem = await prisma.lostItem.findUnique({
-    where: { id },
+    where: { id, userId, isDeleted: false },
     select: { isFound: true },
   });
 
@@ -17,6 +19,7 @@ const toggleFoundStatus = async (id: string) => {
   const result = await prisma.lostItem.update({
     where: {
       id,
+      userId,
     },
     data: {
       isFound: !currentItem.isFound,
@@ -36,7 +39,36 @@ const toggleFoundStatus = async (id: string) => {
   return result;
 };
 
-const createLostItem = async (userId: string, item: LostItem) => {
+const createLostItem = async (userId: string, item: any) => {
+  let ownershipSecret: any = undefined;
+  if (item.ownershipQuestions || item.ownershipAnswers) {
+    const questions = typeof item.ownershipQuestions === "string"
+      ? JSON.parse(item.ownershipQuestions)
+      : item.ownershipQuestions;
+    const answers = typeof item.ownershipAnswers === "string"
+      ? JSON.parse(item.ownershipAnswers)
+      : item.ownershipAnswers;
+    if (!Array.isArray(questions) || !Array.isArray(answers) ||
+        questions.length !== 3 || answers.length !== 3 ||
+        questions.some((value: unknown) => typeof value !== "string" || !value.trim()) ||
+        answers.some((value: unknown) => typeof value !== "string" || !value.trim())) {
+      throw new Error("Provide three ownership questions and three answers.");
+    }
+    const hashes = await Promise.all(answers.map((answer: string) =>
+      bcrypt.hash(answer.trim().toLowerCase(), 12)
+    ));
+    ownershipSecret = {
+      create: {
+        question1: questions[0].trim(),
+        question2: questions[1].trim(),
+        question3: questions[2].trim(),
+        answerHash1: hashes[0],
+        answerHash2: hashes[1],
+        answerHash3: hashes[2],
+      },
+    };
+  }
+
   const result = await prisma.lostItem.create({
     data: {
       lostItemName: item.lostItemName,
@@ -45,7 +77,11 @@ const createLostItem = async (userId: string, item: LostItem) => {
       img: item.img,
       location: item.location,
       date: item.date,
+      contactName: item.contactName || "",
+      contactPhone: item.contactPhone || "",
+      contactPhoneHash: hashPhone(item.contactPhone),
       userId,
+      ...(ownershipSecret ? { ownershipSecret } : {}),
     },
     include: {
       user: {
@@ -79,7 +115,7 @@ const getLostItem = async () => {
       category: true,
     },
   });
-  return result;
+  return result.map(({ contactName, contactPhone, contactPhoneHash, ...item }: any) => item);
 };
 
 // get single lost item
@@ -101,7 +137,9 @@ const getSingleLostItem = async (singleId: string) => {
       category: true,
     },
   });
-  return result;
+  if (!result) return result;
+  const { contactName, contactPhone, contactPhoneHash, ...publicItem } = result as any;
+  return publicItem;
 };
 // get my lost item
 const getMyLostItem = async (user: JwtPayload) => {
@@ -170,10 +208,11 @@ const editMyLostItem = async (data: any, user?: JwtPayload) => {
   });
   return result;
 };
-const deleteMyLostItem = async (id: string) => {
+const deleteMyLostItem = async (id: string, userId: string) => {
   const result = await prisma.lostItem.update({
     where: {
       id,
+      userId,
     },
     data: {
       isDeleted: true,

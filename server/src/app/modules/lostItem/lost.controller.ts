@@ -3,11 +3,12 @@ import { Request, Response } from "express";
 import sendResponse from "../../global/response";
 import { StatusCodes } from "http-status-codes";
 import { lostTItemServices } from "./lostItem.service";
+import { matchingService } from "../aiMatches/matching.service";
 
 const toggleFoundStatus = async (req: Request, res: Response) => {
   try {
     const { id } = req.body;
-    const result = await lostTItemServices.toggleFoundStatus(id);
+    const result = await lostTItemServices.toggleFoundStatus(id, req.user.id);
     const message = result.isFound
       ? "Item marked as found successfully"
       : "Item marked as not found successfully";
@@ -35,13 +36,19 @@ const createLostItem = async (req: Request, res: Response) => {
   try {
     const item = req.body;
     const result = await lostTItemServices.createLostItem(req.user.id, item);
+    const matches = await matchingService.forLostItem(result.id).catch((error) => {
+      console.error("Automatic matching after lost report failed:", error);
+      return [];
+    });
     sendResponse(res, {
       statusCode: StatusCodes.CREATED,
       success: true,
       message: "Lost items created successfully",
-      data: result,
+      data: { ...result, matching: { candidatesFound: matches.length } },
     });
   } catch (error: any) {
+    const uploadedPath = (req as any).uploadedImagePath as string | undefined;
+    if (uploadedPath) await fs.promises.unlink(uploadedPath).catch(() => {});
     sendResponse(res, {
       statusCode: StatusCodes.BAD_REQUEST,
       success: false,
@@ -135,7 +142,7 @@ const editMyLostItem = async (req: Request, res: Response) => {
 const deleteMyLostItem = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
-    await lostTItemServices.deleteMyLostItem(id);
+    await lostTItemServices.deleteMyLostItem(id, req.user.id);
     sendResponse(res, {
       statusCode: StatusCodes.OK,
       success: true,

@@ -8,22 +8,23 @@ datasource db {
 }
 
 model User {
-name   String @default("")
-  id        String      @id @default(uuid())
-  username  String      @unique
-  email     String      @unique
-  activated Boolean     @default(true)
-  password  String
-  role      userRole    @default(USER)
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  foundItem FoundItem[]
-  claim     Claim[]
-  userImg   String      @default("")
-  isDeleted Boolean     @default(false)
-  deletedAt DateTime?
+  name          String         @default("")
+  id            String         @id @default(uuid())
+  username      String         @unique
+  email         String         @unique
+  activated     Boolean        @default(true)
+  password      String
+  role          userRole       @default(USER)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  foundItem     FoundItem[]
+  claim         Claim[]
+  userImg       String         @default("")
+  isDeleted     Boolean        @default(false)
+  deletedAt     DateTime?
   // profile   UserProfile?
-  LostItem  LostItem[]
+  LostItem      LostItem[]
+  notifications Notification[]
 
   @@map("users")
 }
@@ -40,43 +41,57 @@ model ItemCategory {
 }
 
 model FoundItem {
-  id            String             @id @default(uuid())
+  id            String        @id @default(uuid())
   userId        String
-  img           String             @default("")
-  user          User               @relation(fields: [userId], references: [id])
+  img           String        @default("")
+  user          User          @relation(fields: [userId], references: [id])
   categoryId    String
   category      ItemCategory? @relation(fields: [categoryId], references: [id])
   foundItemName String
   description   String
   location      String
-  date          DateTime           @default(now())
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
+  date          DateTime      @default(now())
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
   claim         Claim[]
-  claimProcess  String             @default("")
-  isClaimed     Boolean            @default(false)
-  isDeleted     Boolean            @default(false)
+  claimProcess  String        @default("")
+  isClaimed     Boolean       @default(false)
+  isDeleted     Boolean       @default(false)
   deletedAt     DateTime?
+
+  contactName      String           @default("")
+  contactPhone     String           @default("")
+  contactPhoneHash String           @default("")
+  status           RecoveryStatus   @default(FOUND)
+  matches          MatchCandidate[]
+  isSample         Boolean          @default(false)
 
   @@map("foundItems")
 }
 
 model LostItem {
-  id           String             @id @default(uuid())
-  userId       String
-  lostItemName String
-  categoryId   String
-  img          String             @default("")
-  description  String
-  location     String
-  date         DateTime
-  category     ItemCategory? @relation(fields: [categoryId], references: [id])
-  createdAt    DateTime           @default(now())
-  updatedAt    DateTime           @updatedAt
-  isFound      Boolean            @default(false)
-  isDeleted    Boolean            @default(false)
-  deletedAt    DateTime?
-  user         User               @relation(fields: [userId], references: [id])
+  id               String           @id @default(uuid())
+  userId           String
+  lostItemName     String
+  categoryId       String
+  img              String           @default("")
+  description      String
+  location         String
+  date             DateTime
+  category         ItemCategory?    @relation(fields: [categoryId], references: [id])
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  isFound          Boolean          @default(false)
+  isDeleted        Boolean          @default(false)
+  deletedAt        DateTime?
+  contactName      String           @default("")
+  contactPhone     String           @default("")
+  contactPhoneHash String           @default("")
+  status           RecoveryStatus   @default(LOST)
+  user             User             @relation(fields: [userId], references: [id])
+  ownershipSecret  OwnershipSecret?
+  matches          MatchCandidate[]
+  isSample         Boolean          @default(false)
 
   @@map("lostItems")
 }
@@ -85,8 +100,8 @@ model Claim {
   id                     String    @id @default(uuid())
   userId                 String
   foundItemId            String
-  isDeleted    Boolean            @default(false)
-  deletedAt    DateTime?
+  isDeleted              Boolean   @default(false)
+  deletedAt              DateTime?
   status                 status    @default(PENDING)
   distinguishingFeatures String?
   lostDate               DateTime
@@ -98,7 +113,6 @@ model Claim {
   @@map("claims")
 }
 
-
 enum status {
   PENDING
   APPROVED
@@ -108,4 +122,89 @@ enum status {
 enum userRole {
   ADMIN
   USER
+}
+
+enum RecoveryStatus {
+  LOST
+  FOUND
+  POTENTIAL_MATCH
+  VERIFICATION_PENDING
+  MATCHED
+  HANDOVER_PENDING
+  RECEIVED
+}
+
+enum MatchStatus {
+  POTENTIAL_MATCH
+  VERIFICATION_PENDING
+  MATCHED
+  HANDOVER_PENDING
+  RECEIVED
+  REJECTED
+}
+
+model MatchCandidate {
+  id          String      @id @default(uuid())
+  lostItemId  String
+  foundItemId String
+  score       Float
+  confidence  String
+  explanation String
+  status      MatchStatus @default(POTENTIAL_MATCH)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  lostItem    LostItem    @relation(fields: [lostItemId], references: [id], onDelete: Cascade)
+  foundItem   FoundItem   @relation(fields: [foundItemId], references: [id], onDelete: Cascade)
+  handover    Handover?
+
+  @@unique([lostItemId, foundItemId])
+  @@index([lostItemId, score])
+  @@index([foundItemId, score])
+  @@map("matchCandidates")
+}
+
+model OwnershipSecret {
+  id                   String    @id @default(uuid())
+  lostItemId           String    @unique
+  question1            String
+  question2            String
+  question3            String
+  answerHash1          String
+  answerHash2          String
+  answerHash3          String
+  verificationAttempts Int       @default(0)
+  lockedUntil          DateTime?
+  createdAt            DateTime  @default(now())
+  lostItem             LostItem  @relation(fields: [lostItemId], references: [id], onDelete: Cascade)
+
+  @@map("ownershipSecrets")
+}
+
+model Notification {
+  id        String    @id @default(uuid())
+  userId    String
+  title     String
+  message   String
+  type      String    @default("INFO")
+  metadata  Json?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("notifications")
+}
+
+model Handover {
+  id               String         @id @default(uuid())
+  matchCandidateId String         @unique
+  otpHash          String
+  expiresAt        DateTime
+  attempts         Int            @default(0)
+  sentAt           DateTime       @default(now())
+  verifiedAt       DateTime?
+  receivedAt       DateTime?
+  matchCandidate   MatchCandidate @relation(fields: [matchCandidateId], references: [id], onDelete: Cascade)
+
+  @@map("handovers")
 }

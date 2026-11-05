@@ -5,7 +5,7 @@ import { aiSearchService } from "./aiSearch.service";
 
 const aiSearch = async (req: Request, res: Response) => {
   try {
-    const { query } = req.body;
+    const { query, type, location, category, dateFrom, dateTo } = req.body;
 
     if (!query || query.trim() === "") {
       return sendResponse(res, {
@@ -16,7 +16,7 @@ const aiSearch = async (req: Request, res: Response) => {
       });
     }
 
-    const result = await aiSearchService.aiSearchItems(query);
+    const result = await aiSearchService.aiSearchItems(query, { type, location, category, dateFrom, dateTo });
 
     sendResponse(res, {
       statusCode: StatusCodes.OK,

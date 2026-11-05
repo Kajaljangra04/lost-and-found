@@ -68,7 +68,10 @@ async function generateText(prompt: string, budgetMs = 8000): Promise<string> {
   throw lastError;
 }
 
-const aiSearchItems = async (searchQuery: string) => {
+const aiSearchItems = async (
+  searchQuery: string,
+  filters: { type?: "ALL" | "LOST" | "FOUND"; location?: string; category?: string; dateFrom?: string; dateTo?: string } = {},
+) => {
   console.log("User search:", searchQuery);
   try {
     // Fetch found items
@@ -76,7 +79,7 @@ const aiSearchItems = async (searchQuery: string) => {
       where: { isDeleted: false, isClaimed: false },
       include: {
         category: true,
-        user: { select: { id: true, username: true, email: true } },
+        user: { select: { id: true, username: true } },
       },
     });
 
@@ -85,12 +88,25 @@ const aiSearchItems = async (searchQuery: string) => {
       where: { isDeleted: false, isFound: false },
       include: {
         category: true,
-        user: { select: { id: true, username: true, email: true } },
+        user: { select: { id: true, username: true } },
       },
     });
 
+    const matchesFilters = (item: any) => {
+      const locationOk = !filters.location ||
+        (item.location || "").toLowerCase().includes(filters.location.toLowerCase());
+      const categoryOk = !filters.category ||
+        (item.category?.name || "").toLowerCase() === filters.category.toLowerCase();
+      const itemDate = new Date(item.date).getTime();
+      const fromOk = !filters.dateFrom || itemDate >= new Date(filters.dateFrom).getTime();
+      const toOk = !filters.dateTo || itemDate <= new Date(`${filters.dateTo}T23:59:59`).getTime();
+      return locationOk && categoryOk && fromOk && toOk;
+    };
+    const visibleFoundItems = filters.type === "LOST" ? [] : foundItems.filter(matchesFilters);
+    const visibleLostItems = filters.type === "FOUND" ? [] : lostItems.filter(matchesFilters);
+
     // Simplify data
-    const foundItemsData = foundItems.map((item) => ({
+    const foundItemsData = visibleFoundItems.map((item) => ({
       id: item.id,
       name: item.foundItemName,
       description: item.description,
@@ -99,7 +115,7 @@ const aiSearchItems = async (searchQuery: string) => {
       date: item.date,
     }));
 
-    const lostItemsData = lostItems.map((item) => ({
+    const lostItemsData = visibleLostItems.map((item) => ({
       id: item.id,
       name: item.lostItemName,
       description: item.description,
@@ -146,20 +162,19 @@ const aiSearchItems = async (searchQuery: string) => {
       aiResult = JSON.parse(aiResponse);
     } catch (error) {
       console.error("Error parsing AI response:", error, aiResponse);
-      return performSimpleSearch(searchQuery, foundItems, lostItems);
+      return performSimpleSearch(searchQuery, visibleFoundItems, visibleLostItems, filters);
     }
 
-    // Filter matched items
-    const matchedFoundItems = foundItems.filter((item) =>
-      aiResult.matches.foundItems.includes(item.id)
-    );
-    const matchedLostItems = lostItems.filter((item) =>
-      aiResult.matches.lostItems.includes(item.id)
-    );
+    // Treat model output as untrusted data. Invalid JSON shapes fall back to
+    // deterministic search instead of causing a 500 response.
+    const foundIds = Array.isArray(aiResult?.matches?.foundItems) ? aiResult.matches.foundItems : [];
+    const lostIds = Array.isArray(aiResult?.matches?.lostItems) ? aiResult.matches.lostItems : [];
+    const matchedFoundItems = visibleFoundItems.filter((item) => foundIds.includes(item.id));
+    const matchedLostItems = visibleLostItems.filter((item) => lostIds.includes(item.id));
 
     return {
-      foundItems: matchedFoundItems,
-      lostItems: matchedLostItems,
+      foundItems: matchedFoundItems.map(({ contactName, contactPhone, contactPhoneHash, ...item }: any) => item),
+      lostItems: matchedLostItems.map(({ contactName, contactPhone, contactPhoneHash, ...item }: any) => item),
       reasoning: aiResult.reasoning,
       totalFound: matchedFoundItems.length,
       totalLost: matchedLostItems.length,
@@ -171,7 +186,7 @@ const aiSearchItems = async (searchQuery: string) => {
       where: { isDeleted: false, isClaimed: false },
       include: {
         category: true,
-        user: { select: { id: true, username: true, email: true } },
+        user: { select: { id: true, username: true } },
       },
     });
 
@@ -179,11 +194,11 @@ const aiSearchItems = async (searchQuery: string) => {
       where: { isDeleted: false, isFound: false },
       include: {
         category: true,
-        user: { select: { id: true, username: true, email: true } },
+        user: { select: { id: true, username: true } },
       },
     });
 
-    return performSimpleSearch(searchQuery, foundItems, lostItems);
+    return performSimpleSearch(searchQuery, foundItems, lostItems, filters);
   }
 };
 
@@ -191,8 +206,21 @@ const aiSearchItems = async (searchQuery: string) => {
 const performSimpleSearch = (
   searchQuery: string,
   foundItems: any[],
-  lostItems: any[]
+  lostItems: any[],
+  filters: { type?: "ALL" | "LOST" | "FOUND"; location?: string; category?: string; dateFrom?: string; dateTo?: string } = {},
 ) => {
+  const matchesFilters = (item: any) => {
+    const locationOk = !filters.location ||
+      (item.location || "").toLowerCase().includes(filters.location.toLowerCase());
+    const categoryOk = !filters.category ||
+      (item.category?.name || "").toLowerCase() === filters.category.toLowerCase();
+    const itemDate = new Date(item.date).getTime();
+    const fromOk = !filters.dateFrom || itemDate >= new Date(filters.dateFrom).getTime();
+    const toOk = !filters.dateTo || itemDate <= new Date(`${filters.dateTo}T23:59:59`).getTime();
+    return locationOk && categoryOk && fromOk && toOk;
+  };
+  foundItems = filters.type === "LOST" ? [] : foundItems.filter(matchesFilters);
+  lostItems = filters.type === "FOUND" ? [] : lostItems.filter(matchesFilters);
   const query = searchQuery.toLowerCase();
   // Split into meaningful keywords so partial queries still match
   const keywords = query
@@ -238,8 +266,8 @@ const performSimpleSearch = (
     .map((entry) => entry.item);
 
   return {
-    foundItems: matchedFoundItems,
-    lostItems: matchedLostItems,
+    foundItems: matchedFoundItems.map(({ contactName, contactPhone, contactPhoneHash, ...item }: any) => item),
+    lostItems: matchedLostItems.map(({ contactName, contactPhone, contactPhoneHash, ...item }: any) => item),
     reasoning: "Simple text-based search results",
     totalFound: matchedFoundItems.length,
     totalLost: matchedLostItems.length,

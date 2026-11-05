@@ -2,6 +2,7 @@ import { FoundItem, Prisma } from "@prisma/client";
 import { TFilter } from "../../global/interface";
 import { JwtPayload } from "jsonwebtoken";
 import prisma from "../../config/prisma";
+import { hashPhone } from "../../utils/phoneHash";
 const createFoundItem = async (data: FoundItem, userId: string) => {
   const result = await prisma.foundItem.create({
     data: {
@@ -13,6 +14,9 @@ const createFoundItem = async (data: FoundItem, userId: string) => {
       foundItemName: data.foundItemName,
       location: data.location,
       userId,
+      contactName: (data as any).contactName || "",
+      contactPhone: (data as any).contactPhone || "",
+      contactPhoneHash: hashPhone((data as any).contactPhone),
     },
     include: {
       user: {
@@ -71,14 +75,13 @@ const getFoundItem = async (data: TFilter) => {
         select: {
           id: true,
           username: true,
-          email: true,
         },
       },
       category: true,
     },
   });
 
-  return result;
+  return result.map(({ contactName, contactPhone, contactPhoneHash, ...item }: any) => item);
 };
 const getSingleFoundItem = async (id: string) => {
   const result = await prisma.foundItem.findFirst({
@@ -90,7 +93,6 @@ const getSingleFoundItem = async (id: string) => {
       user: {
         select: {
           id: true,
-          email: true,
           username: true,
           role: true,
         },
@@ -98,7 +100,9 @@ const getSingleFoundItem = async (id: string) => {
       category: true,
     },
   });
-  return result;
+  if (!result) return result;
+  const { contactName, contactPhone, contactPhoneHash, ...publicItem } = result as any;
+  return publicItem;
 };
 
 // get my lost item
@@ -123,7 +127,7 @@ const getMyFoundItem = async (user: JwtPayload) => {
   return result;
 };
 
-const editMyFoundItem = async (data: any) => {
+const editMyFoundItem = async (data: any, userId: string) => {
   const updateData: any = {};
   if (data?.foundItemName) {
     updateData.foundItemName = data?.foundItemName;
@@ -140,16 +144,18 @@ const editMyFoundItem = async (data: any) => {
   const result = await prisma.foundItem.update({
     where: {
       id: data.id,
+      userId,
     },
     data: updateData,
   });
   return result;
 };
-const deleteMyFoundItem = async (id: string) => {
+const deleteMyFoundItem = async (id: string, userId: string) => {
   // Soft delete
   const result = await prisma.foundItem.update({
     where: {
       id,
+      userId,
     },
     data: {
       isDeleted: true,

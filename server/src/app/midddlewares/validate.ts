@@ -1,3 +1,4 @@
+import fs from "fs";
 import { NextFunction, Request, Response } from "express";
 import { AnyZodObject } from "zod";
 
@@ -10,6 +11,8 @@ const validateRequest =
       });
       return next();
     } catch (err) {
+      const uploadedPath = (req as any).uploadedImagePath as string | undefined;
+      if (uploadedPath) await fs.promises.unlink(uploadedPath).catch(() => {});
       next(err);
     }
   };

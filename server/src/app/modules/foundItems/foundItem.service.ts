@@ -2,13 +2,14 @@ import { FoundItem, Prisma } from "@prisma/client";
 import { TFilter } from "../../global/interface";
 import { JwtPayload } from "jsonwebtoken";
 import prisma from "../../config/prisma";
+import { normalizeDate } from "../../utils/normalizeDate";
 import { hashPhone } from "../../utils/phoneHash";
 const createFoundItem = async (data: FoundItem, userId: string) => {
   const result = await prisma.foundItem.create({
     data: {
       categoryId: data.categoryId,
       description: data.description,
-      date: data.date,
+      date: normalizeDate(data.date),
       claimProcess: data.claimProcess,
       img: data.img,
       foundItemName: data.foundItemName,

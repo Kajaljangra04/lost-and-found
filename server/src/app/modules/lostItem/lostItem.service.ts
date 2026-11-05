@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import { hashPhone } from "../../utils/phoneHash";
+import { normalizeDate } from "../../utils/normalizeDate";
 import { LostItem } from "@prisma/client";
 import { JwtPayload } from "jsonwebtoken";
 import prisma from "../../config/prisma";
@@ -76,7 +77,7 @@ const createLostItem = async (userId: string, item: any) => {
       categoryId: item.categoryId,
       img: item.img,
       location: item.location,
-      date: item.date,
+      date: normalizeDate(item.date),
       contactName: item.contactName || "",
       contactPhone: item.contactPhone || "",
       contactPhoneHash: hashPhone(item.contactPhone),

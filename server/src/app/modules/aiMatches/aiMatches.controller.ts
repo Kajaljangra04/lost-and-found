@@ -76,6 +76,100 @@ const aiMatchesForFound = async (req: Request, res: Response) => {
   }
 };
 
+const getMyMatches = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user.id;
+
+    const candidates = await prisma.matchCandidate.findMany({
+      where: {
+        OR: [
+          {
+            lostItem: { is: { userId, isDeleted: false } },
+            foundItem: { is: { isDeleted: false } },
+          },
+          {
+            foundItem: { is: { userId, isDeleted: false } },
+            lostItem: { is: { isDeleted: false } },
+          },
+        ],
+      },
+      include: {
+        lostItem: {
+          select: {
+            id: true,
+            userId: true,
+            lostItemName: true,
+            description: true,
+            img: true,
+            location: true,
+            date: true,
+            status: true,
+            category: { select: { name: true } },
+          },
+        },
+        foundItem: {
+          select: {
+            id: true,
+            userId: true,
+            foundItemName: true,
+            description: true,
+            img: true,
+            location: true,
+            date: true,
+            status: true,
+            category: { select: { name: true } },
+          },
+        },
+      },
+      orderBy: [
+        { score: "desc" },
+        { updatedAt: "desc" },
+      ],
+      take: 100,
+    });
+
+    const safeCandidates = candidates.map(({ lostItem, foundItem, ...match }) => {
+      const { userId: lostOwnerId, ...safeLostItem } = lostItem;
+      const { userId: foundOwnerId, ...safeFoundItem } = foundItem;
+
+      return {
+        ...match,
+        lostItem: {
+          ...safeLostItem,
+          isMine: lostOwnerId === userId,
+        },
+        foundItem: {
+          ...safeFoundItem,
+          isMine: foundOwnerId === userId,
+        },
+      };
+    });
+
+    const counts = {
+      total: safeCandidates.length,
+      pending: safeCandidates.filter((m) =>
+        ["POTENTIAL_MATCH", "VERIFICATION_PENDING"].includes(m.status)
+      ).length,
+      verified: safeCandidates.filter((m) =>
+        ["MATCHED", "HANDOVER_PENDING"].includes(m.status)
+      ).length,
+      received: safeCandidates.filter((m) => m.status === "RECEIVED").length,
+    };
+
+    return res.json({
+      success: true,
+      data: { candidates: safeCandidates, counts },
+      disclaimer: "Similarity scores are ranking signals, not proof of ownership.",
+    });
+  } catch (error) {
+    console.error("Could not load account matches:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Could not load your matches.",
+    });
+  }
+};
+
 const getChallenge = async (req: Request, res: Response) => {
   const candidate = await prisma.matchCandidate.findUnique({
     where: { id: req.params.matchId },
@@ -294,4 +388,4 @@ const confirmHandover = async (req: Request, res: Response) => {
   }
 };
 
-export const aiMatchesController = { aiMatches, aiMatchesForFound, getChallenge, verifyOwnership, startHandover, confirmHandover };
+export const aiMatchesController = { aiMatches, aiMatchesForFound, getMyMatches, getChallenge, verifyOwnership, startHandover, confirmHandover };

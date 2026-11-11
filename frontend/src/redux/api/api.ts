@@ -403,6 +403,11 @@ const api = baseApi.injectEndpoints({
       providesTags: ["recoveredItems"],
     }),
 
+    getMyMatches: builder.query({
+      query: () => ({ url: "/ai-matches", method: "GET" }),
+      providesTags: ["matches"],
+    }),
+
     getAiMatchesForFound: builder.query({
       query: (id: string) => ({ url: `/ai-matches/found/${id}`, method: "GET" }),
       providesTags: ["matches"],
@@ -508,6 +513,7 @@ export const {
   useBulkImportCsvMutation,
   useGetNotificationsQuery,
   useMarkNotificationReadMutation,
+  useGetMyMatchesQuery,
   useLazyGetAiMatchesForFoundQuery,
   useLazyGetAiMatchesForLostQuery,
   useLazyGetOwnershipChallengeQuery,

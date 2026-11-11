@@ -191,6 +191,7 @@ router.get("/recent-activity", auth(), adminAuth, recentActivity);
 
 
 // AI-ranked candidates; this endpoint does not approve or claim items.
+router.get("/ai-matches", auth(), aiMatchesController.getMyMatches);
 router.get("/ai-matches/lost/:id", auth(), aiMatchesController.aiMatches);
 router.get("/ai-matches/found/:id", auth(), aiMatchesController.aiMatchesForFound);
 router.get("/ai-matches/:matchId/challenge", auth(), aiMatchesController.getChallenge);

@@ -46,18 +46,18 @@ const newPasswords = async (req: Request, res: Response) => {
 
 const changeEmail = async (req: Request, res: Response) => {
   try {
-    const email:string = req.body;
-    // console.log(email)
+    const { email } = req.body;
     const result = await authServices.changeEmail(email, req.user);
+
     sendResponse(res, {
-        statusCode: StatusCodes.OK,
-        success: true,
-        message: 'Email changed successfully',
-        data: result,
-      });
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "Email updated successfully",
+      data: result,
+    });
   } catch (error: any) {
     sendResponse(res, {
-      statusCode: StatusCodes.BAD_REQUEST,
+      statusCode: error?.statusCode || StatusCodes.BAD_REQUEST,
       success: false,
       message: error?.message,
       data: null,

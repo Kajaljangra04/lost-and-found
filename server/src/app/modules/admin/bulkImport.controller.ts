@@ -90,10 +90,17 @@ export const bulkImport = async (req: Request, res: Response) => {
       }
     }
 
-    if (lostIds.length) {
-      for (const id of lostIds) await matchingService.forLostItem(id, false).catch((error) => console.error("Bulk lost match failed:", error));
-    } else {
-      for (const id of foundIds) await matchingService.forFoundItem(id, false).catch((error) => console.error("Bulk found match failed:", error));
+    // Process matching independently for both LOST and FOUND records.
+    for (const id of lostIds) {
+      await matchingService.forLostItem(id, false).catch((error) =>
+        console.error("Bulk lost match failed:", error)
+      );
+    }
+
+    for (const id of foundIds) {
+      await matchingService.forFoundItem(id, false).catch((error) =>
+        console.error("Bulk found match failed:", error)
+      );
     }
     return res.json({
       success: true,

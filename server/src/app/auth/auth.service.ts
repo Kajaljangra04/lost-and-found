@@ -1,3 +1,4 @@
+import { emailVerificationService } from "../modules/user/emailVerification.service";
 import { utils } from "../utils/utils";
 import AppError from "../global/error";
 import { StatusCodes } from "http-status-codes";
@@ -85,26 +86,67 @@ const newPasswords = async (data: any, user: JwtPayload) => {
   });
 };
 
-const changeEmail = async (email: any, user: JwtPayload) => {
-  // console.log(email);
-  const existedUser: any = await prisma.user.findFirst({
-    where: email,
-  });
-  // console.log(user);
+const changeEmail = async (email: string, user: JwtPayload) => {
+  const normalizedEmail = email?.trim().toLowerCase();
 
-  // console.log(existedUser);
-  if (existedUser) {
+  if (!normalizedEmail) {
+    throw new AppError(StatusCodes.BAD_REQUEST, "Email is required.");
+  }
+
+  const currentUser = await prisma.user.findUnique({
+    where: { id: user.id },
+  });
+
+  if (!currentUser || currentUser.isDeleted) {
+    throw new AppError(StatusCodes.NOT_FOUND, "User not found.");
+  }
+
+  const existingUser = await prisma.user.findUnique({
+    where: { email: normalizedEmail },
+  });
+
+  if (existingUser && existingUser.id !== currentUser.id) {
     throw new AppError(
       StatusCodes.CONFLICT,
-      "Email already exists. Try new one!"
+      "Email already exists. Try another email."
     );
   }
+
+  if (currentUser.email === normalizedEmail && currentUser.emailVerified) {
+    throw new AppError(
+      StatusCodes.BAD_REQUEST,
+      "This email is already verified."
+    );
+  }
+
   await prisma.user.update({
-    where: {
-      username: user?.username,
+    where: { id: currentUser.id },
+    data: {
+      email: normalizedEmail,
+      emailVerified: false,
     },
-    data: email,
   });
+
+  try {
+    await emailVerificationService.issueEmailVerificationOtp(currentUser.id);
+  } catch (error) {
+    // Restore the original account email if OTP delivery or issuance fails.
+    await prisma.user.update({
+      where: { id: currentUser.id },
+      data: {
+        email: currentUser.email,
+        emailVerified: currentUser.emailVerified,
+      },
+    });
+
+    throw error;
+  }
+
+  return {
+    email: normalizedEmail,
+    emailVerified: false,
+    message: "Email updated. Please verify your new email address.",
+  };
 };
 
 const changeUsername = async (username: object, user: JwtPayload) => {

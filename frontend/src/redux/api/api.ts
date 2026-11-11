@@ -26,6 +26,22 @@ const api = baseApi.injectEndpoints({
       },
     }),
 
+    verifyEmail: builder.mutation({
+      query: (data: { email: string; otp: string }) => ({
+        url: "/verify-email",
+        method: "POST",
+        body: data,
+      }),
+    }),
+
+    resendVerification: builder.mutation({
+      query: (data: { email: string }) => ({
+        url: "/resend-verification",
+        method: "POST",
+        body: data,
+      }),
+    }),
+
     // item category
     category: builder.query({
       query: () => {
@@ -473,6 +489,8 @@ export const {
   useGetLostItemsQuery,
   useLoginMutation,
   useRegistersMutation,
+  useVerifyEmailMutation,
+  useResendVerificationMutation,
   useCategoryQuery,
   useCreateCategoryMutation,
   useUpdateCategoryMutation,

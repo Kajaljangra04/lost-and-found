@@ -23,13 +23,38 @@ import { recentActivity } from "../utils/recentActivity";
 import prisma from "../config/prisma";
 import { uploadCsv } from "../midddlewares/csvUpload";
 import { bulkImport } from "../modules/admin/bulkImport.controller";
+import {
+  registerLimiter,
+  loginLimiter,
+  verifyEmailLimiter,
+  resendVerificationLimiter,
+  startHandoverLimiter,
+  confirmHandoverLimiter,
+} from "../midddlewares/rateLimiters";
 
 const router = express.Router();
 ////////////////////////////////////////////////// user //////////////////////////////////////////////
 // user registraion
 router.post(
   "/register",
+  registerLimiter,
+  validateRequest(UserSchema.userRegisterSchema),
   userController.registerUser
+);
+
+// Email verification
+router.post(
+  "/verify-email",
+  verifyEmailLimiter,
+  validateRequest(UserSchema.verifyEmailSchema),
+  userController.verifyEmail
+);
+
+router.post(
+  "/resend-verification",
+  resendVerificationLimiter,
+  validateRequest(UserSchema.resendVerificationSchema),
+  userController.resendVerification
 );
 
 //get users
@@ -43,6 +68,7 @@ router.get(
 // user login
 router.post(
   "/login",
+  loginLimiter,
   validateRequest(UserSchema.userLoginSchema),
   authController.login
 );
@@ -196,8 +222,8 @@ router.get("/ai-matches/lost/:id", auth(), aiMatchesController.aiMatches);
 router.get("/ai-matches/found/:id", auth(), aiMatchesController.aiMatchesForFound);
 router.get("/ai-matches/:matchId/challenge", auth(), aiMatchesController.getChallenge);
 router.post("/ai-matches/:matchId/verify", auth(), aiMatchesController.verifyOwnership);
-router.post("/ai-matches/:matchId/handover", auth(), aiMatchesController.startHandover);
-router.post("/ai-matches/:matchId/received", auth(), aiMatchesController.confirmHandover);
+router.post("/ai-matches/:matchId/handover", startHandoverLimiter, auth(), aiMatchesController.startHandover);
+router.post("/ai-matches/:matchId/received", confirmHandoverLimiter, auth(), aiMatchesController.confirmHandover);
 
 // Admin-only CSV bulk import (XLSX requires an additional parser dependency).
 router.post("/admin/bulk-import", auth(), adminAuth, uploadCsv, bulkImport);

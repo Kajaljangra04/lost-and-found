@@ -5,7 +5,8 @@ import { JwtPayload } from "jsonwebtoken";
 import prisma from "../config/prisma";
 
 const loginUser = async (data: any) => {
-  const { password, username: userNameEmail } = data;
+  const { password, username: loginUsername, email: loginEmail } = data;
+  const userNameEmail = loginUsername?.trim() || loginEmail?.trim().toLowerCase();
   const user = await prisma.user.findFirst({
     where: {
       OR: [
@@ -29,6 +30,13 @@ const loginUser = async (data: any) => {
 
   if (!(await utils.comparePasswords(password, user.password))) {
     throw new AppError(StatusCodes.UNAUTHORIZED, "Invalid credentials");
+  }
+
+  if (!user.emailVerified) {
+    throw new AppError(
+      StatusCodes.FORBIDDEN,
+      "Please verify your email before logging in."
+    );
   }
 
   if (!user.activated || user.isDeleted) {

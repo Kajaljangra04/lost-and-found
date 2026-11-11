@@ -1,15 +1,15 @@
 import { status } from "../../global/globalValues";
-import { INVALID, z } from "zod";
+import { z } from "zod";
 const createClaim = z.object({
   body: z.object({
     foundItemId: z.string({
-      required_error: "Claim item id field is required",
+      error: (issue) => issue.input === undefined ? "Claim item id field is required" : undefined,
     }),
     distinguishingFeatures: z.string({
-      required_error: "Distinguishing features of claim item field is required",
+      error: (issue) => issue.input === undefined ? "Distinguishing features of claim item field is required" : undefined,
     }),
     lostDate: z.string({
-      required_error: "Lost date of claim item field is required",
+      error: (issue) => issue.input === undefined ? "Lost date of claim item field is required" : undefined,
     }),
   }),
 });

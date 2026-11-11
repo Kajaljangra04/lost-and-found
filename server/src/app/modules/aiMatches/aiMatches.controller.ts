@@ -3,6 +3,7 @@ import { randomInt } from "crypto";
 import { Request, Response } from "express";
 import prisma from "../../config/prisma";
 import { matchingService } from "./matching.service";
+import { deliverOtp } from "../../utils/otpDelivery";
 
 const aiMatches = async (req: Request, res: Response) => {
   try {
@@ -285,11 +286,6 @@ const verifyOwnership = async (req: Request, res: Response) => {
 
 const startHandover = async (req: Request, res: Response) => {
   try {
-    const apiKey = process.env.RESEND_API_KEY;
-    const from = process.env.EMAIL_FROM;
-    if (!apiKey || !from) {
-      return res.status(503).json({ success: false, message: "Handover email is not configured. Set RESEND_API_KEY and EMAIL_FROM." });
-    }
     const candidate = await prisma.matchCandidate.findUnique({
       where: { id: req.params.matchId },
       include: {
@@ -308,21 +304,12 @@ const startHandover = async (req: Request, res: Response) => {
     const otp = String(randomInt(100000, 1000000));
     const otpHash = await bcrypt.hash(otp, 12);
     const expiry = new Date(Date.now() + 10 * 60 * 1000);
-    const mail = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        from,
-        to: [candidate.lostItem.user.email],
-        subject: "Findora handover verification code",
-        html: `<p>Your Findora handover code is <strong>${otp}</strong>.</p><p>Share it with the finder only when you are physically receiving your item. It expires in 10 minutes.</p>`,
-      }),
-      signal: AbortSignal.timeout(10000),
+    const deliveryMode = await deliverOtp({
+      to: candidate.lostItem.user.email,
+      otp,
+      subject: "Findora handover verification code",
+      html: `<p>Your Findora handover code is <strong>${otp}</strong>.</p><p>Share it with the finder only when you are physically receiving your item. It expires in 10 minutes.</p>`,
     });
-    if (!mail.ok) {
-      console.error("Resend handover email failed:", mail.status, await mail.text());
-      return res.status(502).json({ success: false, message: "Could not deliver the handover code. Please try again." });
-    }
 
     await prisma.$transaction([
       prisma.handover.upsert({
@@ -334,7 +321,12 @@ const startHandover = async (req: Request, res: Response) => {
       prisma.lostItem.update({ where: { id: candidate.lostItemId }, data: { status: "HANDOVER_PENDING" } }),
       prisma.foundItem.update({ where: { id: candidate.foundItemId }, data: { status: "HANDOVER_PENDING" } }),
     ]);
-    return res.json({ success: true, message: "A one-time handover code was emailed to the item reporter. It expires in 10 minutes." });
+    return res.json({
+      success: true,
+      message: deliveryMode === "TEST"
+        ? "A handover test code has been issued. Check the restricted backend logs."
+        : "A one-time handover code was emailed to the item reporter. It expires in 10 minutes.",
+    });
   } catch (error) {
     console.error("Handover initiation failed:", error);
     return res.status(500).json({ success: false, message: "Could not start the handover." });

@@ -4,12 +4,13 @@ import toastNotify from "../../components/modal/toastNotify";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 import { setUserLocalStorage } from "../../auth/auth";
 import { useLoginMutation } from "../../redux/api/api";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { MdEmail, MdVisibility, MdVisibilityOff } from "react-icons/md";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
   const {
     handleSubmit,
@@ -19,6 +20,12 @@ const Login = () => {
   } = useForm<{ username: string; password: string }>();
 
   const [login, { isLoading }] = useLoginMutation();
+
+  useEffect(() => {
+    if (location.state?.email) {
+      setValue("username", location.state.email);
+    }
+  }, [location.state, setValue]);
 
   // Auto-fill for demo accounts (matches the seeded database)
   const fillAdminCredentials = () => {
@@ -39,10 +46,25 @@ const Login = () => {
         setUserLocalStorage(res?.data?.data?.token);
         navigate("/");
       } else {
+        const error = res?.error as any;
+        const errorMessage = getErrorMessage(error, "Failed to login");
+        const statusCode = error?.status;
+
         toastNotify({
-          message: getErrorMessage(res?.error, "Failed to login"),
+          message: errorMessage,
           status: false,
         });
+
+        if (
+          statusCode === 403 ||
+          errorMessage.toLowerCase().includes("verify your email")
+        ) {
+          navigate("/verify-email", {
+            state: {
+              email: data.username.includes("@") ? data.username : "",
+            },
+          });
+        }
       }
     } catch {
       toastNotify({ message: "Failed to login", status: false });

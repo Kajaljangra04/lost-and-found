@@ -66,3 +66,6 @@ ai-service/*.redirect-backup-*
 server/src/**/*.backup-*
 server/src/**/*.before-*
 server/test-db-create-user.js
+
+# Temporary OTP implementation backups
+*.otp-backup

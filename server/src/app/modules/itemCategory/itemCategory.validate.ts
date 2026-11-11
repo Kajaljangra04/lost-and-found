@@ -2,7 +2,7 @@ import { z } from "zod";
 const createFoundItemCategory = z.object({
   body: z.object({
     name: z.string({
-      required_error: "Category name field is required",
+      error: (issue) => issue.input === undefined ? "Category name field is required" : undefined,
     }),
   }),
 });

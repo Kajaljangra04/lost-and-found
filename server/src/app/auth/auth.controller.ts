@@ -17,7 +17,7 @@ const login = async (req: Request, res: Response) => {
       });
   } catch (error: any) {
     sendResponse(res, {
-      statusCode: StatusCodes.BAD_REQUEST,
+      statusCode: error?.statusCode || StatusCodes.BAD_REQUEST,
       success: false,
       message: error?.message,
       data: null,

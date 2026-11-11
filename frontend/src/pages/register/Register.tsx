@@ -53,10 +53,12 @@ const Register = () => {
       }
       if (res?.success == true) {
         toastNotify({
-          message: "User registered successfully. Please login again!!!",
+          message: "Account created successfully. Please verify your email.",
           status: true,
         });
-        navigate("/login");
+        navigate("/verify-email", {
+          state: { email: res?.data?.email || data.email },
+        });
       }
     } catch (err) {
       toastNotify({

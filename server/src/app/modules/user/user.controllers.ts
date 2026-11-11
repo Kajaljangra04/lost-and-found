@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { userService } from "./user.service";
 import sendResponse from "../../global/response";
 import { StatusCodes } from "http-status-codes";
+import { emailVerificationService } from "./emailVerification.service";
 
 const registerUser = async (
   req: Request,
@@ -11,16 +12,64 @@ const registerUser = async (
   try {
     const user = req.body;
     const result = await userService.registerUser(user);
+
+    await emailVerificationService.issueEmailVerificationOtp(result.id);
+
     sendResponse(res, {
       statusCode: StatusCodes.CREATED,
       success: true,
-      message: "User registered successfully",
-      data: result,
+      message: "Account created. Verify your email before logging in.",
+      data: {
+        id: result.id,
+        username: result.username,
+        email: result.email,
+        emailVerified: result.emailVerified,
+      },
     });
   } catch (error: any) {
     next(error);
   }
 };
+
+const verifyEmail = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { email, otp } = req.body;
+
+    const result = await emailVerificationService.verifyEmailOtp(email, otp);
+
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: result.message,
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const resendVerification = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { email } = req.body;
+
+    const result =
+      await emailVerificationService.resendEmailVerificationOtp(email);
+
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: result.message,
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const blockUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const id = req.params.id;
@@ -112,6 +161,8 @@ const allUsers = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 export const userController = {
+  verifyEmail,
+  resendVerification,
   registerUser,
   allUsers,
   blockUser,

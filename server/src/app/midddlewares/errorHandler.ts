@@ -47,9 +47,9 @@ const errorHandler = (
       },
     });
   } else if (err instanceof ZodError) {
-    const errorMessage = err.errors.map((error) => error.message).join(". ");
+    const errorMessage = err.issues.map((error) => error.message).join(". ");
 
-    const issues = err.errors.map((error) => ({
+    const issues = err.issues.map((error) => ({
       field: error.path[1],
       message: error.message,
     }));

@@ -6,6 +6,7 @@ import Providers from "./providers/Providers.tsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Home from "./pages/home/Home.tsx";
 import Register from "./pages/register/Register.tsx";
+import VerifyEmail from "./pages/verifyEmail/VerifyEmail.tsx";
 import Login from "./pages/login/Login.tsx";
 import FoundItemsPage from "./pages/foundItems/FoundItems.tsx";
 import SingleFoundItem from "./pages/foundItems/SingleFoundItem.tsx";
@@ -43,6 +44,10 @@ const router = createBrowserRouter([
       {
         path: "/register",
         element: <Register />,
+      },
+      {
+        path: "/verify-email",
+        element: <VerifyEmail />,
       },
       {
         path: "/login",

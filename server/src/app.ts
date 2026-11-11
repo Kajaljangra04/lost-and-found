@@ -9,6 +9,9 @@ dotenv.config();
 
 const app: Application = express();
 
+// Render runs the service behind one trusted reverse-proxy hop.
+app.set("trust proxy", 1);
+
 app.use(
   cors({
     origin: ["http://localhost:5173", `${process.env.CLIENT_URL}`],

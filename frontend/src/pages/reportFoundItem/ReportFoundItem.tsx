@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useCreateFoundItemMutation } from "../../redux/api/api";
 import { useCategoryQuery } from "../../redux/api/api";
 import type { ItemCategory } from "../../types/types";
-import { FaArrowLeft, FaCloudUploadAlt, FaHandHoldingHeart, FaRobot, FaShieldAlt } from "react-icons/fa";
+import { FaArrowLeft, FaCloudUploadAlt, FaHandHoldingHeart, FaRobot, FaShieldAlt, FaCamera } from "react-icons/fa";
 import toastNotify from "../../components/modal/toastNotify";
 
 export default function ReportFoundItem() {
@@ -72,7 +72,60 @@ export default function ReportFoundItem() {
               <div><label className="field-label" htmlFor="contactPhone">Finder phone</label><input className="field" id="contactPhone" name="contactPhone" type="tel" placeholder="+91 98XXXXXX10" required pattern="[+0-9 ()-]{7,20}"/></div>
               <div className="sm:col-span-2"><label className="field-label" htmlFor="claimProcess">Safe collection instructions</label><textarea className="field min-h-20 resize-y" id="claimProcess" name="claimProcess" placeholder="e.g. Item is secured with campus security at the main reception." required maxLength={1000}/></div>
             </div>
-            <div><label className="field-label">Item photograph</label><label className="group flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-line-strong bg-surface-2/70 px-5 py-7 text-center transition hover:border-accent/60 hover:bg-accent/[0.04]">{preview ? <img src={preview} alt="Selected item preview" className="mb-4 max-h-56 max-w-full rounded-xl object-contain"/> : <FaCloudUploadAlt className="mb-3 text-3xl text-accent"/>}<span className="text-sm font-semibold text-ink">{image ? image.name : "Choose an item photo"}</span><span className="mt-1 text-xs text-ink-mute">JPEG, PNG or WebP · up to 5 MB</span><input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(e)=>setImage(e.target.files?.[0] || null)}/></label></div>
+            <div>
+  <label className="field-label">Item photograph</label>
+
+  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+    <label className="group flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-line-strong bg-surface-2/70 px-5 py-6 text-center transition hover:border-accent/60 hover:bg-accent/[0.04]">
+      <FaCloudUploadAlt className="mb-3 text-3xl text-accent" />
+      <span className="text-sm font-semibold text-ink">Choose from gallery</span>
+      <span className="mt-1 text-xs text-ink-mute">Select an existing photo</span>
+      <input
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        className="sr-only"
+        onChange={(e) => setImage(e.target.files?.[0] || null)}
+      />
+    </label>
+
+    <label className="group flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-line-strong bg-surface-2/70 px-5 py-6 text-center transition hover:border-accent/60 hover:bg-accent/[0.04]">
+      <FaCamera className="mb-3 text-3xl text-accent" />
+      <span className="text-sm font-semibold text-ink">Take a photo</span>
+      <span className="mt-1 text-xs text-ink-mute">Open your device camera</span>
+      <input
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        capture="environment"
+        className="sr-only"
+        onChange={(e) => setImage(e.target.files?.[0] || null)}
+      />
+    </label>
+  </div>
+
+  {preview && (
+    <div className="mt-4 rounded-2xl border border-line-strong bg-surface-2/70 p-4">
+      <img
+        src={preview}
+        alt="Selected item preview"
+        className="mx-auto max-h-56 max-w-full rounded-xl object-contain"
+      />
+      <p className="mt-2 text-center text-sm font-medium text-ink">
+        {image?.name}
+      </p>
+      <button
+        type="button"
+        onClick={() => setImage(null)}
+        className="mt-2 w-full text-sm font-semibold text-red-500 hover:text-red-600"
+      >
+        Remove photo
+      </button>
+    </div>
+  )}
+
+  <p className="mt-2 text-xs text-ink-mute">
+    JPEG, PNG or WebP · Maximum 5 MB
+  </p>
+</div>
             {isLoading && <div className="rounded-xl border border-line bg-surface-2 p-4"><div className="mb-2 flex items-center gap-2 text-sm font-semibold text-ink"><FaRobot className="text-accent"/> Findora is processing your report</div><div className="flex flex-wrap gap-2 text-xs text-ink-dim"><span className="badge badge-ok">Image validated</span><span className="badge badge-accent">Uploading and saving</span><span className="badge badge-neutral">Ranking potential matches</span></div></div>}
             {savedMatches !== null && <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/[0.05] p-4 text-sm text-emerald-300"><FaRobot className="mr-2 inline"/> Report saved. {savedMatches} potential lost-item candidate{savedMatches===1?"":"s"} ranked. Ownership still requires verification.</div>}
             <button className="btn btn-brand btn-lg w-full" type="submit" disabled={isLoading}>{isLoading ? "Uploading & matching…" : "Submit found-item report"}</button>

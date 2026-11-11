@@ -2,7 +2,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCategoryQuery, useCreateLostItemMutation } from "../../redux/api/api";
 import type { ItemCategory } from "../../types/types";
-import { FaArrowLeft, FaCheck, FaCloudUploadAlt, FaLock, FaRobot, FaShieldAlt } from "react-icons/fa";
+import { FaArrowLeft, FaCheck, FaCloudUploadAlt, FaLock, FaRobot, FaShieldAlt, FaCamera } from "react-icons/fa";
 import toastNotify from "../../components/modal/toastNotify";
 
 const steps = [
@@ -119,14 +119,59 @@ export default function ReportLostItem() {
             </div>
 
             <div>
-              <label className="field-label">Item photograph</label>
-              <label className="group flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-line-strong bg-surface-2/70 px-5 py-7 text-center transition hover:border-accent/60 hover:bg-accent/[0.04]">
-                {preview ? <img src={preview} alt="Selected item preview" className="mb-4 max-h-56 max-w-full rounded-xl object-contain" /> : <FaCloudUploadAlt className="mb-3 text-3xl text-accent" />}
-                <span className="text-sm font-semibold text-ink">{image ? image.name : "Choose an item photo"}</span>
-                <span className="mt-1 text-xs text-ink-mute">JPEG, PNG or WebP · up to 5 MB</span>
-                <input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(e) => setImage(e.target.files?.[0] || null)} />
-              </label>
-            </div>
+  <label className="field-label">Item photograph</label>
+
+  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+    <label className="group flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-line-strong bg-surface-2/70 px-5 py-6 text-center transition hover:border-accent/60 hover:bg-accent/[0.04]">
+      <FaCloudUploadAlt className="mb-3 text-3xl text-accent" />
+      <span className="text-sm font-semibold text-ink">Choose from gallery</span>
+      <span className="mt-1 text-xs text-ink-mute">Select an existing photo</span>
+      <input
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        className="sr-only"
+        onChange={(e) => setImage(e.target.files?.[0] || null)}
+      />
+    </label>
+
+    <label className="group flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-line-strong bg-surface-2/70 px-5 py-6 text-center transition hover:border-accent/60 hover:bg-accent/[0.04]">
+      <FaCamera className="mb-3 text-3xl text-accent" />
+      <span className="text-sm font-semibold text-ink">Take a photo</span>
+      <span className="mt-1 text-xs text-ink-mute">Open your device camera</span>
+      <input
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        capture="environment"
+        className="sr-only"
+        onChange={(e) => setImage(e.target.files?.[0] || null)}
+      />
+    </label>
+  </div>
+
+  {preview && (
+    <div className="mt-4 rounded-2xl border border-line-strong bg-surface-2/70 p-4">
+      <img
+        src={preview}
+        alt="Selected item preview"
+        className="mx-auto max-h-56 max-w-full rounded-xl object-contain"
+      />
+      <p className="mt-2 text-center text-sm font-medium text-ink">
+        {image?.name}
+      </p>
+      <button
+        type="button"
+        onClick={() => setImage(null)}
+        className="mt-2 w-full text-sm font-semibold text-red-500 hover:text-red-600"
+      >
+        Remove photo
+      </button>
+    </div>
+  )}
+
+  <p className="mt-2 text-xs text-ink-mute">
+    JPEG, PNG or WebP · Maximum 5 MB
+  </p>
+</div>
 
             <div className="rounded-2xl border border-accent/20 bg-accent/[0.05] p-5 sm:p-6">
               <div className="mb-2 flex items-center gap-2 text-ink"><FaLock className="text-accent" /><h2 className="font-bold">Private ownership check</h2></div>

@@ -30,6 +30,9 @@ import {
   resendVerificationLimiter,
   startHandoverLimiter,
   confirmHandoverLimiter,
+  forgotPasswordLimiter,
+  verifyResetOtpLimiter,
+  resetPasswordLimiter,
 } from "../midddlewares/rateLimiters";
 
 const router = express.Router();
@@ -63,6 +66,28 @@ router.get(
   auth(),
   adminAuth,
   userController.allUsers
+);
+
+// Password recovery
+router.post(
+  "/forgot-password",
+  forgotPasswordLimiter,
+  validateRequest(UserSchema.forgotPasswordSchema),
+  authController.forgotPassword
+);
+
+router.post(
+  "/verify-reset-otp",
+  verifyResetOtpLimiter,
+  validateRequest(UserSchema.verifyResetOtpSchema),
+  authController.verifyResetOtp
+);
+
+router.post(
+  "/reset-password",
+  resetPasswordLimiter,
+  validateRequest(UserSchema.resetPasswordSchema),
+  authController.resetPassword
 );
 
 // user login

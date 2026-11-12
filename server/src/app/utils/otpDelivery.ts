@@ -24,7 +24,7 @@ export const deliverOtp = async ({
   subject,
   html,
   otp,
-}: OtpDeliveryOptions): Promise<"TEST" | "EMAIL"> => {
+}: OtpDeliveryOptions): Promise<"TEST" | "EMAIL" | "BREVO"> => {
   const mode = (process.env.OTP_DELIVERY_MODE || "EMAIL")
     .trim()
     .toUpperCase();
@@ -54,11 +54,88 @@ export const deliverOtp = async ({
     return "TEST";
   }
 
+  // BREVO mode: HTTPS transactional email API.
+  if (mode === "BREVO") {
+    const apiKey = process.env.BREVO_API_KEY;
+    const senderEmail = process.env.BREVO_SENDER_EMAIL;
+    const senderName = process.env.BREVO_SENDER_NAME || "Findora";
+
+    if (!apiKey || !senderEmail) {
+      console.error("Brevo configuration is incomplete.");
+
+      throw new AppError(
+        503,
+        "Email delivery is not configured. Please contact support."
+      );
+    }
+
+    try {
+      const response = await fetch(
+        "https://api.brevo.com/v3/smtp/email",
+        {
+          method: "POST",
+          headers: {
+            "accept": "application/json",
+            "api-key": apiKey,
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            sender: {
+              name: senderName,
+              email: senderEmail,
+            },
+            to: [{ email: to }],
+            subject,
+            htmlContent: html,
+            textContent:
+              `Your Findora verification code is ${otp}. ` +
+              "It expires in 10 minutes. If you did not request this code, ignore this email.",
+          }),
+          signal: AbortSignal.timeout(15000),
+        }
+      );
+
+      if (!response.ok) {
+        const errorDetails = await response.text();
+
+        console.error(
+          `Brevo API rejected email. HTTP ${response.status}:`,
+          errorDetails.slice(0, 1000)
+        );
+
+        throw new AppError(
+          502,
+          "Could not deliver the verification code. Please try again."
+        );
+      }
+
+      console.info(
+        `[OTP_BREVO] Delivery accepted for ${maskEmail(to)}`
+      );
+
+      return "BREVO";
+    } catch (error) {
+      if (error instanceof AppError) {
+        throw error;
+      }
+
+      console.error(
+        "Brevo email delivery failed:",
+        error instanceof Error ? error.message : "Unknown error"
+      );
+
+      throw new AppError(
+        502,
+        "Could not deliver the verification code. Please try again."
+      );
+    }
+  }
+
+  // EMAIL mode: existing Gmail SMTP.
   if (mode !== "EMAIL") {
     throw new AppError(503, "Invalid OTP delivery configuration.");
   }
 
-  // EMAIL mode: Gmail SMTP.
   const smtpUser = process.env.SMTP_USER;
   const smtpPassword = process.env.SMTP_APP_PASSWORD;
 

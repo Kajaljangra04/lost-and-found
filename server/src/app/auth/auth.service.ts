@@ -1,3 +1,4 @@
+import { passwordRecoveryService } from "./passwordRecovery.service";
 import { emailVerificationService } from "../modules/user/emailVerification.service";
 import { utils } from "../utils/utils";
 import AppError from "../global/error";
@@ -174,4 +175,7 @@ export const authServices = {
   newPasswords,
   changeEmail,
   changeUsername,
+  requestPasswordReset: passwordRecoveryService.requestPasswordReset,
+  verifyPasswordResetOtp: passwordRecoveryService.verifyPasswordResetOtp,
+  resetPassword: passwordRecoveryService.resetPassword,
 };

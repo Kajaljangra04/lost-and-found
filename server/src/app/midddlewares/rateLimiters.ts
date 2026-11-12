@@ -51,3 +51,21 @@ export const confirmHandoverLimiter = createLimiter(
   10,
   "Too many handover verification attempts. Please try again after 15 minutes."
 );
+
+export const forgotPasswordLimiter = createLimiter(
+  15 * 60 * 1000,
+  5,
+  "Too many password reset requests. Please try again after 15 minutes."
+);
+
+export const verifyResetOtpLimiter = createLimiter(
+  15 * 60 * 1000,
+  10,
+  "Too many password reset verification attempts. Please try again after 15 minutes."
+);
+
+export const resetPasswordLimiter = createLimiter(
+  15 * 60 * 1000,
+  10,
+  "Too many password reset attempts. Please try again after 15 minutes."
+);

@@ -58,6 +58,27 @@ const changeUsernameSchema = z.object({
     username: z.string({ error: (issue) => issue.input === undefined ? "Username is required" : undefined }),
   }),
 });
+
+const forgotPasswordSchema = z.object({
+  body: z.object({
+    email: z.string().trim().email("Enter a valid email address."),
+  }),
+});
+
+const verifyResetOtpSchema = z.object({
+  body: z.object({
+    email: z.string().trim().email("Enter a valid email address."),
+    otp: z.string().regex(/^\d{6}$/, "Enter a six-digit reset code."),
+  }),
+});
+
+const resetPasswordSchema = z.object({
+  body: z.object({
+    resetToken: z.string().regex(/^[a-f0-9]{64}$/i, "Invalid reset token."),
+    newPassword: z.string().min(8, "Password must contain at least 8 characters."),
+  }),
+});
+
 export const UserSchema = {
   verifyEmailSchema,
   resendVerificationSchema,
@@ -66,4 +87,7 @@ export const UserSchema = {
   changePasswordSchema,
   changeEmailSchema,
   changeUsernameSchema,
+  forgotPasswordSchema,
+  verifyResetOtpSchema,
+  resetPasswordSchema,
 };

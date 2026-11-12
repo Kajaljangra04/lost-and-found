@@ -86,9 +86,82 @@ const changeUsername = async (req: Request, res: Response) => {
 };
 
 
+
+const forgotPassword = async (req: Request, res: Response) => {
+  try {
+    const result = await authServices.requestPasswordReset(req.body.email);
+
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: result.message,
+      data: null,
+    });
+  } catch (error: any) {
+    sendResponse(res, {
+      statusCode: error?.statusCode || StatusCodes.BAD_REQUEST,
+      success: false,
+      message: error?.message || "Unable to process password reset request.",
+      data: null,
+    });
+  }
+};
+
+const verifyResetOtp = async (req: Request, res: Response) => {
+  try {
+    const result = await authServices.verifyPasswordResetOtp(
+      req.body.email,
+      req.body.otp
+    );
+
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: result.message,
+      data: {
+        resetToken: result.resetToken,
+        expiresIn: result.expiresIn,
+      },
+    });
+  } catch (error: any) {
+    sendResponse(res, {
+      statusCode: error?.statusCode || StatusCodes.BAD_REQUEST,
+      success: false,
+      message: error?.message || "Unable to verify reset code.",
+      data: null,
+    });
+  }
+};
+
+const resetPassword = async (req: Request, res: Response) => {
+  try {
+    const result = await authServices.resetPassword(
+      req.body.resetToken,
+      req.body.newPassword
+    );
+
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: result.message,
+      data: null,
+    });
+  } catch (error: any) {
+    sendResponse(res, {
+      statusCode: error?.statusCode || StatusCodes.BAD_REQUEST,
+      success: false,
+      message: error?.message || "Unable to reset password.",
+      data: null,
+    });
+  }
+};
+
 export const authController={
     login,
     newPasswords,
     changeEmail,
-    changeUsername
+    changeUsername,
+    forgotPassword,
+    verifyResetOtp,
+    resetPassword
 }

@@ -8,29 +8,29 @@ datasource db {
 }
 
 model User {
-  name          String         @default("")
-  id            String         @id @default(uuid())
-  username      String         @unique
-  email         String         @unique
-  emailVerified Boolean        @default(true)
+  name                 String                @default("")
+  id                   String                @id @default(uuid())
+  username             String                @unique
+  email                String                @unique
+  emailVerified        Boolean               @default(true)
   emailVerificationOtp EmailVerificationOtp?
-  activated     Boolean        @default(true)
-  password      String
-  role          userRole       @default(USER)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  foundItem     FoundItem[]
-  claim         Claim[]
-  userImg       String         @default("")
-  isDeleted     Boolean        @default(false)
-  deletedAt     DateTime?
+  activated            Boolean               @default(true)
+  password             String
+  role                 userRole              @default(USER)
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  foundItem            FoundItem[]
+  claim                Claim[]
+  userImg              String                @default("")
+  isDeleted            Boolean               @default(false)
+  deletedAt            DateTime?
   // profile   UserProfile?
-  LostItem      LostItem[]
-  notifications Notification[]
+  LostItem             LostItem[]
+  notifications        Notification[]
+  passwordResetOtp     PasswordResetOtp?
 
   @@map("users")
 }
-
 
 model EmailVerificationOtp {
   id        String   @id @default(uuid())
@@ -42,6 +42,21 @@ model EmailVerificationOtp {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("emailVerificationOtps")
+}
+
+model PasswordResetOtp {
+  id                  String    @id @default(uuid())
+  userId              String    @unique
+  otpHash             String?
+  resetTokenHash      String?
+  resetTokenExpiresAt DateTime?
+  expiresAt           DateTime
+  attempts            Int       @default(0)
+  sentAt              DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("passwordResetOtps")
 }
 
 model ItemCategory {
